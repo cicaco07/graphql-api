@@ -1,0 +1,50 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Hero {
+  _id: ID!
+  name: String!
+  alias: String
+  role: [String!]!
+  type: [String!]!
+  avatar: String
+  image: String
+  short_description: String
+  realese_date: DateTime
+  durability: Float
+  offense: Float
+  control_effect: Float
+  difficulty: Float
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Query {
+  heroes: [Hero!]!
+  hero(id: ID!): Hero!
+}
+
+type Mutation {
+  createHero(input: CreateHeroInput!): Hero!
+  updateHero(id: ID!, input: CreateHeroInput!): Hero!
+  removeHero(id: ID!): Hero!
+}
+
+input CreateHeroInput {
+  name: String!
+  alias: String
+  role: [String!]!
+  type: [String!]!
+  avatar: String
+  image: String
+  short_description: String
+  realese_date: DateTime
+  durability: Float
+  offense: Float
+  control_effect: Float
+  difficulty: Float
+}

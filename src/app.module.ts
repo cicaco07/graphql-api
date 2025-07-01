@@ -6,7 +6,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { MongooseModule } from '@nestjs/mongoose';
 import { HeroModule } from './hero/hero.module';
-// import { SkillModule } from './skill/skill.module';
+import { SkillModule } from './skill/skill.module';
 // import { SkillDetailModule } from './skill-detail/skill-detail.module';
 
 @Module({
@@ -17,7 +17,7 @@ import { HeroModule } from './hero/hero.module';
     }),
     MongooseModule.forRoot('mongodb://localhost:27017/ml'),
     HeroModule,
-    // SkillModule,
+    SkillModule,
     // SkillDetailModule,
   ],
   controllers: [AppController],

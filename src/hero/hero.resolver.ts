@@ -2,7 +2,7 @@ import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
 import { HeroService } from './hero.service';
 import { Hero } from './entities/hero.entity';
 import { CreateHeroInput } from './dto/create-hero.input';
-// import { UpdateHeroInput } from './dto/update-hero.input';
+import { UpdateHeroInput } from './dto/update-hero.input';
 
 @Resolver(() => Hero)
 export class HeroResolver {
@@ -26,7 +26,7 @@ export class HeroResolver {
   @Mutation(() => Hero)
   updateHero(
     @Args('id', { type: () => ID }) id: string,
-    @Args('input') input: CreateHeroInput,
+    @Args('input') input: UpdateHeroInput,
   ) {
     return this.heroService.update(id, input);
   }

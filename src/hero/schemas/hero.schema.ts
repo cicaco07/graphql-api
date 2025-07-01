@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-// import mongoose from 'mongoose';
+import mongoose from 'mongoose';
+import { Skill } from 'src/skill/schemas/skill.schema';
 
 @Schema()
 export class Hero extends Document {
@@ -40,8 +41,8 @@ export class Hero extends Document {
   @Prop()
   difficulty: number;
 
-  // @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Skill' })
-  // skills: Skill[];
+  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Skill' })
+  skills: Skill[];
 }
 
 export const HeroSchema = SchemaFactory.createForClass(Hero);

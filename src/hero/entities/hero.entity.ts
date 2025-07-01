@@ -1,4 +1,5 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { Skill } from 'src/skill/entities/skill.entity';
 
 @ObjectType()
 export class Hero {
@@ -15,4 +16,6 @@ export class Hero {
   @Field({ nullable: true }) offense?: number;
   @Field({ nullable: true }) control_effect?: number;
   @Field({ nullable: true }) difficulty?: number;
+  @Field(() => [Skill], { nullable: true })
+  skills?: Skill[];
 }

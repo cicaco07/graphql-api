@@ -2,6 +2,17 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Skill {
+  _id: ID!
+  name: String!
+  type: String
+  tag: [String!]
+  attack_effect: Float
+  skill_icon: String
+  lite_description: String
+  full_description: String
+}
+
 type Hero {
   _id: ID!
   name: String!
@@ -16,6 +27,7 @@ type Hero {
   offense: Float
   control_effect: Float
   difficulty: Float
+  skills: [Skill!]
 }
 
 """
@@ -23,15 +35,14 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type Skill {
+type SkillDetail {
   _id: ID!
-  name: String!
-  type: String
-  tag: [String!]
-  attack_effect: Float
-  skill_icon: String
-  lite_description: String
-  full_description: String
+  level: Float
+  mana_cost: Float
+  base_damage: Float
+  duration: Float
+  cooldown: Float
+  spell_vamp_ratio: Float
 }
 
 type Query {
@@ -39,15 +50,17 @@ type Query {
   hero(id: ID!): Hero!
   skills: [Skill!]!
   skill(id: ID!): Skill!
+  skillDetails: [SkillDetail!]!
 }
 
 type Mutation {
   createHero(input: CreateHeroInput!): Hero!
-  updateHero(id: ID!, input: CreateHeroInput!): Hero!
+  updateHero(id: ID!, input: UpdateHeroInput!): Hero!
   removeHero(id: ID!): Hero!
   createSkill(input: CreateSkillInput!): Skill!
   updateSkill(id: ID!, input: UpdateSkillInput!): Skill!
   removeSkill(id: ID!): Skill!
+  createSkillDetail(input: CreateSkillDetailInput!): SkillDetail!
 }
 
 input CreateHeroInput {
@@ -63,6 +76,7 @@ input CreateHeroInput {
   offense: Float
   control_effect: Float
   difficulty: Float
+  skills: [CreateSkillInput!]
 }
 
 input CreateSkillInput {
@@ -75,6 +89,22 @@ input CreateSkillInput {
   full_description: String
 }
 
+input UpdateHeroInput {
+  name: String
+  alias: String
+  role: [String!]
+  type: [String!]
+  avatar: String
+  image: String
+  short_description: String
+  realese_date: DateTime
+  durability: Float
+  offense: Float
+  control_effect: Float
+  difficulty: Float
+  skills: [CreateSkillInput!]
+}
+
 input UpdateSkillInput {
   name: String
   type: String
@@ -83,4 +113,13 @@ input UpdateSkillInput {
   skill_icon: String
   lite_description: String
   full_description: String
+}
+
+input CreateSkillDetailInput {
+  level: Float!
+  mana_cost: Float!
+  base_damage: Float!
+  duration: Float!
+  cooldown: Float!
+  spell_vamp_ratio: Float!
 }

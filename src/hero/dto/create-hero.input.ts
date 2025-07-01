@@ -1,4 +1,5 @@
 import { InputType, Field } from '@nestjs/graphql';
+import { CreateSkillInput } from '../../skill/dto/create-skill.input';
 
 @InputType()
 export class CreateHeroInput {
@@ -14,4 +15,6 @@ export class CreateHeroInput {
   @Field({ nullable: true }) offense?: number;
   @Field({ nullable: true }) control_effect?: number;
   @Field({ nullable: true }) difficulty?: number;
+  @Field(() => [CreateSkillInput], { nullable: true })
+  skills?: CreateSkillInput[];
 }

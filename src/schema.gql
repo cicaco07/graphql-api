@@ -2,6 +2,16 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type SkillDetail {
+  _id: ID!
+  level: Float
+  mana_cost: Float
+  base_damage: Float
+  duration: Float
+  cooldown: Float
+  spell_vamp_ratio: Float
+}
+
 type Skill {
   _id: ID!
   name: String!
@@ -11,6 +21,7 @@ type Skill {
   skill_icon: String
   lite_description: String
   full_description: String
+  skills_detail: [SkillDetail!]
 }
 
 type Hero {
@@ -35,22 +46,13 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type SkillDetail {
-  _id: ID!
-  level: Float
-  mana_cost: Float
-  base_damage: Float
-  duration: Float
-  cooldown: Float
-  spell_vamp_ratio: Float
-}
-
 type Query {
   heroes: [Hero!]!
   hero(id: ID!): Hero!
   skills: [Skill!]!
   skill(id: ID!): Skill!
   skillDetails: [SkillDetail!]!
+  skillDetail(id: ID!): SkillDetail!
 }
 
 type Mutation {
@@ -61,6 +63,8 @@ type Mutation {
   updateSkill(id: ID!, input: UpdateSkillInput!): Skill!
   removeSkill(id: ID!): Skill!
   createSkillDetail(input: CreateSkillDetailInput!): SkillDetail!
+  updateSkillDetail(id: ID!, input: UpdateSkillDetailInput!): SkillDetail!
+  removeSkillDetail(id: ID!): SkillDetail!
 }
 
 input CreateHeroInput {
@@ -87,6 +91,16 @@ input CreateSkillInput {
   skill_icon: String
   lite_description: String
   full_description: String
+  skills_detail: [CreateSkillDetailInput!]
+}
+
+input CreateSkillDetailInput {
+  level: Int!
+  mana_cost: Int!
+  base_damage: Int!
+  duration: Int!
+  cooldown: Int!
+  spell_vamp_ratio: Int!
 }
 
 input UpdateHeroInput {
@@ -113,13 +127,14 @@ input UpdateSkillInput {
   skill_icon: String
   lite_description: String
   full_description: String
+  skills_detail: [CreateSkillDetailInput!]
 }
 
-input CreateSkillDetailInput {
-  level: Float!
-  mana_cost: Float!
-  base_damage: Float!
-  duration: Float!
-  cooldown: Float!
-  spell_vamp_ratio: Float!
+input UpdateSkillDetailInput {
+  level: Int
+  mana_cost: Int
+  base_damage: Int
+  duration: Int
+  cooldown: Int
+  spell_vamp_ratio: Int
 }

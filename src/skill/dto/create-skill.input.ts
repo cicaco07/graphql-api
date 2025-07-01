@@ -1,4 +1,5 @@
 import { InputType, Field } from '@nestjs/graphql';
+import { CreateSkillDetailInput } from 'src/skill-detail/dto/create-skill-detail.input';
 
 @InputType()
 export class CreateSkillInput {
@@ -9,4 +10,6 @@ export class CreateSkillInput {
   @Field({ nullable: true }) skill_icon?: string;
   @Field({ nullable: true }) lite_description?: string;
   @Field({ nullable: true }) full_description?: string;
+  @Field(() => [CreateSkillDetailInput], { nullable: true })
+  skills_detail?: CreateSkillDetailInput[];
 }

@@ -7,7 +7,7 @@ import { join } from 'path';
 import { MongooseModule } from '@nestjs/mongoose';
 import { HeroModule } from './hero/hero.module';
 import { SkillModule } from './skill/skill.module';
-// import { SkillDetailModule } from './skill-detail/skill-detail.module';
+import { SkillDetailModule } from './skill-detail/skill-detail.module';
 
 @Module({
   imports: [
@@ -18,7 +18,7 @@ import { SkillModule } from './skill/skill.module';
     MongooseModule.forRoot('mongodb://localhost:27017/ml'),
     HeroModule,
     SkillModule,
-    // SkillDetailModule,
+    SkillDetailModule,
   ],
   controllers: [AppController],
   providers: [AppService],

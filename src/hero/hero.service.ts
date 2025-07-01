@@ -5,12 +5,14 @@ import { Hero } from './schemas/hero.schema';
 import { CreateHeroInput } from './dto/create-hero.input';
 import { UpdateHeroInput } from './dto/update-hero.input';
 import { Skill } from '../skill/schemas/skill.schema';
+import { SkillDetail } from 'src/skill-detail/schemas/skill-detail.schema';
 
 @Injectable()
 export class HeroService {
   constructor(
     @InjectModel(Hero.name) private heroModel: Model<Hero>,
     @InjectModel(Skill.name) private skillModel: Model<Skill>,
+    @InjectModel(SkillDetail.name) private skillDetailModel: Model<SkillDetail>,
   ) {}
 
   async create(input: CreateHeroInput): Promise<Hero> {
@@ -18,15 +20,30 @@ export class HeroService {
 
     const createdHero = await this.heroModel.create(heroData);
 
-    const createdSkills: Skill[] = await Promise.all(
-      skills.map(async (s) => {
-        const newSkill = await this.skillModel.create({
-          ...s,
-          hero: createdHero._id,
+    const createdSkills: Skill[] = [];
+
+    for (const skillInput of skills) {
+      const { skills_detail = [], ...skillData } = skillInput;
+      const skill = await this.skillModel.create({
+        ...skillData,
+        hero: createdHero._id,
+      });
+
+      const detailIds: any[] = [];
+
+      for (const detail of skills_detail) {
+        const newDetail = await this.skillDetailModel.create({
+          ...detail,
+          skill: skill._id,
         });
-        return newSkill;
-      }),
-    );
+        detailIds.push(newDetail._id);
+      }
+
+      skill.set('skills_detail', detailIds);
+      await skill.save();
+
+      createdSkills.push(skill);
+    }
 
     createdHero.skills = createdSkills;
     await createdHero.save();
@@ -41,6 +58,7 @@ export class HeroService {
   async findOne(id: string): Promise<Hero> {
     const hero = await this.heroModel.findById(id).populate({
       path: 'skills',
+      populate: { path: 'skills_detail' },
     });
 
     if (!hero) throw new NotFoundException('Hero not found');

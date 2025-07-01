@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
-// import mongoose from 'mongoose';
+import { Document, Types } from 'mongoose';
+import { SkillDetail } from 'src/skill-detail/schemas/skill-detail.schema';
 
 @Schema()
 export class Skill extends Document {
@@ -11,9 +11,8 @@ export class Skill extends Document {
   @Prop() skill_icon: string;
   @Prop() lite_description: string;
   @Prop() full_description: string;
-
-  // @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Skill' })
-  // skills: Skill[];
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'SkillDetail' }] })
+  skills_detail: SkillDetail[];
 }
 
 export const SkillSchema = SchemaFactory.createForClass(Skill);

@@ -1,4 +1,5 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { SkillDetail } from 'src/skill-detail/entities/skill-detail.entity';
 
 @ObjectType()
 export class Skill {
@@ -10,4 +11,6 @@ export class Skill {
   @Field({ nullable: true }) skill_icon?: string;
   @Field({ nullable: true }) lite_description?: string;
   @Field({ nullable: true }) full_description?: string;
+  @Field(() => [SkillDetail], { nullable: true })
+  skills_detail?: SkillDetail[];
 }

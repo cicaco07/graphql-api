@@ -5,12 +5,13 @@
 type SkillDetail {
   _id: ID!
   level: Float
-  mana_cost: Float
-  base_damage: Float
-  duration: Float
-  cooldown: Float
-  spell_vamp_ratio: Float
+  attributes: JSON
 }
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
 
 type Skill {
   _id: ID!
@@ -96,11 +97,7 @@ input CreateSkillInput {
 
 input CreateSkillDetailInput {
   level: Int!
-  mana_cost: Int!
-  base_damage: Int!
-  duration: Int!
-  cooldown: Int!
-  spell_vamp_ratio: Int!
+  attributes: JSON!
 }
 
 input UpdateHeroInput {
@@ -132,9 +129,5 @@ input UpdateSkillInput {
 
 input UpdateSkillDetailInput {
   level: Int
-  mana_cost: Int
-  base_damage: Int
-  duration: Int
-  cooldown: Int
-  spell_vamp_ratio: Int
+  attributes: JSON
 }

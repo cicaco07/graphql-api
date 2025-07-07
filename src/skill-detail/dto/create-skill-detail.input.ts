@@ -1,11 +1,9 @@
 import { InputType, Field, Int } from '@nestjs/graphql';
+import GraphQLJSON from 'graphql-type-json';
 
 @InputType()
 export class CreateSkillDetailInput {
   @Field(() => Int) level: number;
-  @Field(() => Int) mana_cost: number;
-  @Field(() => Int) base_damage: number;
-  @Field(() => Int) duration: number;
-  @Field(() => Int) cooldown: number;
-  @Field(() => Int) spell_vamp_ratio: number;
+  @Field(() => GraphQLJSON)
+  attributes: Record<string, any>;
 }

@@ -52,16 +52,36 @@ export class HeroService {
   }
 
   async findAll(): Promise<Hero[]> {
-    return await this.heroModel.find().exec();
+    return this.heroModel
+      .find()
+      .populate({
+        path: 'skills',
+        populate: {
+          path: 'skills_detail',
+        },
+      })
+      .exec();
   }
 
   async findOne(id: string): Promise<Hero> {
-    const hero = await this.heroModel.findById(id).populate({
+    const heroes = await this.heroModel.findById(id).populate({
       path: 'skills',
       populate: { path: 'skills_detail' },
     });
 
-    if (!hero) throw new NotFoundException('Hero not found');
+    if (!heroes) throw new NotFoundException('Hero not found');
+    return heroes;
+  }
+
+  async findByName(name: string): Promise<Hero[]> {
+    const hero = await this.heroModel
+      .find({ name: new RegExp(name, 'i') })
+      .populate({
+        path: 'skills',
+        populate: { path: 'skills_detail' },
+      });
+
+    if (hero.length === 0) throw new NotFoundException('No heroes found');
     return hero;
   }
 

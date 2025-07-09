@@ -27,7 +27,7 @@ export class Hero extends Document {
   short_description: string;
 
   @Prop()
-  realese_date: Date;
+  release_date: Date;
 
   @Prop()
   durability: number;

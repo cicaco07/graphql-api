@@ -34,7 +34,7 @@ type Hero {
   avatar: String
   image: String
   short_description: String
-  realese_date: DateTime
+  release_date: DateTime
   durability: Float
   offense: Float
   control_effect: Float
@@ -49,6 +49,7 @@ scalar DateTime
 
 type Query {
   heroes: [Hero!]!
+  heroByName(name: String!): [Hero!]!
   hero(id: ID!): Hero!
   skills: [Skill!]!
   skill(id: ID!): Skill!
@@ -76,7 +77,7 @@ input CreateHeroInput {
   avatar: String
   image: String
   short_description: String
-  realese_date: DateTime
+  release_date: DateTime
   durability: Float
   offense: Float
   control_effect: Float
@@ -108,7 +109,7 @@ input UpdateHeroInput {
   avatar: String
   image: String
   short_description: String
-  realese_date: DateTime
+  release_date: DateTime
   durability: Float
   offense: Float
   control_effect: Float

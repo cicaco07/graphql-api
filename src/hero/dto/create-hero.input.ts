@@ -10,7 +10,7 @@ export class CreateHeroInput {
   @Field({ nullable: true }) avatar?: string;
   @Field({ nullable: true }) image?: string;
   @Field({ nullable: true }) short_description?: string;
-  @Field({ nullable: true }) realese_date?: Date;
+  @Field({ nullable: true }) release_date?: Date;
   @Field({ nullable: true }) durability?: number;
   @Field({ nullable: true }) offense?: number;
   @Field({ nullable: true }) control_effect?: number;

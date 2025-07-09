@@ -18,6 +18,11 @@ export class HeroResolver {
     return this.heroService.findAll();
   }
 
+  @Query(() => [Hero], { name: 'heroByName' })
+  findByName(@Args('name') name: string) {
+    return this.heroService.findByName(name);
+  }
+
   @Query(() => Hero, { name: 'hero' })
   findOne(@Args('id', { type: () => ID }) id: string) {
     return this.heroService.findOne(id);

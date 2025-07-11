@@ -4,13 +4,32 @@ import { Skill } from './schemas/skill.schema';
 import { Model } from 'mongoose';
 import { CreateSkillInput } from './dto/create-skill.input';
 import { UpdateSkillInput } from './dto/update-skill.input';
+import { Hero } from 'src/hero/schemas/hero.schema';
 
 @Injectable()
 export class SkillService {
-  constructor(@InjectModel(Skill.name) private skillModel: Model<Skill>) {}
+  constructor(
+    @InjectModel(Skill.name) private skillModel: Model<Skill>,
+    @InjectModel(Hero.name) private heroModel: Model<Hero>,
+  ) {}
 
   async create(input: CreateSkillInput): Promise<Skill> {
     return this.skillModel.create(input);
+  }
+
+  async addSkillToHero(
+    heroId: string,
+    input: CreateSkillInput,
+  ): Promise<Skill> {
+    const hero = await this.heroModel.findById(heroId);
+    if (!hero) throw new NotFoundException('Hero not found');
+
+    const skill = await this.skillModel.create({ ...input, hero: heroId });
+
+    (hero.skills as any[]).push(skill._id);
+    await hero.save();
+
+    return skill;
   }
 
   async findAll(): Promise<Skill[]> {

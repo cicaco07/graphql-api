@@ -13,6 +13,14 @@ export class SkillResolver {
     return this.skillService.create(input);
   }
 
+  @Mutation(() => Skill)
+  addSkillToHero(
+    @Args('heroId', { type: () => ID }) heroId: string,
+    @Args('input') input: CreateSkillInput,
+  ) {
+    return this.skillService.addSkillToHero(heroId, input);
+  }
+
   @Query(() => [Skill], { name: 'skills' })
   findAll() {
     return this.skillService.findAll();

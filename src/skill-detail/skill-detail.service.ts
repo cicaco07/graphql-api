@@ -4,15 +4,40 @@ import { UpdateSkillDetailInput } from './dto/update-skill-detail.input';
 import { InjectModel } from '@nestjs/mongoose';
 import { SkillDetail } from './schemas/skill-detail.schema';
 import { Model } from 'mongoose';
+import { Skill } from 'src/skill/schemas/skill.schema';
 
 @Injectable()
 export class SkillDetailService {
   constructor(
     @InjectModel(SkillDetail.name) private skillDetailModel: Model<SkillDetail>,
+    @InjectModel(Skill.name) private skillModel: Model<Skill>,
   ) {}
 
   async create(input: CreateSkillDetailInput): Promise<SkillDetail> {
     return this.skillDetailModel.create(input);
+  }
+
+  async addSkillDetailsToSkill(
+    skillId: string,
+    input: CreateSkillDetailInput[],
+  ): Promise<SkillDetail[]> {
+    const skill = await this.skillModel.findById(skillId);
+    if (!skill) throw new NotFoundException('Skill not found');
+
+    const details: SkillDetail[] = await Promise.all(
+      input.map(async (detailInput) => {
+        const detail = await this.skillDetailModel.create({
+          ...detailInput,
+          skill: skillId,
+        });
+        return detail as SkillDetail;
+      }),
+    );
+
+    (skill.skills_detail as any[]).push(...details.map((d) => d._id));
+    await skill.save();
+
+    return details;
   }
 
   async findAll(): Promise<SkillDetail[]> {

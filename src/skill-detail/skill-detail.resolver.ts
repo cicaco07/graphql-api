@@ -13,6 +13,15 @@ export class SkillDetailResolver {
     return this.service.create(input);
   }
 
+  @Mutation(() => [SkillDetail])
+  addSkillDetailToSkill(
+    @Args('skillId', { type: () => ID }) skillId: string,
+    @Args({ name: 'input', type: () => [CreateSkillDetailInput] })
+    input: CreateSkillDetailInput[],
+  ) {
+    return this.service.addSkillDetailsToSkill(skillId, input);
+  }
+
   @Query(() => [SkillDetail], { name: 'skillDetails' })
   findAll() {
     return this.service.findAll();

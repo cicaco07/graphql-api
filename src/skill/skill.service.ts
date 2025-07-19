@@ -33,11 +33,18 @@ export class SkillService {
   }
 
   async findAll(): Promise<Skill[]> {
-    return this.skillModel.find().exec();
+    return this.skillModel
+      .find()
+      .populate({
+        path: 'skills_detail',
+      })
+      .exec();
   }
 
   async findOne(id: string): Promise<Skill> {
-    const skill = await this.skillModel.findById(id);
+    const skill = await this.skillModel.findById(id).populate({
+      path: 'skills_detail',
+    });
     if (!skill) throw new NotFoundException('Skill not found');
     return skill;
   }

@@ -66,6 +66,7 @@ type Mutation {
   updateSkill(id: ID!, input: UpdateSkillInput!): Skill!
   removeSkill(id: ID!): Skill!
   createSkillDetail(input: CreateSkillDetailInput!): SkillDetail!
+  addSkillDetailToSkill(skillId: ID!, input: [CreateSkillDetailInput!]!): [SkillDetail!]!
   updateSkillDetail(id: ID!, input: UpdateSkillDetailInput!): SkillDetail!
   removeSkillDetail(id: ID!): SkillDetail!
 }

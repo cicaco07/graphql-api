@@ -9,6 +9,7 @@ import { HeroModule } from './hero/hero.module';
 import { SkillModule } from './skill/skill.module';
 import { SkillDetailModule } from './skill-detail/skill-detail.module';
 import { GraphQLJSON } from 'graphql-type-json';
+import { ItemModule } from './item/item.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { GraphQLJSON } from 'graphql-type-json';
     HeroModule,
     SkillModule,
     SkillDetailModule,
+    ItemModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: 'GraphQLJSON', useValue: GraphQLJSON }],

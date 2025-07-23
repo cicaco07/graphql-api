@@ -47,6 +47,19 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Item {
+  _id: ID!
+  name: String!
+  type: String!
+  item_type: String!
+  attributes: [String!]!
+  price: Int!
+  image: String!
+  story: String
+  isChildren: Boolean!
+  parent_item: String
+}
+
 type Query {
   heroes: [Hero!]!
   heroByName(name: String!): [Hero!]!
@@ -55,6 +68,7 @@ type Query {
   skill(id: ID!): Skill!
   skillDetails: [SkillDetail!]!
   skillDetail(id: ID!): SkillDetail!
+  item(id: Int!): Item!
 }
 
 type Mutation {
@@ -69,6 +83,9 @@ type Mutation {
   addSkillDetailToSkill(skillId: ID!, input: [CreateSkillDetailInput!]!): [SkillDetail!]!
   updateSkillDetail(id: ID!, input: UpdateSkillDetailInput!): SkillDetail!
   removeSkillDetail(id: ID!): SkillDetail!
+  createItem(createItemInput: CreateItemInput!): Item!
+  updateItem(id: ID!): Item!
+  removeItem(id: Int!): Item!
 }
 
 input CreateHeroInput {
@@ -133,4 +150,16 @@ input UpdateSkillInput {
 input UpdateSkillDetailInput {
   level: Int
   attributes: JSON
+}
+
+input CreateItemInput {
+  name: String!
+  type: String!
+  item_type: String!
+  attributes: [String!]!
+  price: Float!
+  image: String!
+  story: String
+  isChildren: Boolean!
+  parent_item: String
 }

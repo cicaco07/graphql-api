@@ -25,6 +25,11 @@ export class ItemService {
     }
     return item;
   }
+
+  async findChildren(parentId: string): Promise<Item[]> {
+    return this.itemModel.find({ parent_items: parentId }).exec();
+  }
+
   async update(id: string, input: UpdateItemInput): Promise<Item> {
     const updatedItem = await this.itemModel
       .findByIdAndUpdate(id, input, { new: true, runValidators: true })

@@ -50,14 +50,15 @@ scalar DateTime
 type Item {
   _id: ID!
   name: String!
+  tag: String
   type: String!
-  item_type: String!
   attributes: [String!]!
   price: Int!
   image: String!
   story: String
-  isChildren: Boolean!
-  parent_item: String
+  description: [String!]!
+  tips: String
+  parent_items: [ID!]
 }
 
 type Query {
@@ -68,7 +69,9 @@ type Query {
   skill(id: ID!): Skill!
   skillDetails: [SkillDetail!]!
   skillDetail(id: ID!): SkillDetail!
-  item(id: Int!): Item!
+  items: [Item!]!
+  item(id: ID!): Item!
+  childrenItems(parentId: ID!): [Item!]!
 }
 
 type Mutation {
@@ -83,9 +86,9 @@ type Mutation {
   addSkillDetailToSkill(skillId: ID!, input: [CreateSkillDetailInput!]!): [SkillDetail!]!
   updateSkillDetail(id: ID!, input: UpdateSkillDetailInput!): SkillDetail!
   removeSkillDetail(id: ID!): SkillDetail!
-  createItem(createItemInput: CreateItemInput!): Item!
-  updateItem(id: ID!): Item!
-  removeItem(id: Int!): Item!
+  createItem(input: CreateItemInput!): Item!
+  updateItem(id: ID!, input: UpdateItemInput!): Item!
+  removeItem(id: ID!): Item!
 }
 
 input CreateHeroInput {
@@ -154,12 +157,26 @@ input UpdateSkillDetailInput {
 
 input CreateItemInput {
   name: String!
+  tag: String
   type: String!
-  item_type: String!
   attributes: [String!]!
   price: Float!
   image: String!
   story: String
-  isChildren: Boolean!
-  parent_item: String
+  description: [String!]
+  tips: String
+  parent_items: [String!]
+}
+
+input UpdateItemInput {
+  name: String
+  tag: String
+  type: String
+  attributes: [String!]
+  price: Float
+  image: String
+  story: String
+  description: [String!]
+  tips: String
+  parent_items: [String!]
 }

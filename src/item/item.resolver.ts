@@ -23,6 +23,11 @@ export class ItemResolver {
     return this.itemService.findOne(id);
   }
 
+  @Query(() => [Item], { name: 'childrenItems' })
+  findChildren(@Args('parentId', { type: () => ID }) parentId: string) {
+    return this.itemService.findChildren(parentId);
+  }
+
   @Mutation(() => Item)
   updateItem(
     @Args('id', { type: () => ID }) id: string,

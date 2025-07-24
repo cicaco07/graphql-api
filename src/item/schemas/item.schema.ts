@@ -6,11 +6,11 @@ export class Item extends Document {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true })
-  type: string;
+  @Prop({ required: false })
+  tag: string;
 
   @Prop({ required: true })
-  item_type: string;
+  type: string;
 
   @Prop({ type: [String], required: true })
   attributes: string[];
@@ -24,11 +24,14 @@ export class Item extends Document {
   @Prop({ required: false })
   story: string;
 
-  @Prop({ required: true })
-  isChildren: boolean;
+  @Prop({ type: [String], required: false })
+  description: string[];
 
   @Prop({ required: false })
-  parent_item: string;
+  tips: string;
+
+  @Prop({ required: false })
+  parent_items: string[];
 }
 
 export const ItemSchema = SchemaFactory.createForClass(Item);

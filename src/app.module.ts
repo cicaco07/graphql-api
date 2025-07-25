@@ -10,6 +10,7 @@ import { SkillModule } from './skill/skill.module';
 import { SkillDetailModule } from './skill-detail/skill-detail.module';
 import { GraphQLJSON } from 'graphql-type-json';
 import { ItemModule } from './item/item.module';
+import { EmblemModule } from './emblem/emblem.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { ItemModule } from './item/item.module';
     SkillModule,
     SkillDetailModule,
     ItemModule,
+    EmblemModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: 'GraphQLJSON', useValue: GraphQLJSON }],

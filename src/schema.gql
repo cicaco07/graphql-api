@@ -61,6 +61,17 @@ type Item {
   parent_items: [ID!]
 }
 
+type Emblem {
+  _id: ID!
+  name: String!
+  type: String!
+  icon: String!
+  attributes: JSON
+  benefit: String
+  description: String
+  cooldown: String
+}
+
 type Query {
   heroes: [Hero!]!
   heroByName(name: String!): [Hero!]!
@@ -72,6 +83,8 @@ type Query {
   items: [Item!]!
   item(id: ID!): Item!
   childrenItems(parentId: ID!): [Item!]!
+  emblems: [Emblem!]!
+  emblem(id: ID!): Emblem!
 }
 
 type Mutation {
@@ -89,6 +102,9 @@ type Mutation {
   createItem(input: CreateItemInput!): Item!
   updateItem(id: ID!, input: UpdateItemInput!): Item!
   removeItem(id: ID!): Item!
+  createEmblem(input: CreateEmblemInput!): Emblem!
+  updateEmblem(id: ID!, input: UpdateEmblemInput!): Emblem!
+  removeEmblem(id: ID!): Emblem!
 }
 
 input CreateHeroInput {
@@ -179,4 +195,24 @@ input UpdateItemInput {
   description: [String!]
   tips: String
   parent_items: [String!]
+}
+
+input CreateEmblemInput {
+  name: String!
+  type: String!
+  icon: String!
+  cooldown: String
+  benefit: String
+  description: String
+  attributes: JSON
+}
+
+input UpdateEmblemInput {
+  name: String
+  type: String
+  icon: String
+  cooldown: String
+  benefit: String
+  description: String
+  attributes: JSON
 }

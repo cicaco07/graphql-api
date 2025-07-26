@@ -61,6 +61,24 @@ export class SkillDetailService {
     return updated;
   }
 
+  async updateSkillDetailToSkill(
+    skillId: string,
+    skillDetailId: string,
+    input: UpdateSkillDetailInput,
+  ): Promise<SkillDetail> {
+    const skill = await this.skillModel.findById(skillId);
+    if (!skill) throw new NotFoundException('Skill not found');
+
+    const detail = await this.skillDetailModel.findByIdAndUpdate(
+      skillDetailId,
+      input,
+      { new: true },
+    );
+    if (!detail) throw new NotFoundException('Skill detail not found');
+
+    return detail;
+  }
+
   async remove(id: string): Promise<SkillDetail> {
     const deleted = await this.skillDetailModel.findByIdAndDelete(id);
     if (!deleted) throw new NotFoundException('Skill detail not found');

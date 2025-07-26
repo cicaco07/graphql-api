@@ -40,6 +40,14 @@ export class SkillDetailResolver {
     return this.service.update(id, input);
   }
 
+  updateSkillDetailToSkill(
+    @Args('skillId', { type: () => ID }) skillId: string,
+    @Args('skillDetailId', { type: () => ID }) skillDetailId: string,
+    @Args('input') input: UpdateSkillDetailInput,
+  ) {
+    return this.service.updateSkillDetailToSkill(skillId, skillDetailId, input);
+  }
+
   @Mutation(() => SkillDetail)
   removeSkillDetail(@Args('id', { type: () => ID }) id: string) {
     return this.service.remove(id);

@@ -59,23 +59,6 @@ export class SkillService {
     return updated;
   }
 
-  async updateSkillToHero(
-    heroId: string,
-    skillId: string,
-    input: UpdateSkillInput,
-  ): Promise<Skill> {
-    const hero = await this.heroModel.findById(heroId);
-    if (!hero) throw new NotFoundException('Hero not found');
-
-    const skill = await this.skillModel.findById(skillId);
-    if (!skill) throw new NotFoundException('Skill not found');
-
-    Object.assign(skill, input);
-    await skill.save();
-
-    return skill;
-  }
-
   async remove(id: string): Promise<Skill> {
     await this.skillDetailModel.deleteMany({ skill: id });
     const deleted = await this.skillModel.findByIdAndDelete(id);

@@ -40,15 +40,6 @@ export class SkillResolver {
   }
 
   @Mutation(() => Skill)
-  updateSkillToHero(
-    @Args('heroId', { type: () => ID }) heroId: string,
-    @Args('skillId', { type: () => ID }) skillId: string,
-    @Args('input') input: UpdateSkillInput,
-  ) {
-    return this.skillService.updateSkillToHero(heroId, skillId, input);
-  }
-
-  @Mutation(() => Skill)
   removeSkill(@Args('id', { type: () => ID }) id: string) {
     return this.skillService.remove(id);
   }

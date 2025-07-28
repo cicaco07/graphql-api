@@ -16,29 +16,29 @@ scalar JSON
 type Skill {
   _id: ID!
   name: String!
-  type: String
-  tag: [String!]
+  type: String!
+  tag: [String!]!
   attack_effect: Float
-  skill_icon: String
-  lite_description: String
-  full_description: String
+  skill_icon: String!
+  lite_description: String!
+  full_description: String!
   skills_detail: [SkillDetail!]
 }
 
 type Hero {
   _id: ID!
   name: String!
-  alias: String
+  alias: String!
   role: [String!]!
   type: [String!]!
-  avatar: String
-  image: String
-  short_description: String
-  release_date: DateTime
-  durability: Float
-  offense: Float
-  control_effect: Float
-  difficulty: Float
+  avatar: String!
+  image: String!
+  short_description: String!
+  release_date: DateTime!
+  durability: Float!
+  offense: Float!
+  control_effect: Float!
+  difficulty: Float!
   skills: [Skill!]
 }
 
@@ -94,7 +94,6 @@ type Mutation {
   createSkill(input: CreateSkillInput!): Skill!
   addSkillToHero(heroId: ID!, input: CreateSkillInput!): Skill!
   updateSkill(id: ID!, input: UpdateSkillInput!): Skill!
-  updateSkillToHero(heroId: ID!, skillId: ID!, input: UpdateSkillInput!): Skill!
   removeSkill(id: ID!): Skill!
   createSkillDetail(input: CreateSkillDetailInput!): SkillDetail!
   addSkillDetailToSkill(skillId: ID!, input: [CreateSkillDetailInput!]!): [SkillDetail!]!
@@ -110,28 +109,28 @@ type Mutation {
 
 input CreateHeroInput {
   name: String!
-  alias: String
+  alias: String!
   role: [String!]!
   type: [String!]!
-  avatar: String
-  image: String
-  short_description: String
-  release_date: DateTime
-  durability: Float
-  offense: Float
-  control_effect: Float
-  difficulty: Float
+  avatar: String!
+  image: String!
+  short_description: String!
+  release_date: DateTime!
+  durability: Float!
+  offense: Float!
+  control_effect: Float!
+  difficulty: Float!
   skills: [CreateSkillInput!]
 }
 
 input CreateSkillInput {
   name: String!
-  type: String
-  tag: [String!]
+  type: String!
+  tag: [String!]!
   attack_effect: Float
-  skill_icon: String
-  lite_description: String
-  full_description: String
+  skill_icon: String!
+  lite_description: String!
+  full_description: String!
   skills_detail: [CreateSkillDetailInput!]
 }
 

@@ -16,6 +16,10 @@ export class HeroService {
   ) {}
 
   async create(input: CreateHeroInput): Promise<Hero> {
+    return this.heroModel.create(input);
+  }
+
+  async createHeroWithSkillDetail(input: CreateHeroInput): Promise<Hero> {
     const { skills = [], ...heroData } = input;
 
     const createdHero = await this.heroModel.create(heroData);
@@ -93,9 +97,48 @@ export class HeroService {
     return updated;
   }
 
+  // async updateHeroToSkills(heroId: string, skillIds: string[]): Promise<Hero> {
+  //   const hero = await this.heroModel.findById(heroId);
+  //   if (!hero) throw new NotFoundException('Hero not found');
+
+  //   const skills = await this.skillModel.find({ _id: { $in: skillIds } });
+  //   if (skills.length !== skillIds.length) {
+  //     throw new NotFoundException('Some skills not found');
+  //   }
+
+  //   hero.skills = skills;
+  //   await hero.save();
+
+  //   for (const skill of skills) {
+  //     skill.hero = new this.heroModel.base.Types.ObjectId(heroId);
+  //     await skill.save();
+  //   }
+
+  //   await hero.populate({
+  //     path: 'skills',
+  //     populate: { path: 'skills_detail' },
+  //   });
+
+  //   return hero;
+  // }
+
   async remove(id: string): Promise<Hero> {
-    const deleted = await this.heroModel.findByIdAndDelete(id);
+    const deleted = await this.heroModel
+      .findByIdAndDelete(id)
+      .populate('skills');
     if (!deleted) throw new NotFoundException('Hero not found');
+
+    // If deleted.skills is undefined, set it to empty array
+    const skills: Skill[] = deleted.skills || [];
+
+    await this.skillModel.deleteMany({ hero: id });
+
+    const skillIds = skills.map((skill) => skill._id);
+    await this.skillDetailModel.deleteMany({ skill: { $in: skillIds } });
+
+    for (const skill of skills) {
+      await this.skillModel.findByIdAndDelete(skill._id);
+    }
     return deleted;
   }
 }

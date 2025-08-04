@@ -30,7 +30,7 @@ export class HeroResolver {
 
   @Query(() => Hero, { name: 'hero' })
   findOne(@Args('id', { type: () => ID }) id: string) {
-    return this.heroService.findOne(id);
+    return this.heroService.findById(id);
   }
 
   @Mutation(() => Hero)

@@ -5,7 +5,7 @@ import { Hero } from './schemas/hero.schema';
 import { CreateHeroInput } from './dto/create-hero.input';
 import { UpdateHeroInput } from './dto/update-hero.input';
 import { Skill } from '../skill/schemas/skill.schema';
-import { SkillDetail } from 'src/skill-detail/schemas/skill-detail.schema';
+import { SkillDetail } from '../skill-detail/schemas/skill-detail.schema';
 
 @Injectable()
 export class HeroService {
@@ -52,7 +52,7 @@ export class HeroService {
     createdHero.skills = createdSkills;
     await createdHero.save();
 
-    return this.findOne(String(createdHero._id));
+    return this.findById(String(createdHero._id));
   }
 
   async findAll(): Promise<Hero[]> {
@@ -67,11 +67,14 @@ export class HeroService {
       .exec();
   }
 
-  async findOne(id: string): Promise<Hero> {
-    const heroes = await this.heroModel.findById(id).populate({
-      path: 'skills',
-      populate: { path: 'skills_detail' },
-    });
+  async findById(id: string): Promise<Hero> {
+    const heroes = await this.heroModel
+      .findById(id)
+      .populate({
+        path: 'skills',
+        populate: { path: 'skills_detail' },
+      })
+      .exec();
 
     if (!heroes) throw new NotFoundException('Hero not found');
     return heroes;

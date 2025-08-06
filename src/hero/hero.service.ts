@@ -19,7 +19,30 @@ export class HeroService {
     return this.heroModel.create(input);
   }
 
-  async createHeroWithSkillDetail(input: CreateHeroInput): Promise<Hero> {
+  async createHeroWithSkill(input: CreateHeroInput): Promise<Hero> {
+    const { skills = [], ...heroData } = input;
+
+    const createdHero = await this.heroModel.create(heroData);
+
+    const createdSkills: Skill[] = [];
+
+    for (const skillInput of skills) {
+      const skill = await this.skillModel.create({
+        ...skillInput,
+        hero: createdHero._id,
+      });
+      createdSkills.push(skill);
+    }
+
+    createdHero.skills = createdSkills;
+    await createdHero.save();
+
+    return this.findById(String(createdHero._id));
+  }
+
+  async createHeroWithSkillandSkillDetail(
+    input: CreateHeroInput,
+  ): Promise<Hero> {
     const { skills = [], ...heroData } = input;
 
     const createdHero = await this.heroModel.create(heroData);
@@ -100,38 +123,12 @@ export class HeroService {
     return updated;
   }
 
-  // async updateHeroToSkills(heroId: string, skillIds: string[]): Promise<Hero> {
-  //   const hero = await this.heroModel.findById(heroId);
-  //   if (!hero) throw new NotFoundException('Hero not found');
-
-  //   const skills = await this.skillModel.find({ _id: { $in: skillIds } });
-  //   if (skills.length !== skillIds.length) {
-  //     throw new NotFoundException('Some skills not found');
-  //   }
-
-  //   hero.skills = skills;
-  //   await hero.save();
-
-  //   for (const skill of skills) {
-  //     skill.hero = new this.heroModel.base.Types.ObjectId(heroId);
-  //     await skill.save();
-  //   }
-
-  //   await hero.populate({
-  //     path: 'skills',
-  //     populate: { path: 'skills_detail' },
-  //   });
-
-  //   return hero;
-  // }
-
   async remove(id: string): Promise<Hero> {
     const deleted = await this.heroModel
       .findByIdAndDelete(id)
       .populate('skills');
     if (!deleted) throw new NotFoundException('Hero not found');
 
-    // If deleted.skills is undefined, set it to empty array
     const skills: Skill[] = deleted.skills || [];
 
     await this.skillModel.deleteMany({ hero: id });

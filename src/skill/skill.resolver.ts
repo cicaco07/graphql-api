@@ -21,6 +21,21 @@ export class SkillResolver {
     return this.skillService.addSkillToHero(heroId, input);
   }
 
+  @Mutation(() => Skill)
+  updateHeroWithSkills(
+    @Args('fromHeroId', { type: () => ID }) fromHeroId: string,
+    @Args('toHeroId', { type: () => ID }) toHeroId: string,
+    @Args('skillId', { type: () => ID }) skillId: string,
+    @Args('input') input: CreateSkillInput,
+  ) {
+    return this.skillService.updateHeroWithSkills(
+      fromHeroId,
+      toHeroId,
+      skillId,
+      input,
+    );
+  }
+
   @Query(() => [Skill], { name: 'skills' })
   findAll() {
     return this.skillService.findAll();

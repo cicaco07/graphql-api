@@ -34,23 +34,30 @@ export class SkillService {
     return skill;
   }
 
-  // async updateSkillToHero(
-  //   heroId: string,
-  //   skillId: string,
-  //   input: UpdateSkillInput,
-  // ): Promise<Skill> {
-  //   const hero = await this.heroModel.findById(heroId);
-  //   if (!hero) throw new NotFoundException('Hero not found');
+  async updateHeroWithSkills(
+    fromHeroId: string,
+    toHeroId: string,
+    skillId: string,
+    input: CreateSkillInput,
+  ): Promise<Skill> {
+    const fromHero = await this.heroModel.findById(fromHeroId);
+    if (!fromHero) throw new NotFoundException('From Hero not found');
 
-  //   const skill = await this.skillModel.findByIdAndUpdate(skillId, input, {
-  //     new: true,
-  //     runValidators: true,
-  //   });
+    const toHero = await this.heroModel.findById(toHeroId);
+    if (!toHero) throw new NotFoundException('To Hero not found');
 
-  //   if (!skill) throw new NotFoundException('Skill not found');
+    const skill = await this.skillModel.findById(skillId);
+    if (!skill) throw new NotFoundException('Skill not found');
 
-  //   return skill;
-  // }
+    if (fromHero == toHero) {
+      return await this.update(skillId, input);
+    } else if (fromHero != toHero) {
+      await this.remove(skillId);
+      return await this.addSkillToHero(toHeroId, input);
+    } else {
+      throw new NotFoundException('Hero not found');
+    }
+  }
 
   async findAll(): Promise<Skill[]> {
     return this.skillModel

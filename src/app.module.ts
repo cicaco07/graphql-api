@@ -19,7 +19,9 @@ import { EmblemModule } from './emblem/emblem.module';
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       resolvers: { JSON: GraphQLJSON },
     }),
-    MongooseModule.forRoot(process.env.MONGO_URI || ''),
+    MongooseModule.forRoot(
+      process.env.MONGO_URI || 'mongodb://localhost:27017/ml',
+    ),
     HeroModule,
     SkillModule,
     SkillDetailModule,

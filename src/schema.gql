@@ -89,11 +89,13 @@ type Query {
 
 type Mutation {
   createHero(input: CreateHeroInput!): Hero!
-  createHeroWithSkillDetail(input: CreateHeroInput!): Hero!
+  createHeroWithSkill(input: CreateHeroInput!): Hero!
+  createHeroWithSkillandSkillDetail(input: CreateHeroInput!): Hero!
   updateHero(id: ID!, input: UpdateHeroInput!): Hero!
   removeHero(id: ID!): Hero!
   createSkill(input: CreateSkillInput!): Skill!
   addSkillToHero(heroId: ID!, input: CreateSkillInput!): Skill!
+  updateHeroWithSkills(fromHeroId: ID!, toHeroId: ID!, skillId: ID!, input: CreateSkillInput!): Skill!
   updateSkill(id: ID!, input: UpdateSkillInput!): Skill!
   removeSkill(id: ID!): Skill!
   createSkillDetail(input: CreateSkillDetailInput!): SkillDetail!

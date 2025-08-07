@@ -105,4 +105,53 @@ describe('HeroService', () => {
       );
     });
   });
+
+  // describe('findAll', () => {
+  //   it('should return an array of heroes', async () => {
+  //     const mockHeroes = [mockHero];
+  //     jest.spyOn(model, 'find').mockReturnValue({
+  //       populate: jest.fn().mockReturnThis(),
+  //       exec: jest.fn().mockResolvedValue(mockHeroes),
+  //     } as unknown as mongoose.Query<Hero[], Hero>);
+
+  //     const result = await heroService.findAll();
+  //     expect(result).toEqual(mockHeroes);
+  //   });
+
+  //   it('should return an empty array if no heroes found', async () => {
+  //     jest.spyOn(model, 'find').mockReturnValue({
+  //       populate: jest.fn().mockReturnThis(),
+  //       exec: jest.fn().mockResolvedValue([]),
+  //     } as unknown as mongoose.Query<Hero[], Hero>);
+
+  //     const result = await heroService.findAll();
+  //     expect(result).toEqual([]);
+  //   });
+
+  //   it('should call populate with skills and skills_detail', async () => {
+  //     const mockHeroes = [mockHero];
+  //     jest.spyOn(model, 'find').mockReturnValue({
+  //       populate: jest.fn().mockReturnThis(),
+  //       exec: jest.fn().mockResolvedValue(mockHeroes),
+  //     } as unknown as mongoose.Query<Hero[], Hero>);
+
+  //     const mockPopulate = jest.fn().mockReturnThis();
+  //     const mockExec = jest.fn().mockResolvedValue(mockHeroes);
+  //     jest.spyOn(model, 'find').mockReturnValue({
+  //       populate: mockPopulate,
+  //       exec: mockExec,
+  //     } as unknown as mongoose.Query<Hero[], Hero>);
+
+  //     await heroService.findAll();
+  //     expect(jest.spyOn(model, 'find')).toHaveBeenCalled();
+  //     expect(mockPopulate).toHaveBeenCalledWith({
+  //       path: 'skills',
+  //       model: 'Skill',
+  //     });
+  //     expect(mockPopulate).toHaveBeenCalledWith({
+  //       path: 'skills_detail',
+  //       model: 'SkillDetail',
+  //     });
+  //   });
+  // });
 });

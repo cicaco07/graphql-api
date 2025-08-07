@@ -68,7 +68,7 @@ export class SkillService {
       .exec();
   }
 
-  async findOne(id: string): Promise<Skill> {
+  async findById(id: string): Promise<Skill> {
     const skill = await this.skillModel.findById(id).populate({
       path: 'skills_detail',
     });

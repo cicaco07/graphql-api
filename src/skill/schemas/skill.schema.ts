@@ -13,8 +13,6 @@ export class Skill extends Document {
   @Prop() full_description: string;
   @Prop({ type: [{ type: Types.ObjectId, ref: 'SkillDetail' }] })
   skills_detail: SkillDetail[];
-  // @Prop({ type: Types.ObjectId, ref: 'Hero' })
-  // hero: Types.ObjectId;
 }
 
 export const SkillSchema = SchemaFactory.createForClass(Skill);

@@ -42,8 +42,8 @@ export class SkillResolver {
   }
 
   @Query(() => Skill, { name: 'skill' })
-  findOne(@Args('id', { type: () => ID }) id: string) {
-    return this.skillService.findOne(id);
+  findById(@Args('id', { type: () => ID }) id: string) {
+    return this.skillService.findById(id);
   }
 
   @Mutation(() => Skill)

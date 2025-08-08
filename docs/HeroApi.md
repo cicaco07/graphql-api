@@ -606,7 +606,7 @@ mutation {
 }
 ```
 
-### - Example mutation for Update Hero 
+### - Example mutation for Update Hero
 
 ```
 mutation {
@@ -646,9 +646,7 @@ Description: This mutation allows you to delete an existing hero by their ID. Yo
 
 ```graphql
 mutation {
-  removeHero(
-    id: string
-  ) {
+  removeHero(id: string) {
     _id
     name
   }
@@ -661,7 +659,7 @@ mutation {
 mutation {
   removeHero(
     id: "60c72b2f9b1e8c001c0a1b2c"
-  ) { 
+  ) {
     _id
     name
   }

@@ -72,6 +72,20 @@ type Emblem {
   cooldown: String
 }
 
+type User {
+  _id: ID!
+  name: String!
+  email: String!
+  role: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type AuthResponse {
+  access_token: String!
+  user: User!
+}
+
 type Query {
   heroes: [Hero!]!
   heroByName(name: String!): [Hero!]!
@@ -85,6 +99,8 @@ type Query {
   childrenItems(parentId: ID!): [Item!]!
   emblems: [Emblem!]!
   emblem(id: ID!): Emblem!
+  me: User!
+  getAllUsers: [User!]!
 }
 
 type Mutation {
@@ -108,6 +124,10 @@ type Mutation {
   createEmblem(input: CreateEmblemInput!): Emblem!
   updateEmblem(id: ID!, input: UpdateEmblemInput!): Emblem!
   removeEmblem(id: ID!): Emblem!
+  register(registerInput: RegisterInput!): AuthResponse!
+  login(loginInput: LoginInput!): AuthResponse!
+  updateUserRole(updateUserRoleInput: UpdateUserRoleInput!): User!
+  deleteUser(userId: String!): Boolean!
 }
 
 input CreateHeroInput {
@@ -218,4 +238,21 @@ input UpdateEmblemInput {
   benefit: String
   description: String
   attributes: JSON
+}
+
+input RegisterInput {
+  name: String!
+  email: String!
+  password: String!
+  role: String
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input UpdateUserRoleInput {
+  userId: String!
+  role: String!
 }

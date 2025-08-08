@@ -11,6 +11,7 @@ import { SkillDetailModule } from './skill-detail/skill-detail.module';
 import { GraphQLJSON } from 'graphql-type-json';
 import { ItemModule } from './item/item.module';
 import { EmblemModule } from './emblem/emblem.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { EmblemModule } from './emblem/emblem.module';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       resolvers: { JSON: GraphQLJSON },
+      context: ({ req }: { req: Request }) => ({ req }),
     }),
     MongooseModule.forRoot(
       process.env.MONGO_URI || 'mongodb://localhost:27017/ml',
@@ -27,6 +29,7 @@ import { EmblemModule } from './emblem/emblem.module';
     SkillDetailModule,
     ItemModule,
     EmblemModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: 'GraphQLJSON', useValue: GraphQLJSON }],

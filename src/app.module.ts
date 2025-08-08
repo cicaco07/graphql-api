@@ -12,6 +12,7 @@ import { GraphQLJSON } from 'graphql-type-json';
 import { ItemModule } from './item/item.module';
 import { EmblemModule } from './emblem/emblem.module';
 import { AuthModule } from './auth/auth.module';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { AuthModule } from './auth/auth.module';
     ItemModule,
     EmblemModule,
     AuthModule,
+    DatabaseModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: 'GraphQLJSON', useValue: GraphQLJSON }],

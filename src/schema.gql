@@ -86,6 +86,10 @@ type AuthResponse {
   user: User!
 }
 
+type LogoutResponse {
+  message: String!
+}
+
 type Query {
   heroes: [Hero!]!
   heroByName(name: String!): [Hero!]!
@@ -101,6 +105,7 @@ type Query {
   emblem(id: ID!): Emblem!
   me: User!
   getAllUsers: [User!]!
+  isTokenValid: Boolean!
 }
 
 type Mutation {
@@ -128,6 +133,8 @@ type Mutation {
   login(loginInput: LoginInput!): AuthResponse!
   updateUserRole(updateUserRoleInput: UpdateUserRoleInput!): User!
   deleteUser(userId: String!): Boolean!
+  logout: LogoutResponse!
+  logoutEverywhere: LogoutResponse!
 }
 
 input CreateHeroInput {

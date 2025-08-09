@@ -17,12 +17,14 @@ import {
 import { AuthResponse } from './dto/auth.response';
 import { JwtPayload } from '../common/interfaces/jwt-payload.interface';
 import { Role } from './enums/role.enum';
+import { TokenService } from './services/token.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private jwtService: JwtService,
+    private tokenService: TokenService,
   ) {}
 
   async register(registerInput: RegisterInput): Promise<AuthResponse> {
@@ -135,5 +137,30 @@ export class AuthService {
   async deleteUser(userId: string): Promise<boolean> {
     const result = await this.userModel.findByIdAndDelete(userId);
     return !!result;
+  }
+
+  async logout(token: string, userId: string): Promise<{ message: string }> {
+    try {
+      await this.tokenService.blacklistToken(token, userId);
+      return {
+        message: 'Logged out successfully',
+      };
+    } catch {
+      throw new UnauthorizedException('Logout failed');
+    }
+  }
+
+  /**
+   * Logout dari semua device (blacklist semua token user)
+   */
+  logoutEverywhere(userId: string): { message: string } {
+    try {
+      this.tokenService.blacklistAllUserTokens(userId);
+      return {
+        message: 'Logged out from all devices successfully',
+      };
+    } catch {
+      throw new UnauthorizedException('Logout everywhere failed');
+    }
   }
 }

@@ -86,6 +86,10 @@ type AuthResponse {
   user: User!
 }
 
+type LogoutResponse {
+  message: String!
+}
+
 type Query {
   heroes: [Hero!]!
   heroByName(name: String!): [Hero!]!
@@ -101,6 +105,7 @@ type Query {
   emblem(id: ID!): Emblem!
   me: User!
   getAllUsers: [User!]!
+  isTokenValid: Boolean!
 }
 
 type Mutation {
@@ -117,6 +122,7 @@ type Mutation {
   createSkillDetail(input: CreateSkillDetailInput!): SkillDetail!
   addSkillDetailToSkill(skillId: ID!, input: [CreateSkillDetailInput!]!): [SkillDetail!]!
   updateSkillDetail(id: ID!, input: UpdateSkillDetailInput!): SkillDetail!
+  updateSkillDetailToSkill(skillId: ID!, skillDetailId: ID!, input: UpdateSkillDetailInput!): SkillDetail!
   removeSkillDetail(id: ID!): SkillDetail!
   createItem(input: CreateItemInput!): Item!
   updateItem(id: ID!, input: UpdateItemInput!): Item!
@@ -128,6 +134,8 @@ type Mutation {
   login(loginInput: LoginInput!): AuthResponse!
   updateUserRole(updateUserRoleInput: UpdateUserRoleInput!): User!
   deleteUser(userId: String!): Boolean!
+  logout: LogoutResponse!
+  logoutEverywhere: LogoutResponse!
 }
 
 input CreateHeroInput {

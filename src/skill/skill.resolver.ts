@@ -3,17 +3,26 @@ import { SkillService } from './skill.service';
 import { Skill } from './entities/skill.entity';
 import { CreateSkillInput } from './dto/create-skill.input';
 import { UpdateSkillInput } from './dto/update-skill.input';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/auth/enums/role.enum';
 
 @Resolver(() => Skill)
 export class SkillResolver {
   constructor(private readonly skillService: SkillService) {}
 
   @Mutation(() => Skill)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MEMBER, Role.SUPER_ADMIN)
   createSkill(@Args('input') input: CreateSkillInput) {
     return this.skillService.create(input);
   }
 
   @Mutation(() => Skill)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MEMBER, Role.SUPER_ADMIN)
   addSkillToHero(
     @Args('heroId', { type: () => ID }) heroId: string,
     @Args('input') input: CreateSkillInput,
@@ -22,6 +31,8 @@ export class SkillResolver {
   }
 
   @Mutation(() => Skill)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MEMBER, Role.SUPER_ADMIN)
   updateHeroWithSkills(
     @Args('fromHeroId', { type: () => ID }) fromHeroId: string,
     @Args('toHeroId', { type: () => ID }) toHeroId: string,
@@ -47,6 +58,8 @@ export class SkillResolver {
   }
 
   @Mutation(() => Skill)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MEMBER, Role.SUPER_ADMIN)
   updateSkill(
     @Args('id', { type: () => ID }) id: string,
     @Args('input') input: UpdateSkillInput,
@@ -55,6 +68,8 @@ export class SkillResolver {
   }
 
   @Mutation(() => Skill)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MEMBER, Role.SUPER_ADMIN)
   removeSkill(@Args('id', { type: () => ID }) id: string) {
     return this.skillService.remove(id);
   }

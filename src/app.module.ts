@@ -13,6 +13,7 @@ import { ItemModule } from './item/item.module';
 import { EmblemModule } from './emblem/emblem.module';
 import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
+import { NavigationModule } from './navigation/navigation.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { DatabaseModule } from './database/database.module';
     EmblemModule,
     AuthModule,
     DatabaseModule,
+    NavigationModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: 'GraphQLJSON', useValue: GraphQLJSON }],

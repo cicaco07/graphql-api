@@ -90,6 +90,17 @@ type LogoutResponse {
   message: String!
 }
 
+type Navigation {
+  _id: ID!
+  parent_id: String
+  name: String!
+  icon: String
+  link: String
+  order: Int!
+  is_header: Boolean!
+  is_active: Boolean!
+}
+
 type Query {
   heroes: [Hero!]!
   heroByName(name: String!): [Hero!]!
@@ -106,6 +117,8 @@ type Query {
   me: User!
   getAllUsers: [User!]!
   isTokenValid: Boolean!
+  navigations: [Navigation!]!
+  navigation(id: ID!): Navigation!
 }
 
 type Mutation {
@@ -136,6 +149,9 @@ type Mutation {
   deleteUser(userId: String!): Boolean!
   logout: LogoutResponse!
   logoutEverywhere: LogoutResponse!
+  createNavigation(createNavigationInput: CreateNavigationInput!): Navigation!
+  updateNavigation(id: ID!, updateNavigationInput: UpdateNavigationInput!): Navigation!
+  removeNavigation(id: ID!): Navigation!
 }
 
 input CreateHeroInput {
@@ -263,4 +279,24 @@ input LoginInput {
 input UpdateUserRoleInput {
   userId: String!
   role: String!
+}
+
+input CreateNavigationInput {
+  parent_id: String
+  name: String!
+  icon: String
+  link: String
+  order: Int!
+  is_header: Boolean!
+  is_active: Boolean!
+}
+
+input UpdateNavigationInput {
+  parent_id: String
+  name: String
+  icon: String
+  link: String
+  order: Int
+  is_header: Boolean
+  is_active: Boolean
 }

@@ -1,7 +1,6 @@
-import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ID, Context } from '@nestjs/graphql';
 import { NavigationService } from './navigation.service';
-import { Navigation } from './entities/navigation.entity';
-import { CreateNavigationInput } from './dto/create-navigation.input';
+import { CreateNavigationInput, NavigationType } from './dto/navigation.dto';
 import { UpdateNavigationInput } from './dto/update-navigation.input';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -9,47 +8,82 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enums/role.enum';
 
-@Resolver(() => Navigation)
+@Resolver(() => NavigationType)
 export class NavigationResolver {
   constructor(private readonly navigationService: NavigationService) {}
 
-  @Mutation(() => Navigation)
+  @Mutation(() => NavigationType)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
-  createNavigation(
+  async createNavigation(
     @Args('createNavigationInput') createNavigationInput: CreateNavigationInput,
-  ) {
-    return this.navigationService.create(createNavigationInput);
+  ): Promise<NavigationType> {
+    return this.navigationService.createNavigation(createNavigationInput);
   }
 
-  @Query(() => [Navigation], { name: 'navigations' })
+  @Query(() => [NavigationType])
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
-  findAll() {
-    return this.navigationService.findAll();
+  async getAllNavigations(): Promise<NavigationType[]> {
+    return this.navigationService.getAllNavigations();
   }
 
-  @Query(() => Navigation, { name: 'navigation' })
+  @Query(() => NavigationType)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
-  findOne(@Args('id', { type: () => ID }) id: string) {
-    return this.navigationService.findOne(id);
+  async getNavigationById(@Args('id', { type: () => ID }) id: string) {
+    return this.navigationService.getNavigationById(id);
   }
 
-  @Mutation(() => Navigation)
+  @Mutation(() => NavigationType)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
   updateNavigation(
-    @Args('id', { type: () => ID }) id: string,
     @Args('updateNavigationInput') updateNavigationInput: UpdateNavigationInput,
   ) {
-    return this.navigationService.update(id, updateNavigationInput);
+    return this.navigationService.updateNavigation(updateNavigationInput);
   }
 
-  @Mutation(() => Navigation)
+  @Mutation(() => Boolean)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
   removeNavigation(@Args('id', { type: () => ID }) id: string) {
-    return this.navigationService.remove(id);
+    return this.navigationService.removeNavigation(id);
+  }
+
+  @Query(() => [NavigationType])
+  @UseGuards(JwtAuthGuard)
+  async getUserNavigations(
+    @Context()
+    context: {
+      req: { user: { roles?: string[]; permissions?: string[] } };
+    },
+  ): Promise<NavigationType[]> {
+    const user = context.req.user as {
+      roles?: string[];
+      permissions?: string[];
+    };
+    const userRoles = user.roles || [];
+    const userPermissions = user.permissions || [];
+
+    return this.navigationService.getNavigationsByRoleAndPermissions(
+      userRoles,
+      userPermissions,
+    );
+  }
+
+  @Query(() => [NavigationType])
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
+  async getNavigationTree(): Promise<NavigationType[]> {
+    return this.navigationService.getNavigationTree();
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
+  async seedNavigations(): Promise<boolean> {
+    await this.navigationService.seedNavigations();
+    return true;
   }
 }

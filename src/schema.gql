@@ -90,15 +90,24 @@ type LogoutResponse {
   message: String!
 }
 
-type Navigation {
+type NavigationType {
   _id: ID!
-  parent_id: String
   name: String!
+  parent_id: ID
   icon: String
-  link: String
-  order: Int!
+  route: String
   is_header: Boolean!
   is_active: Boolean!
+  order: Int!
+  roles: [String!]!
+  permissions: [String!]!
+  description: String
+  level: Int!
+  component: String
+  is_visible: Boolean!
+  children: [NavigationType!]
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type Query {
@@ -117,8 +126,10 @@ type Query {
   me: User!
   getAllUsers: [User!]!
   isTokenValid: Boolean!
-  navigations: [Navigation!]!
-  navigation(id: ID!): Navigation!
+  getAllNavigations: [NavigationType!]!
+  getNavigationById(id: ID!): NavigationType!
+  getUserNavigations: [NavigationType!]!
+  getNavigationTree: [NavigationType!]!
 }
 
 type Mutation {
@@ -149,9 +160,10 @@ type Mutation {
   deleteUser(userId: String!): Boolean!
   logout: LogoutResponse!
   logoutEverywhere: LogoutResponse!
-  createNavigation(createNavigationInput: CreateNavigationInput!): Navigation!
-  updateNavigation(id: ID!, updateNavigationInput: UpdateNavigationInput!): Navigation!
-  removeNavigation(id: ID!): Navigation!
+  createNavigation(createNavigationInput: CreateNavigationInput!): NavigationType!
+  updateNavigation(updateNavigationInput: UpdateNavigationInput!): NavigationType!
+  removeNavigation(id: ID!): Boolean!
+  seedNavigations: Boolean!
 }
 
 input CreateHeroInput {
@@ -282,21 +294,34 @@ input UpdateUserRoleInput {
 }
 
 input CreateNavigationInput {
-  parent_id: String
   name: String!
+  parent_id: ID
   icon: String
-  link: String
+  route: String
+  is_header: Boolean! = false
+  is_active: Boolean! = true
   order: Int!
-  is_header: Boolean!
-  is_active: Boolean!
+  roles: [String!]!
+  permissions: [String!]
+  description: String
+  level: Int! = 0
+  component: String
+  is_visible: Boolean! = true
 }
 
 input UpdateNavigationInput {
-  parent_id: String
+  _id: ID!
   name: String
+  parent_id: ID
   icon: String
-  link: String
-  order: Int
+  route: String
   is_header: Boolean
   is_active: Boolean
+  order: Int
+  roles: [String!]
+  permissions: [String!]
+  description: String
+  level: Int
+  component: String
+  is_visible: Boolean
 }

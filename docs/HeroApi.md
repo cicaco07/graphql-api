@@ -45,6 +45,7 @@ mutation {
 ```
 
 - HTTP Headers:
+
 ```js
 Authorization: Bearer <access_token>
 ```
@@ -87,6 +88,7 @@ mutation {
 ```
 
 - HTTP Headers:
+
 ```js
 Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODlhMTBlN2Y0NmU1NDA2YTg3NGU>
 ```
@@ -159,6 +161,7 @@ mutation {
 ```
 
 - HTTP Headers:
+
 ```js
 Authorization: Bearer <access_token>
 ```
@@ -214,6 +217,7 @@ mutation {
 ```
 
 - HTTP Headers:
+
 ```js
 Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODlhMTBlN2Y0NmU1NDA2YTg3NGU>
 ```
@@ -297,6 +301,7 @@ mutation {
 ```
 
 - HTTP Headers:
+
 ```js
 Authorization: Bearer <access_token>
 ```
@@ -388,6 +393,7 @@ mutation {
 ```
 
 - HTTP Headers:
+
 ```js
 Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODlhMTBlN2Y0NmU1NDA2YTg3NGU>
 ```
@@ -637,6 +643,7 @@ mutation {
 ```
 
 - HTTP Headers:
+
 ```js
 Authorization: Bearer <access_token>
 ```
@@ -659,6 +666,7 @@ mutation {
 ```
 
 - HTTP Headers:
+
 ```js
 Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODlhMTBlN2Y0NmU1NDA2YTg3NGU>
 ```
@@ -694,6 +702,7 @@ mutation {
 ```
 
 - HTTP Headers:
+
 ```js
 Authorization: Bearer <access_token>
 ```
@@ -712,6 +721,7 @@ mutation {
 ```
 
 - HTTP Headers:
+
 ```js
 Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODlhMTBlN2Y0NmU1NDA2YTg3NGU>
 ```

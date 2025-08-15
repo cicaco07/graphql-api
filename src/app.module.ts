@@ -13,6 +13,9 @@ import { ItemModule } from './item/item.module';
 import { EmblemModule } from './emblem/emblem.module';
 import { AuthModule } from './auth/auth.module';
 import { DatabaseModule } from './database/database.module';
+import { BattleSpellModule } from './battle-spell/battle-spell.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
@@ -21,6 +24,24 @@ import { DatabaseModule } from './database/database.module';
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       resolvers: { JSON: GraphQLJSON },
       context: ({ req }: { req: Request }) => ({ req }),
+      sortSchema: true,
+      playground: true,
+      introspection: true,
+    }),
+    MulterModule.register({
+      dest: './uploads',
+      limits: {
+        fileSize: parseInt('5242880') || 5 * 1024 * 1024, // 5MB
+        files: 1,
+      },
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+      serveStaticOptions: {
+        index: false,
+        dotfiles: 'deny',
+      },
     }),
     MongooseModule.forRoot(
       process.env.MONGO_URI || 'mongodb://localhost:27017/ml',
@@ -32,6 +53,7 @@ import { DatabaseModule } from './database/database.module';
     EmblemModule,
     AuthModule,
     DatabaseModule,
+    BattleSpellModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: 'GraphQLJSON', useValue: GraphQLJSON }],

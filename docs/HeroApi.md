@@ -44,6 +44,12 @@ mutation {
 }
 ```
 
+- HTTP Headers:
+
+```js
+Authorization: Bearer <access_token>
+```
+
 ### - Example mutation for Create Hero API
 
 ```
@@ -79,6 +85,12 @@ mutation {
     difficulty
   }
 }
+```
+
+- HTTP Headers:
+
+```js
+Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODlhMTBlN2Y0NmU1NDA2YTg3NGU>
 ```
 
 ### - Example response for Create Hero API
@@ -148,6 +160,12 @@ mutation {
 }
 ```
 
+- HTTP Headers:
+
+```js
+Authorization: Bearer <access_token>
+```
+
 ### - Example mutation for Create Hero with Skill
 
 ```
@@ -196,6 +214,12 @@ mutation {
     }
   }
 }
+```
+
+- HTTP Headers:
+
+```js
+Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODlhMTBlN2Y0NmU1NDA2YTg3NGU>
 ```
 
 ### - Example response for Create Hero with Skill
@@ -274,6 +298,12 @@ mutation {
     }
   }
 }
+```
+
+- HTTP Headers:
+
+```js
+Authorization: Bearer <access_token>
 ```
 
 ### - Example mutation for Create Hero with Skill & Skill Detail
@@ -360,6 +390,12 @@ mutation {
     }
   )
 }
+```
+
+- HTTP Headers:
+
+```js
+Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODlhMTBlN2Y0NmU1NDA2YTg3NGU>
 ```
 
 ### - Example response for Create Hero with Skill & Skill Detail
@@ -606,6 +642,12 @@ mutation {
 }
 ```
 
+- HTTP Headers:
+
+```js
+Authorization: Bearer <access_token>
+```
+
 ### - Example mutation for Update Hero
 
 ```
@@ -621,6 +663,12 @@ mutation {
     }
   )
 }
+```
+
+- HTTP Headers:
+
+```js
+Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODlhMTBlN2Y0NmU1NDA2YTg3NGU>
 ```
 
 ### - Example response for Update Hero
@@ -653,6 +701,12 @@ mutation {
 }
 ```
 
+- HTTP Headers:
+
+```js
+Authorization: Bearer <access_token>
+```
+
 ### - Example mutation for Remove Hero
 
 ```
@@ -664,6 +718,12 @@ mutation {
     name
   }
 }
+```
+
+- HTTP Headers:
+
+```js
+Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODlhMTBlN2Y0NmU1NDA2YTg3NGU>
 ```
 
 ### - Example response for Remove Hero

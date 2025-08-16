@@ -2,44 +2,83 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type SkillDetail {
-  _id: ID!
-  level: Float
-  attributes: JSON
+type AuthResponse {
+  access_token: String!
+  user: User!
 }
 
-"""
-The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
-"""
-scalar JSON
+type BattleSpell {
+  cooldown: Float!
+  createdAt: DateTime!
+  description: String!
+  icon: String!
+  id: ID!
+  name: String!
+  tag: [String!]!
+  updatedAt: DateTime!
+}
 
-type Skill {
-  _id: ID!
+input CreateBattleSpellInput {
+  cooldown: Float!
+  description: String!
+  icon: String!
+  name: String!
+  tag: [String!]!
+}
+
+input CreateEmblemInput {
+  attributes: JSON
+  benefit: String
+  cooldown: String
+  description: String
+  icon: String!
   name: String!
   type: String!
-  tag: [String!]!
-  attack_effect: Float
-  skill_icon: String!
-  lite_description: String!
-  full_description: String!
-  skills_detail: [SkillDetail!]
 }
 
-type Hero {
-  _id: ID!
-  name: String!
+input CreateHeroInput {
   alias: String!
-  role: [String!]!
-  type: [String!]!
   avatar: String!
-  image: String!
-  short_description: String!
-  release_date: DateTime!
-  durability: Float!
-  offense: Float!
   control_effect: Float!
   difficulty: Float!
-  skills: [Skill!]
+  durability: Float!
+  image: String!
+  name: String!
+  offense: Float!
+  release_date: DateTime!
+  role: [String!]!
+  short_description: String!
+  skills: [CreateSkillInput!]
+  type: [String!]!
+}
+
+input CreateItemInput {
+  attributes: [String!]!
+  description: [String!]
+  image: String!
+  name: String!
+  parent_items: [String!]
+  price: Float!
+  story: String
+  tag: String
+  tips: String
+  type: String!
+}
+
+input CreateSkillDetailInput {
+  attributes: JSON!
+  level: Int!
+}
+
+input CreateSkillInput {
+  attack_effect: Float
+  full_description: String!
+  lite_description: String!
+  name: String!
+  skill_icon: String!
+  skills_detail: [CreateSkillDetailInput!]
+  tag: [String!]!
+  type: String!
 }
 
 """
@@ -47,43 +86,56 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type Item {
-  _id: ID!
-  name: String!
-  tag: String
-  type: String!
-  attributes: [String!]!
-  price: Int!
-  image: String!
-  story: String
-  description: [String!]!
-  tips: String
-  parent_items: [ID!]
-}
-
 type Emblem {
   _id: ID!
-  name: String!
-  type: String!
-  icon: String!
   attributes: JSON
   benefit: String
-  description: String
   cooldown: String
-}
-
-type User {
-  _id: ID!
+  description: String
+  icon: String!
   name: String!
-  email: String!
-  role: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
+  type: String!
 }
 
-type AuthResponse {
-  access_token: String!
-  user: User!
+type Hero {
+  _id: ID!
+  alias: String!
+  avatar: String!
+  control_effect: Float!
+  difficulty: Float!
+  durability: Float!
+  image: String!
+  name: String!
+  offense: Float!
+  release_date: DateTime!
+  role: [String!]!
+  short_description: String!
+  skills: [Skill!]
+  type: [String!]!
+}
+
+type Item {
+  _id: ID!
+  attributes: [String!]!
+  description: [String!]!
+  image: String!
+  name: String!
+  parent_items: [ID!]
+  price: Int!
+  story: String
+  tag: String
+  tips: String
+  type: String!
+}
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+
+input LoginInput {
+  email: String!
+  password: String!
 }
 
 type LogoutResponse {
@@ -133,164 +185,163 @@ type Query {
 }
 
 type Mutation {
+  addSkillDetailToSkill(input: [CreateSkillDetailInput!]!, skillId: ID!): [SkillDetail!]!
+  addSkillToHero(heroId: ID!, input: CreateSkillInput!): Skill!
+  createBattleSpell(createBattleSpellInput: CreateBattleSpellInput!): BattleSpell!
+  createEmblem(input: CreateEmblemInput!): Emblem!
   createHero(input: CreateHeroInput!): Hero!
   createHeroWithSkill(input: CreateHeroInput!): Hero!
   createHeroWithSkillandSkillDetail(input: CreateHeroInput!): Hero!
-  updateHero(id: ID!, input: UpdateHeroInput!): Hero!
-  removeHero(id: ID!): Hero!
-  createSkill(input: CreateSkillInput!): Skill!
-  addSkillToHero(heroId: ID!, input: CreateSkillInput!): Skill!
-  updateHeroWithSkills(fromHeroId: ID!, toHeroId: ID!, skillId: ID!, input: CreateSkillInput!): Skill!
-  updateSkill(id: ID!, input: UpdateSkillInput!): Skill!
-  removeSkill(id: ID!): Skill!
-  createSkillDetail(input: CreateSkillDetailInput!): SkillDetail!
-  addSkillDetailToSkill(skillId: ID!, input: [CreateSkillDetailInput!]!): [SkillDetail!]!
-  updateSkillDetail(id: ID!, input: UpdateSkillDetailInput!): SkillDetail!
-  updateSkillDetailToSkill(skillId: ID!, skillDetailId: ID!, input: UpdateSkillDetailInput!): SkillDetail!
-  removeSkillDetail(id: ID!): SkillDetail!
   createItem(input: CreateItemInput!): Item!
-  updateItem(id: ID!, input: UpdateItemInput!): Item!
-  removeItem(id: ID!): Item!
-  createEmblem(input: CreateEmblemInput!): Emblem!
-  updateEmblem(id: ID!, input: UpdateEmblemInput!): Emblem!
-  removeEmblem(id: ID!): Emblem!
-  register(registerInput: RegisterInput!): AuthResponse!
-  login(loginInput: LoginInput!): AuthResponse!
-  updateUserRole(updateUserRoleInput: UpdateUserRoleInput!): User!
+  createSkill(input: CreateSkillInput!): Skill!
+  createSkillDetail(input: CreateSkillDetailInput!): SkillDetail!
   deleteUser(userId: String!): Boolean!
+  login(loginInput: LoginInput!): AuthResponse!
   logout: LogoutResponse!
   logoutEverywhere: LogoutResponse!
+  register(registerInput: RegisterInput!): AuthResponse!
+  removeBattleSpell(id: String!): Boolean!
+  removeEmblem(id: ID!): Emblem!
+  removeHero(id: ID!): Hero!
+  removeItem(id: ID!): Item!
+  removeSkill(id: ID!): Skill!
+  removeSkillDetail(id: ID!): SkillDetail!
+  updateBattleSpell(id: String!, updateBattleSpellInput: UpdateBattleSpellInput!): BattleSpell!
+  updateEmblem(id: ID!, input: UpdateEmblemInput!): Emblem!
+  updateHero(id: ID!, input: UpdateHeroInput!): Hero!
+  updateHeroWithSkills(fromHeroId: ID!, input: CreateSkillInput!, skillId: ID!, toHeroId: ID!): Skill!
+  updateItem(id: ID!, input: UpdateItemInput!): Item!
+  updateSkill(id: ID!, input: UpdateSkillInput!): Skill!
+  updateSkillDetail(id: ID!, input: UpdateSkillDetailInput!): SkillDetail!
+  updateSkillDetailToSkill(input: UpdateSkillDetailInput!, skillDetailId: ID!, skillId: ID!): SkillDetail!
+  updateUserRole(updateUserRoleInput: UpdateUserRoleInput!): User!
+}
+
+type Query {
+  battleSpell(id: String!): BattleSpell!
+  battleSpells: [BattleSpell!]!
+  childrenItems(parentId: ID!): [Item!]!
+  emblem(id: ID!): Emblem!
+  emblems: [Emblem!]!
+  getAllUsers: [User!]!
+  hero(id: ID!): Hero!
+  heroByName(name: String!): [Hero!]!
+  heroes: [Hero!]!
+  isTokenValid: Boolean!
+  item(id: ID!): Item!
+  items: [Item!]!
+  me: User!
+  skill(id: ID!): Skill!
+  skillDetail(id: ID!): SkillDetail!
+  skillDetails: [SkillDetail!]!
+  skills: [Skill!]!
   createNavigation(createNavigationInput: CreateNavigationInput!): NavigationType!
   updateNavigation(updateNavigationInput: UpdateNavigationInput!): NavigationType!
   removeNavigation(id: ID!): Boolean!
   seedNavigations: Boolean!
 }
 
-input CreateHeroInput {
-  name: String!
-  alias: String!
-  role: [String!]!
-  type: [String!]!
-  avatar: String!
-  image: String!
-  short_description: String!
-  release_date: DateTime!
-  durability: Float!
-  offense: Float!
-  control_effect: Float!
-  difficulty: Float!
-  skills: [CreateSkillInput!]
-}
-
-input CreateSkillInput {
-  name: String!
-  type: String!
-  tag: [String!]!
-  attack_effect: Float
-  skill_icon: String!
-  lite_description: String!
-  full_description: String!
-  skills_detail: [CreateSkillDetailInput!]
-}
-
-input CreateSkillDetailInput {
-  level: Int!
-  attributes: JSON!
-}
-
-input UpdateHeroInput {
-  name: String
-  alias: String
-  role: [String!]
-  type: [String!]
-  avatar: String
-  image: String
-  short_description: String
-  release_date: DateTime
-  durability: Float
-  offense: Float
-  control_effect: Float
-  difficulty: Float
-  skills: [CreateSkillInput!]
-}
-
-input UpdateSkillInput {
-  name: String
-  type: String
-  tag: [String!]
-  attack_effect: Float
-  skill_icon: String
-  lite_description: String
-  full_description: String
-  skills_detail: [CreateSkillDetailInput!]
-}
-
-input UpdateSkillDetailInput {
-  level: Int
-  attributes: JSON
-}
-
-input CreateItemInput {
-  name: String!
-  tag: String
-  type: String!
-  attributes: [String!]!
-  price: Float!
-  image: String!
-  story: String
-  description: [String!]
-  tips: String
-  parent_items: [String!]
-}
-
-input UpdateItemInput {
-  name: String
-  tag: String
-  type: String
-  attributes: [String!]
-  price: Float
-  image: String
-  story: String
-  description: [String!]
-  tips: String
-  parent_items: [String!]
-}
-
-input CreateEmblemInput {
-  name: String!
-  type: String!
-  icon: String!
-  cooldown: String
-  benefit: String
-  description: String
-  attributes: JSON
-}
-
-input UpdateEmblemInput {
-  name: String
-  type: String
-  icon: String
-  cooldown: String
-  benefit: String
-  description: String
-  attributes: JSON
-}
-
 input RegisterInput {
-  name: String!
   email: String!
+  name: String!
   password: String!
   role: String
 }
 
-input LoginInput {
-  email: String!
-  password: String!
+type Skill {
+  _id: ID!
+  attack_effect: Float
+  full_description: String!
+  lite_description: String!
+  name: String!
+  skill_icon: String!
+  skills_detail: [SkillDetail!]
+  tag: [String!]!
+  type: String!
+}
+
+type SkillDetail {
+  _id: ID!
+  attributes: JSON
+  level: Float
+}
+
+input UpdateBattleSpellInput {
+  cooldown: Float
+  description: String
+  icon: String
+  id: ID!
+  name: String
+  tag: [String!]
+}
+
+input UpdateEmblemInput {
+  attributes: JSON
+  benefit: String
+  cooldown: String
+  description: String
+  icon: String
+  name: String
+  type: String
+}
+
+input UpdateHeroInput {
+  alias: String
+  avatar: String
+  control_effect: Float
+  difficulty: Float
+  durability: Float
+  image: String
+  name: String
+  offense: Float
+  release_date: DateTime
+  role: [String!]
+  short_description: String
+  skills: [CreateSkillInput!]
+  type: [String!]
+}
+
+input UpdateItemInput {
+  attributes: [String!]
+  description: [String!]
+  image: String
+  name: String
+  parent_items: [String!]
+  price: Float
+  story: String
+  tag: String
+  tips: String
+  type: String
+}
+
+input UpdateSkillDetailInput {
+  attributes: JSON
+  level: Int
+}
+
+input UpdateSkillInput {
+  attack_effect: Float
+  full_description: String
+  lite_description: String
+  name: String
+  skill_icon: String
+  skills_detail: [CreateSkillDetailInput!]
+  tag: [String!]
+  type: String
 }
 
 input UpdateUserRoleInput {
-  userId: String!
   role: String!
+  userId: String!
+}
+
+type User {
+  _id: ID!
+  createdAt: DateTime!
+  email: String!
+  name: String!
+  role: String!
+  updatedAt: DateTime!
 }
 
 input CreateNavigationInput {

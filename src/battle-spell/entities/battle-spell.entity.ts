@@ -11,8 +11,8 @@ export class BattleSpell {
   @Field()
   description: string;
 
-  @Field({ nullable: true })
-  icon?: string;
+  @Field()
+  icon: string;
 
   @Field()
   cooldown: number;

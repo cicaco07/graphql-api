@@ -4,13 +4,6 @@ import { BattleSpellResolver } from './battle-spell.resolver';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BattleSpell, BattleSpellSchema } from './schemas/battle-spell.schema';
 import { BattleSpellController } from './battle-spell.controller';
-// import { join } from 'path';
-// import { existsSync, mkdirSync } from 'fs';
-
-// const uploadsDir = join(__dirname, '..', '..', 'uploads');
-// if (!existsSync(uploadsDir)) {
-//   mkdirSync(uploadsDir, { recursive: true });
-// }
 
 @Module({
   imports: [

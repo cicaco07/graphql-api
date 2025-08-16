@@ -11,7 +11,7 @@ type BattleSpell {
   cooldown: Float!
   createdAt: DateTime!
   description: String!
-  icon: String
+  icon: String!
   id: ID!
   name: String!
   tag: [String!]!
@@ -21,7 +21,7 @@ type BattleSpell {
 input CreateBattleSpellInput {
   cooldown: Float!
   description: String!
-  icon: String
+  icon: String!
   name: String!
   tag: [String!]!
 }
@@ -158,13 +158,13 @@ type Mutation {
   logout: LogoutResponse!
   logoutEverywhere: LogoutResponse!
   register(registerInput: RegisterInput!): AuthResponse!
-  removeBattleSpell(id: ID!): BattleSpell!
+  removeBattleSpell(id: String!): Boolean!
   removeEmblem(id: ID!): Emblem!
   removeHero(id: ID!): Hero!
   removeItem(id: ID!): Item!
   removeSkill(id: ID!): Skill!
   removeSkillDetail(id: ID!): SkillDetail!
-  updateBattleSpell(updateBattleSpellInput: UpdateBattleSpellInput!): BattleSpell!
+  updateBattleSpell(id: String!, updateBattleSpellInput: UpdateBattleSpellInput!): BattleSpell!
   updateEmblem(id: ID!, input: UpdateEmblemInput!): Emblem!
   updateHero(id: ID!, input: UpdateHeroInput!): Hero!
   updateHeroWithSkills(fromHeroId: ID!, input: CreateSkillInput!, skillId: ID!, toHeroId: ID!): Skill!
@@ -173,11 +173,10 @@ type Mutation {
   updateSkillDetail(id: ID!, input: UpdateSkillDetailInput!): SkillDetail!
   updateSkillDetailToSkill(input: UpdateSkillDetailInput!, skillDetailId: ID!, skillId: ID!): SkillDetail!
   updateUserRole(updateUserRoleInput: UpdateUserRoleInput!): User!
-  uploadBattleSpellIcon(id: ID!): BattleSpell!
 }
 
 type Query {
-  battleSpell(id: ID!): BattleSpell!
+  battleSpell(id: String!): BattleSpell!
   battleSpells: [BattleSpell!]!
   childrenItems(parentId: ID!): [Item!]!
   emblem(id: ID!): Emblem!

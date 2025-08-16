@@ -16,9 +16,11 @@ export class BattleSpellService {
   async create(
     createBattleSpellInput: CreateBattleSpellInput,
   ): Promise<BattleSpell> {
-    const createdBattleSpell = new this.battleSpellModel(
-      createBattleSpellInput,
-    );
+    const data = {
+      ...createBattleSpellInput,
+      cooldown: Number(createBattleSpellInput.cooldown),
+    };
+    const createdBattleSpell = new this.battleSpellModel(data);
     return createdBattleSpell.save();
   }
 
@@ -35,12 +37,22 @@ export class BattleSpellService {
   }
 
   async update(
+    id: string,
     updateBattleSpellInput: UpdateBattleSpellInput,
   ): Promise<BattleSpell> {
-    const { id, ...updateData } = updateBattleSpellInput;
+    const existingBattleSpell = await this.findOne(id);
+
+    if (
+      updateBattleSpellInput.icon &&
+      updateBattleSpellInput.icon !== existingBattleSpell.icon
+    ) {
+      if (existingBattleSpell.icon) {
+        this.deleteImageFile(existingBattleSpell.icon);
+      }
+    }
 
     const updatedBattleSpell = await this.battleSpellModel
-      .findByIdAndUpdate(id, updateData, { new: true })
+      .findByIdAndUpdate(id, updateBattleSpellInput, { new: true })
       .exec();
 
     if (!updatedBattleSpell) {
@@ -50,70 +62,26 @@ export class BattleSpellService {
     return updatedBattleSpell;
   }
 
-  async remove(id: string): Promise<BattleSpell> {
-    const deletedBattleSpell = await this.battleSpellModel
-      .findByIdAndDelete(id)
-      .exec();
-
-    if (!deletedBattleSpell) {
-      throw new NotFoundException(`BattleSpell with ID "${id}" not found`);
-    }
-
-    // Delete associated icon file if exists
-    if (deletedBattleSpell.icon) {
-      const filePath = path.join(
-        process.cwd(),
-        'uploads',
-        deletedBattleSpell.icon,
-      );
-      try {
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-        }
-      } catch (error) {
-        console.error('Error deleting file:', error);
+  private deleteImageFile(imagePath: string): void {
+    try {
+      const fullPath = path.join(process.cwd(), imagePath.replace(/^\//, ''));
+      if (fs.existsSync(fullPath)) {
+        fs.unlinkSync(fullPath);
       }
+    } catch (error) {
+      console.error('Error deleting image file:', error);
     }
-
-    return deletedBattleSpell;
   }
 
-  async updateIcon(id: string, filename: string): Promise<BattleSpell> {
+  async remove(id: string): Promise<boolean> {
     const battleSpell = await this.findOne(id);
 
-    // Delete old icon file if exists
+    // Hapus file ikon
     if (battleSpell.icon) {
-      const oldFilePath = path.join(process.cwd(), 'uploads', battleSpell.icon);
-      try {
-        if (fs.existsSync(oldFilePath)) {
-          fs.unlinkSync(oldFilePath);
-        }
-      } catch (error) {
-        console.error('Error deleting old file:', error);
-      }
+      this.deleteImageFile(battleSpell.icon);
     }
 
-    const updatedBattleSpell = await this.battleSpellModel
-      .findByIdAndUpdate(id, { icon: filename }, { new: true })
-      .exec();
-
-    if (!updatedBattleSpell) {
-      throw new NotFoundException(`BattleSpell with ID "${id}" not found`);
-    }
-
-    return updatedBattleSpell;
-  }
-
-  async createWithIcon(
-    createBattleSpellInput: CreateBattleSpellInput,
-    filename?: string,
-  ): Promise<BattleSpell> {
-    const data = {
-      ...createBattleSpellInput,
-      icon: filename || null,
-    };
-
-    const createdBattleSpell = new this.battleSpellModel(data);
-    return createdBattleSpell.save();
+    await this.battleSpellModel.findByIdAndDelete(id).exec();
+    return true;
   }
 }

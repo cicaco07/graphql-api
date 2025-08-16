@@ -1,8 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export type BattleSpellDocument = BattleSpell & Document;
-
 @Schema({ timestamps: true })
 export class BattleSpell {
   @Prop({ required: true })

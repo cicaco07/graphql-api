@@ -1,79 +1,46 @@
 import {
   Controller,
   Post,
-  Body,
   UploadedFile,
   UseInterceptors,
   BadRequestException,
-  Param,
-  Put,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
-import { BattleSpellService } from './battle-spell.service';
-import { CreateBattleSpellInput } from './dto/create-battle-spell.input';
+import { extname, join } from 'path';
+import { v4 as uuidv4 } from 'uuid';
+import * as fs from 'fs';
 
-@Controller('battle-spell')
+@Controller('battlespell')
 export class BattleSpellController {
-  constructor(private readonly battleSpellService: BattleSpellService) {}
-
-  @Post('create-with-icon')
-  @UseInterceptors(
-    FileInterceptor('icon', {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, callback) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          callback(
-            null,
-            `battle-spell-${uniqueSuffix}${extname(file.originalname)}`,
-          );
-        },
-      }),
-      fileFilter: (req, file, callback) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
-          return callback(
-            new BadRequestException('Only image files are allowed!'),
-            false,
-          );
-        }
-        callback(null, true);
-      },
-      limits: {
-        fileSize: 5 * 1024 * 1024, // 5MB
-      },
-    }),
-  )
-  async createWithIcon(
-    @Body() createBattleSpellInput: CreateBattleSpellInput,
-    @UploadedFile() file?: Express.Multer.File,
-  ) {
-    return this.battleSpellService.createWithIcon(
-      createBattleSpellInput,
-      file?.filename,
-    );
+  constructor() {
+    const uploadDir = join(process.cwd(), 'uploads', 'battlespells');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
   }
 
-  @Put(':id/upload-icon')
+  @Post('battlespell-icon')
   @UseInterceptors(
     FileInterceptor('icon', {
+      // Sesuai dengan nama field di frontend
       storage: diskStorage({
-        destination: './uploads',
+        destination: './uploads/battlespells',
         filename: (req, file, callback) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          callback(
-            null,
-            `battle-spell-${uniqueSuffix}${extname(file.originalname)}`,
-          );
+          const uniqueName = `${uuidv4()}${extname(file.originalname)}`;
+          callback(null, uniqueName);
         },
       }),
       fileFilter: (req, file, callback) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
+        const allowedMimes = [
+          'image/jpeg',
+          'image/png',
+          'image/gif',
+          'image/webp',
+        ];
+        if (!allowedMimes.includes(file.mimetype)) {
           return callback(
-            new BadRequestException('Only image files are allowed!'),
+            new BadRequestException('Only image files are allowed'),
             false,
           );
         }
@@ -84,14 +51,17 @@ export class BattleSpellController {
       },
     }),
   )
-  async uploadIcon(
-    @Param('id') id: string,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
+  uploadBattleSpellIcon(@UploadedFile() file: Express.Multer.File) {
     if (!file) {
-      throw new BadRequestException('File is required');
+      throw new BadRequestException('No file uploaded');
     }
 
-    return this.battleSpellService.updateIcon(id, file.filename);
+    return {
+      filename: file.filename,
+      originalName: file.originalname,
+      path: `/uploads/battlespells/${file.filename}`,
+      size: file.size,
+      mimetype: file.mimetype,
+    };
   }
 }

@@ -65,6 +65,22 @@ input CreateItemInput {
   type: String!
 }
 
+input CreateNavigationInput {
+  component: String
+  description: String
+  icon: String
+  is_active: Boolean! = true
+  is_header: Boolean! = false
+  is_visible: Boolean! = true
+  level: Int! = 0
+  name: String!
+  order: Int!
+  parent_id: ID
+  permissions: [String!]
+  roles: [String!]!
+  route: String
+}
+
 input CreateSkillDetailInput {
   attributes: JSON!
   level: Int!
@@ -142,57 +158,23 @@ type LogoutResponse {
   message: String!
 }
 
-type NavigationType {
-  _id: ID!
-  name: String!
-  parent_id: ID
-  icon: String
-  route: String
-  is_header: Boolean!
-  is_active: Boolean!
-  order: Int!
-  roles: [String!]!
-  permissions: [String!]!
-  description: String
-  level: Int!
-  component: String
-  is_visible: Boolean!
-  children: [NavigationType!]
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-type Query {
-  heroes: [Hero!]!
-  heroByName(name: String!): [Hero!]!
-  hero(id: ID!): Hero!
-  skills: [Skill!]!
-  skill(id: ID!): Skill!
-  skillDetails: [SkillDetail!]!
-  skillDetail(id: ID!): SkillDetail!
-  items: [Item!]!
-  item(id: ID!): Item!
-  childrenItems(parentId: ID!): [Item!]!
-  emblems: [Emblem!]!
-  emblem(id: ID!): Emblem!
-  me: User!
-  getAllUsers: [User!]!
-  isTokenValid: Boolean!
-  getAllNavigations: [NavigationType!]!
-  getNavigationById(id: ID!): NavigationType!
-  getUserNavigations: [NavigationType!]!
-  getNavigationTree: [NavigationType!]!
-}
-
 type Mutation {
-  addSkillDetailToSkill(input: [CreateSkillDetailInput!]!, skillId: ID!): [SkillDetail!]!
+  addSkillDetailToSkill(
+    input: [CreateSkillDetailInput!]!
+    skillId: ID!
+  ): [SkillDetail!]!
   addSkillToHero(heroId: ID!, input: CreateSkillInput!): Skill!
-  createBattleSpell(createBattleSpellInput: CreateBattleSpellInput!): BattleSpell!
+  createBattleSpell(
+    createBattleSpellInput: CreateBattleSpellInput!
+  ): BattleSpell!
   createEmblem(input: CreateEmblemInput!): Emblem!
   createHero(input: CreateHeroInput!): Hero!
   createHeroWithSkill(input: CreateHeroInput!): Hero!
   createHeroWithSkillandSkillDetail(input: CreateHeroInput!): Hero!
   createItem(input: CreateItemInput!): Item!
+  createNavigation(
+    createNavigationInput: CreateNavigationInput!
+  ): NavigationType!
   createSkill(input: CreateSkillInput!): Skill!
   createSkillDetail(input: CreateSkillDetailInput!): SkillDetail!
   deleteUser(userId: String!): Boolean!
@@ -204,17 +186,54 @@ type Mutation {
   removeEmblem(id: ID!): Emblem!
   removeHero(id: ID!): Hero!
   removeItem(id: ID!): Item!
+  removeNavigation(id: ID!): Boolean!
   removeSkill(id: ID!): Skill!
   removeSkillDetail(id: ID!): SkillDetail!
-  updateBattleSpell(id: String!, updateBattleSpellInput: UpdateBattleSpellInput!): BattleSpell!
+  seedNavigations: Boolean!
+  updateBattleSpell(
+    id: String!
+    updateBattleSpellInput: UpdateBattleSpellInput!
+  ): BattleSpell!
   updateEmblem(id: ID!, input: UpdateEmblemInput!): Emblem!
   updateHero(id: ID!, input: UpdateHeroInput!): Hero!
-  updateHeroWithSkills(fromHeroId: ID!, input: CreateSkillInput!, skillId: ID!, toHeroId: ID!): Skill!
+  updateHeroWithSkills(
+    fromHeroId: ID!
+    input: CreateSkillInput!
+    skillId: ID!
+    toHeroId: ID!
+  ): Skill!
   updateItem(id: ID!, input: UpdateItemInput!): Item!
+  updateNavigation(
+    updateNavigationInput: UpdateNavigationInput!
+  ): NavigationType!
   updateSkill(id: ID!, input: UpdateSkillInput!): Skill!
   updateSkillDetail(id: ID!, input: UpdateSkillDetailInput!): SkillDetail!
-  updateSkillDetailToSkill(input: UpdateSkillDetailInput!, skillDetailId: ID!, skillId: ID!): SkillDetail!
+  updateSkillDetailToSkill(
+    input: UpdateSkillDetailInput!
+    skillDetailId: ID!
+    skillId: ID!
+  ): SkillDetail!
   updateUserRole(updateUserRoleInput: UpdateUserRoleInput!): User!
+}
+
+type NavigationType {
+  _id: ID!
+  children: [NavigationType!]
+  component: String
+  createdAt: DateTime!
+  description: String
+  icon: String
+  is_active: Boolean!
+  is_header: Boolean!
+  is_visible: Boolean!
+  level: Int!
+  name: String!
+  order: Int!
+  parent_id: ID
+  permissions: [String!]!
+  roles: [String!]!
+  route: String
+  updatedAt: DateTime!
 }
 
 type Query {
@@ -223,7 +242,11 @@ type Query {
   childrenItems(parentId: ID!): [Item!]!
   emblem(id: ID!): Emblem!
   emblems: [Emblem!]!
+  getAllNavigations: [NavigationType!]!
   getAllUsers: [User!]!
+  getNavigationById(id: ID!): NavigationType!
+  getNavigationTree: [NavigationType!]!
+  getUserNavigations: [NavigationType!]!
   hero(id: ID!): Hero!
   heroByName(name: String!): [Hero!]!
   heroes: [Hero!]!
@@ -235,10 +258,6 @@ type Query {
   skillDetail(id: ID!): SkillDetail!
   skillDetails: [SkillDetail!]!
   skills: [Skill!]!
-  createNavigation(createNavigationInput: CreateNavigationInput!): NavigationType!
-  updateNavigation(updateNavigationInput: UpdateNavigationInput!): NavigationType!
-  removeNavigation(id: ID!): Boolean!
-  seedNavigations: Boolean!
 }
 
 input RegisterInput {
@@ -314,6 +333,23 @@ input UpdateItemInput {
   type: String
 }
 
+input UpdateNavigationInput {
+  _id: ID!
+  component: String
+  description: String
+  icon: String
+  is_active: Boolean
+  is_header: Boolean
+  is_visible: Boolean
+  level: Int
+  name: String
+  order: Int
+  parent_id: ID
+  permissions: [String!]
+  roles: [String!]
+  route: String
+}
+
 input UpdateSkillDetailInput {
   attributes: JSON
   level: Int
@@ -342,37 +378,4 @@ type User {
   name: String!
   role: String!
   updatedAt: DateTime!
-}
-
-input CreateNavigationInput {
-  name: String!
-  parent_id: ID
-  icon: String
-  route: String
-  is_header: Boolean! = false
-  is_active: Boolean! = true
-  order: Int!
-  roles: [String!]!
-  permissions: [String!]
-  description: String
-  level: Int! = 0
-  component: String
-  is_visible: Boolean! = true
-}
-
-input UpdateNavigationInput {
-  _id: ID!
-  name: String
-  parent_id: ID
-  icon: String
-  route: String
-  is_header: Boolean
-  is_active: Boolean
-  order: Int
-  roles: [String!]
-  permissions: [String!]
-  description: String
-  level: Int
-  component: String
-  is_visible: Boolean
 }

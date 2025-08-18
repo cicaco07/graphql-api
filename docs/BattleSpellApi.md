@@ -18,9 +18,10 @@
     - [- Example schema field for Update Battle Spell API](#--example-schema-field-for-update-battle-spell-api)
     - [- Example mutation for Update Battle Spell API](#--example-mutation-for-update-battle-spell-api)
     - [- Example response for Update Battle Spell API](#--example-response-for-update-battle-spell-api)
-  - [5. Delete Battle Spell API](#5-delete-battle-spell-api)
-    - [- Example mutation for Delete Battle Spell API](#--example-mutation-for-delete-battle-spell-api)
-    - [- Example response for Delete Battle Spell API](#--example-response-for-delete-battle-spell-api)
+  - [5. Remove Battle Spell API](#5-remove-battle-spell-api)
+    - [- Example schema field for Remove Battle Spell API](#--example-schema-field-for-remove-battle-spell-api)
+    - [- Example mutation for Remove Battle Spell API](#--example-mutation-for-remove-battle-spell-api)
+    - [- Example response for Remove Battle Spell API](#--example-response-for-remove-battle-spell-api)
 
 ## 1. Create Battle Spell API
 
@@ -49,6 +50,12 @@ mutation {
 }
 ```
 
+- HTTP Headers:
+
+```js
+Authorization: Bearer <access_token>
+```
+
 ### - Example mutation for Create Battle Spell API
 
 ```
@@ -70,6 +77,10 @@ mutation {
     description
   }
 }
+```
+
+```js
+Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODlhMTBlN2Y0NmU1NDA2YTg3NGU>
 ```
 
 ### - Example response for Create Battle Spell API
@@ -199,6 +210,12 @@ mutation {
 }
 ```
 
+- HTTP Headers:
+
+```js
+Authorization: Bearer <access_token>
+```
+
 ### - Example mutation for Update Battle Spell API
 
 ```
@@ -223,6 +240,10 @@ mutation {
 }
 ```
 
+```js
+Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODlhMTBlN2Y0NmU1NDA2YTg3NGU>
+```
+
 ### - Example response for Update Battle Spell API
 
 ```json
@@ -240,15 +261,15 @@ mutation {
 }
 ```
 
-## 5. Delete Battle Spell API
+## 5. Remove Battle Spell API
 
 Description: This mutation allows you to delete a specific battle spell by its ID.
 
-### - Example mutation for Delete Battle Spell API
+### - Example schema field for Remove Battle Spell API
 
 ```
 mutation {
-  deleteBattleSpell(id: "1") {
+  removeBattleSpell(id: string) {
     id
     name
     tag
@@ -259,7 +280,34 @@ mutation {
 }
 ```
 
-### - Example response for Delete Battle Spell API
+- HTTP Headers:
+
+```js
+Authorization: Bearer <access_token>
+```
+
+### - Example mutation for Remove Battle Spell API
+
+```
+mutation {
+  removeBattleSpell(id: "60c72b2f9b1e8c001c0a1b2c") {
+    id
+    name
+    tag
+    cooldown
+    icon
+    description
+  }
+}
+```
+
+- HTTP Headers:
+
+```js
+Authorization: Bearer <eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2ODlhMTBlN2Y0NmU1NDA2YTg3NGU>
+```
+
+### - Example response for Remove Battle Spell API
 
 ```json
 {

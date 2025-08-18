@@ -3,12 +3,19 @@ import { BattleSpellService } from './battle-spell.service';
 import { BattleSpell } from './entities/battle-spell.entity';
 import { CreateBattleSpellInput } from './dto/create-battle-spell.input';
 import { UpdateBattleSpellInput } from './dto/update-battle-spell.input';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/auth/enums/role.enum';
 
 @Resolver(() => BattleSpell)
 export class BattleSpellResolver {
   constructor(private readonly battleSpellService: BattleSpellService) {}
 
   @Mutation(() => BattleSpell)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MEMBER, Role.SUPER_ADMIN)
   createBattleSpell(
     @Args('createBattleSpellInput')
     createBattleSpellInput: CreateBattleSpellInput,
@@ -27,6 +34,8 @@ export class BattleSpellResolver {
   }
 
   @Mutation(() => BattleSpell)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MEMBER, Role.SUPER_ADMIN)
   updateBattleSpell(
     @Args('id') id: string,
     @Args('updateBattleSpellInput')
@@ -36,6 +45,8 @@ export class BattleSpellResolver {
   }
 
   @Mutation(() => Boolean)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MEMBER, Role.SUPER_ADMIN)
   removeBattleSpell(@Args('id') id: string) {
     return this.battleSpellService.remove(id);
   }

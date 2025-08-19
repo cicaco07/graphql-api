@@ -182,7 +182,7 @@ type Mutation {
   logout: LogoutResponse!
   logoutEverywhere: LogoutResponse!
   register(registerInput: RegisterInput!): AuthResponse!
-  removeBattleSpell(id: String!): Boolean!
+  removeBattleSpell(id: ID!): Boolean!
   removeEmblem(id: ID!): Emblem!
   removeHero(id: ID!): Hero!
   removeItem(id: ID!): Item!
@@ -191,7 +191,7 @@ type Mutation {
   removeSkillDetail(id: ID!): SkillDetail!
   seedNavigations: Boolean!
   updateBattleSpell(
-    id: String!
+    id: ID!
     updateBattleSpellInput: UpdateBattleSpellInput!
   ): BattleSpell!
   updateEmblem(id: ID!, input: UpdateEmblemInput!): Emblem!
@@ -237,7 +237,7 @@ type NavigationType {
 }
 
 type Query {
-  battleSpell(id: String!): BattleSpell!
+  battleSpell(id: ID!): BattleSpell!
   battleSpells: [BattleSpell!]!
   childrenItems(parentId: ID!): [Item!]!
   emblem(id: ID!): Emblem!
@@ -286,7 +286,6 @@ type SkillDetail {
 }
 
 input UpdateBattleSpellInput {
-  _id: ID!
   cooldown: Float
   description: String
   icon: String

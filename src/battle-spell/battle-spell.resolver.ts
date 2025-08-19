@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
 import { BattleSpellService } from './battle-spell.service';
 import { BattleSpell } from './entities/battle-spell.entity';
 import { CreateBattleSpellInput } from './dto/create-battle-spell.input';
@@ -29,7 +29,7 @@ export class BattleSpellResolver {
   }
 
   @Query(() => BattleSpell, { name: 'battleSpell' })
-  findOne(@Args('id') id: string) {
+  findOne(@Args('id', { type: () => ID }) id: string) {
     return this.battleSpellService.findOne(id);
   }
 
@@ -37,7 +37,7 @@ export class BattleSpellResolver {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.MEMBER, Role.SUPER_ADMIN)
   updateBattleSpell(
-    @Args('id') id: string,
+    @Args('id', { type: () => ID }) id: string,
     @Args('updateBattleSpellInput')
     updateBattleSpellInput: UpdateBattleSpellInput,
   ) {
@@ -47,7 +47,7 @@ export class BattleSpellResolver {
   @Mutation(() => Boolean)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.MEMBER, Role.SUPER_ADMIN)
-  removeBattleSpell(@Args('id') id: string) {
+  removeBattleSpell(@Args('id', { type: () => ID }) id: string) {
     return this.battleSpellService.remove(id);
   }
 }

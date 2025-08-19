@@ -8,13 +8,13 @@ type AuthResponse {
 }
 
 type BattleSpell {
+  _id: ID!
   cooldown: Float!
   createdAt: DateTime!
   description: String!
   icon: String!
-  id: ID!
   name: String!
-  tag: [String!]!
+  tag: String!
   updatedAt: DateTime!
 }
 
@@ -23,7 +23,7 @@ input CreateBattleSpellInput {
   description: String!
   icon: String!
   name: String!
-  tag: [String!]!
+  tag: String!
 }
 
 input CreateEmblemInput {
@@ -286,12 +286,12 @@ type SkillDetail {
 }
 
 input UpdateBattleSpellInput {
+  _id: ID!
   cooldown: Float
   description: String
   icon: String
-  id: ID!
   name: String
-  tag: [String!]
+  tag: String
 }
 
 input UpdateEmblemInput {

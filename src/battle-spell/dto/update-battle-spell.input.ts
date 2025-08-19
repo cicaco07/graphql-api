@@ -8,5 +8,5 @@ export class UpdateBattleSpellInput extends PartialType(
 ) {
   @Field(() => ID)
   @IsString()
-  id: string;
+  _id: string;
 }

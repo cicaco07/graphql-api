@@ -8,13 +8,13 @@ type AuthResponse {
 }
 
 type BattleSpell {
+  _id: ID!
   cooldown: Float!
   createdAt: DateTime!
   description: String!
   icon: String!
-  id: ID!
   name: String!
-  tag: [String!]!
+  tag: String!
   updatedAt: DateTime!
 }
 
@@ -23,7 +23,7 @@ input CreateBattleSpellInput {
   description: String!
   icon: String!
   name: String!
-  tag: [String!]!
+  tag: String!
 }
 
 input CreateEmblemInput {
@@ -63,6 +63,22 @@ input CreateItemInput {
   tag: String
   tips: String
   type: String!
+}
+
+input CreateNavigationInput {
+  component: String
+  description: String
+  icon: String
+  is_active: Boolean! = true
+  is_header: Boolean! = false
+  is_visible: Boolean! = true
+  level: Int! = 0
+  name: String!
+  order: Int!
+  parent_id: ID
+  permissions: [String!]
+  roles: [String!]!
+  route: String
 }
 
 input CreateSkillDetailInput {
@@ -143,14 +159,22 @@ type LogoutResponse {
 }
 
 type Mutation {
-  addSkillDetailToSkill(input: [CreateSkillDetailInput!]!, skillId: ID!): [SkillDetail!]!
+  addSkillDetailToSkill(
+    input: [CreateSkillDetailInput!]!
+    skillId: ID!
+  ): [SkillDetail!]!
   addSkillToHero(heroId: ID!, input: CreateSkillInput!): Skill!
-  createBattleSpell(createBattleSpellInput: CreateBattleSpellInput!): BattleSpell!
+  createBattleSpell(
+    createBattleSpellInput: CreateBattleSpellInput!
+  ): BattleSpell!
   createEmblem(input: CreateEmblemInput!): Emblem!
   createHero(input: CreateHeroInput!): Hero!
   createHeroWithSkill(input: CreateHeroInput!): Hero!
   createHeroWithSkillandSkillDetail(input: CreateHeroInput!): Hero!
   createItem(input: CreateItemInput!): Item!
+  createNavigation(
+    createNavigationInput: CreateNavigationInput!
+  ): NavigationType!
   createSkill(input: CreateSkillInput!): Skill!
   createSkillDetail(input: CreateSkillDetailInput!): SkillDetail!
   deleteUser(userId: String!): Boolean!
@@ -158,30 +182,71 @@ type Mutation {
   logout: LogoutResponse!
   logoutEverywhere: LogoutResponse!
   register(registerInput: RegisterInput!): AuthResponse!
-  removeBattleSpell(id: String!): Boolean!
+  removeBattleSpell(id: ID!): Boolean!
   removeEmblem(id: ID!): Emblem!
   removeHero(id: ID!): Hero!
   removeItem(id: ID!): Item!
+  removeNavigation(id: ID!): Boolean!
   removeSkill(id: ID!): Skill!
   removeSkillDetail(id: ID!): SkillDetail!
-  updateBattleSpell(id: String!, updateBattleSpellInput: UpdateBattleSpellInput!): BattleSpell!
+  seedNavigations: Boolean!
+  updateBattleSpell(
+    id: ID!
+    updateBattleSpellInput: UpdateBattleSpellInput!
+  ): BattleSpell!
   updateEmblem(id: ID!, input: UpdateEmblemInput!): Emblem!
   updateHero(id: ID!, input: UpdateHeroInput!): Hero!
-  updateHeroWithSkills(fromHeroId: ID!, input: CreateSkillInput!, skillId: ID!, toHeroId: ID!): Skill!
+  updateHeroWithSkills(
+    fromHeroId: ID!
+    input: CreateSkillInput!
+    skillId: ID!
+    toHeroId: ID!
+  ): Skill!
   updateItem(id: ID!, input: UpdateItemInput!): Item!
+  updateNavigation(
+    updateNavigationInput: UpdateNavigationInput!
+  ): NavigationType!
   updateSkill(id: ID!, input: UpdateSkillInput!): Skill!
   updateSkillDetail(id: ID!, input: UpdateSkillDetailInput!): SkillDetail!
-  updateSkillDetailToSkill(input: UpdateSkillDetailInput!, skillDetailId: ID!, skillId: ID!): SkillDetail!
+  updateSkillDetailToSkill(
+    input: UpdateSkillDetailInput!
+    skillDetailId: ID!
+    skillId: ID!
+  ): SkillDetail!
   updateUserRole(updateUserRoleInput: UpdateUserRoleInput!): User!
 }
 
+type NavigationType {
+  _id: ID!
+  children: [NavigationType!]
+  component: String
+  createdAt: DateTime!
+  description: String
+  icon: String
+  is_active: Boolean!
+  is_header: Boolean!
+  is_visible: Boolean!
+  level: Int!
+  name: String!
+  order: Int!
+  parent_id: ID
+  permissions: [String!]!
+  roles: [String!]!
+  route: String
+  updatedAt: DateTime!
+}
+
 type Query {
-  battleSpell(id: String!): BattleSpell!
+  battleSpell(id: ID!): BattleSpell!
   battleSpells: [BattleSpell!]!
   childrenItems(parentId: ID!): [Item!]!
   emblem(id: ID!): Emblem!
   emblems: [Emblem!]!
+  getAllNavigations: [NavigationType!]!
   getAllUsers: [User!]!
+  getNavigationById(id: ID!): NavigationType!
+  getNavigationTree: [NavigationType!]!
+  getUserNavigations: [NavigationType!]!
   hero(id: ID!): Hero!
   heroByName(name: String!): [Hero!]!
   heroes: [Hero!]!
@@ -224,9 +289,8 @@ input UpdateBattleSpellInput {
   cooldown: Float
   description: String
   icon: String
-  id: ID!
   name: String
-  tag: [String!]
+  tag: String
 }
 
 input UpdateEmblemInput {
@@ -266,6 +330,23 @@ input UpdateItemInput {
   tag: String
   tips: String
   type: String
+}
+
+input UpdateNavigationInput {
+  _id: ID!
+  component: String
+  description: String
+  icon: String
+  is_active: Boolean
+  is_header: Boolean
+  is_visible: Boolean
+  level: Int
+  name: String
+  order: Int
+  parent_id: ID
+  permissions: [String!]
+  roles: [String!]
+  route: String
 }
 
 input UpdateSkillDetailInput {

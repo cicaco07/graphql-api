@@ -3,7 +3,7 @@ import { ObjectType, Field, ID } from '@nestjs/graphql';
 @ObjectType()
 export class BattleSpell {
   @Field(() => ID)
-  id: string;
+  _id: string;
 
   @Field()
   name: string;
@@ -17,8 +17,8 @@ export class BattleSpell {
   @Field()
   cooldown: number;
 
-  @Field(() => [String])
-  tag: string[];
+  @Field()
+  tag: string;
 
   @Field()
   createdAt: Date;

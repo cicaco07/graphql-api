@@ -15,8 +15,8 @@ export class BattleSpell {
   @Prop({ required: true, type: Number })
   cooldown: number; // in seconds
 
-  @Prop({ type: [String], default: [] })
-  tag: string[];
+  @Prop({ required: true })
+  tag: string;
 
   @Prop({ default: Date.now })
   createdAt?: Date;

@@ -1,5 +1,5 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { IsArray, IsNumber, IsString, Min } from 'class-validator';
+import { IsNumber, IsString, Min } from 'class-validator';
 
 @InputType()
 export class CreateBattleSpellInput {
@@ -20,8 +20,7 @@ export class CreateBattleSpellInput {
   @Min(0)
   cooldown: number;
 
-  @Field(() => [String])
-  @IsArray()
-  @IsString({ each: true })
-  tag: string[];
+  @Field()
+  @IsString()
+  tag: string;
 }

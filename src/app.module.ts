@@ -17,6 +17,7 @@ import { BattleSpellModule } from './battle-spell/battle-spell.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { NavigationModule } from './navigation/navigation.module';
+import { BaseStatModule } from './base-stat/base-stat.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { NavigationModule } from './navigation/navigation.module';
     DatabaseModule,
     BattleSpellModule,
     NavigationModule,
+    BaseStatModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: 'GraphQLJSON', useValue: GraphQLJSON }],

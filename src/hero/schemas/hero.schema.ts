@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import mongoose from 'mongoose';
+import { BaseStat } from 'src/base-stat/schemas/base-stat.schema';
 import { Skill } from 'src/skill/schemas/skill.schema';
 
 @Schema()
@@ -43,6 +44,9 @@ export class Hero extends Document {
 
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Skill' })
   skills: Skill[];
+
+  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'BaseStat' })
+  baseStat: BaseStat[];
 }
 
 export const HeroSchema = SchemaFactory.createForClass(Hero);

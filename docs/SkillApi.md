@@ -1,12 +1,35 @@
 # **Skill API Table of Contents**
 
-1. [Create Skill API](#1-create-skill-api)
-2. [Add Skill to Hero API](#2-create-skill-to-hero-api)
-3. [Update Hero with Skill API](#3-update-hero-with-skill-api)
-4. [Find All Skill API](#4-find-all-skill-api)
-5. [Find Skill by ID API](#5-find-skill-by-id-api)
-6. [Update Skill API](#6-update-skill-api)
-7. [Delete Skill API](#7-delete-skill-api)
+## Skill API Table of Contents
+
+- [**Skill API Table of Contents**](#skill-api-table-of-contents)
+  - [Skill API Table of Contents](#skill-api-table-of-contents-1)
+  - [1. Create Skill API](#1-create-skill-api)
+    - [- Example schema field for Create Skill API](#--example-schema-field-for-create-skill-api)
+    - [- Example mutation for Create Skill](#--example-mutation-for-create-skill)
+    - [- Example response for Create Skill](#--example-response-for-create-skill)
+  - [2. Add Skill to Hero API](#2-add-skill-to-hero-api)
+    - [- Example schema field for Add Skill to Hero API](#--example-schema-field-for-add-skill-to-hero-api)
+    - [- Example mutation for Add Skill to Hero](#--example-mutation-for-add-skill-to-hero)
+    - [- Example response for Add Skill to Hero](#--example-response-for-add-skill-to-hero)
+  - [3. Update Hero with Skill API](#3-update-hero-with-skill-api)
+    - [- Example schema field for Update Hero with Skill API](#--example-schema-field-for-update-hero-with-skill-api)
+    - [- Example mutation for Update Hero with Skill](#--example-mutation-for-update-hero-with-skill)
+    - [- Example response for Update Hero with Skill](#--example-response-for-update-hero-with-skill)
+  - [4. Find All Skill API](#4-find-all-skill-api)
+    - [- Example query for Find All Skill](#--example-query-for-find-all-skill)
+    - [- Example response for Find All Skill](#--example-response-for-find-all-skill)
+  - [5. Find Skill by ID API](#5-find-skill-by-id-api)
+    - [- Example query for Find Skill by ID](#--example-query-for-find-skill-by-id)
+    - [- Example response for Find Skill by ID](#--example-response-for-find-skill-by-id)
+  - [6. Update Skill API](#6-update-skill-api)
+    - [- Example schema field for Update Skill API](#--example-schema-field-for-update-skill-api)
+    - [- Example mutation for Update Skill](#--example-mutation-for-update-skill)
+    - [- Example response for Update Skill](#--example-response-for-update-skill)
+  - [7. Remove Skill API](#7-remove-skill-api)
+    - [- Example schema field for Remove Skill](#--example-schema-field-for-remove-skill)
+    - [- Example mutation for Remove Skill](#--example-mutation-for-remove-skill)
+    - [- Example response for Remove Skill](#--example-response-for-remove-skill)
 
 ## 1. Create Skill API
 

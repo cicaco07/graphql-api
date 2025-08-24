@@ -7,6 +7,24 @@ type AuthResponse {
   user: User!
 }
 
+type BaseStat {
+  attack_range: Int!
+  attack_speed: Int!
+  attack_speed_ratio: Int!
+  energy: Int!
+  energy_regen: Int!
+  hp: Int!
+  hp_regen: Int!
+  magic_defense: Int!
+  magic_power: Int!
+  mana: Int!
+  mana_regen: Int!
+  movement_speed: Int!
+  physical_attack: Int!
+  physical_defense: Int!
+  spell_vamp_ratio: Int!
+}
+
 type BattleSpell {
   _id: ID!
   cooldown: Float!
@@ -16,6 +34,24 @@ type BattleSpell {
   name: String!
   tag: String!
   updatedAt: DateTime!
+}
+
+input CreateBaseStatInput {
+  attack_range: Int!
+  attack_speed: Int!
+  attack_speed_ratio: Int!
+  energy: Int!
+  energy_regen: Int!
+  hp: Int!
+  hp_regen: Int!
+  magic_defense: Int!
+  magic_power: Int!
+  mana: Int!
+  mana_regen: Int!
+  movement_speed: Int!
+  physical_attack: Int!
+  physical_defense: Int!
+  spell_vamp_ratio: Int!
 }
 
 input CreateBattleSpellInput {
@@ -39,6 +75,7 @@ input CreateEmblemInput {
 input CreateHeroInput {
   alias: String!
   avatar: String!
+  base_stats: [CreateBaseStatInput!]
   control_effect: Float!
   difficulty: Float!
   durability: Float!
@@ -117,6 +154,7 @@ type Hero {
   _id: ID!
   alias: String!
   avatar: String!
+  base_stats: [BaseStat!]
   control_effect: Float!
   difficulty: Float!
   durability: Float!
@@ -159,22 +197,16 @@ type LogoutResponse {
 }
 
 type Mutation {
-  addSkillDetailToSkill(
-    input: [CreateSkillDetailInput!]!
-    skillId: ID!
-  ): [SkillDetail!]!
+  addSkillDetailToSkill(input: [CreateSkillDetailInput!]!, skillId: ID!): [SkillDetail!]!
   addSkillToHero(heroId: ID!, input: CreateSkillInput!): Skill!
-  createBattleSpell(
-    createBattleSpellInput: CreateBattleSpellInput!
-  ): BattleSpell!
+  createBaseStat(createBaseStatInput: CreateBaseStatInput!): BaseStat!
+  createBattleSpell(createBattleSpellInput: CreateBattleSpellInput!): BattleSpell!
   createEmblem(input: CreateEmblemInput!): Emblem!
   createHero(input: CreateHeroInput!): Hero!
   createHeroWithSkill(input: CreateHeroInput!): Hero!
   createHeroWithSkillandSkillDetail(input: CreateHeroInput!): Hero!
   createItem(input: CreateItemInput!): Item!
-  createNavigation(
-    createNavigationInput: CreateNavigationInput!
-  ): NavigationType!
+  createNavigation(createNavigationInput: CreateNavigationInput!): NavigationType!
   createSkill(input: CreateSkillInput!): Skill!
   createSkillDetail(input: CreateSkillDetailInput!): SkillDetail!
   deleteUser(userId: String!): Boolean!
@@ -182,6 +214,7 @@ type Mutation {
   logout: LogoutResponse!
   logoutEverywhere: LogoutResponse!
   register(registerInput: RegisterInput!): AuthResponse!
+  removeBaseStat(id: ID!): BaseStat!
   removeBattleSpell(id: ID!): Boolean!
   removeEmblem(id: ID!): Emblem!
   removeHero(id: ID!): Hero!
@@ -190,29 +223,16 @@ type Mutation {
   removeSkill(id: ID!): Skill!
   removeSkillDetail(id: ID!): SkillDetail!
   seedNavigations: Boolean!
-  updateBattleSpell(
-    id: ID!
-    updateBattleSpellInput: UpdateBattleSpellInput!
-  ): BattleSpell!
+  updateBaseStat(id: ID!, updateBaseStatInput: UpdateBaseStatInput!): BaseStat!
+  updateBattleSpell(id: ID!, updateBattleSpellInput: UpdateBattleSpellInput!): BattleSpell!
   updateEmblem(id: ID!, input: UpdateEmblemInput!): Emblem!
   updateHero(id: ID!, input: UpdateHeroInput!): Hero!
-  updateHeroWithSkills(
-    fromHeroId: ID!
-    input: CreateSkillInput!
-    skillId: ID!
-    toHeroId: ID!
-  ): Skill!
+  updateHeroWithSkills(fromHeroId: ID!, input: CreateSkillInput!, skillId: ID!, toHeroId: ID!): Skill!
   updateItem(id: ID!, input: UpdateItemInput!): Item!
-  updateNavigation(
-    updateNavigationInput: UpdateNavigationInput!
-  ): NavigationType!
+  updateNavigation(updateNavigationInput: UpdateNavigationInput!): NavigationType!
   updateSkill(id: ID!, input: UpdateSkillInput!): Skill!
   updateSkillDetail(id: ID!, input: UpdateSkillDetailInput!): SkillDetail!
-  updateSkillDetailToSkill(
-    input: UpdateSkillDetailInput!
-    skillDetailId: ID!
-    skillId: ID!
-  ): SkillDetail!
+  updateSkillDetailToSkill(input: UpdateSkillDetailInput!, skillDetailId: ID!, skillId: ID!): SkillDetail!
   updateUserRole(updateUserRoleInput: UpdateUserRoleInput!): User!
 }
 
@@ -237,6 +257,7 @@ type NavigationType {
 }
 
 type Query {
+  baseStat(id: ID!): BaseStat!
   battleSpell(id: ID!): BattleSpell!
   battleSpells: [BattleSpell!]!
   childrenItems(parentId: ID!): [Item!]!
@@ -285,6 +306,24 @@ type SkillDetail {
   level: Float
 }
 
+input UpdateBaseStatInput {
+  attack_range: Int
+  attack_speed: Int
+  attack_speed_ratio: Int
+  energy: Int
+  energy_regen: Int
+  hp: Int
+  hp_regen: Int
+  magic_defense: Int
+  magic_power: Int
+  mana: Int
+  mana_regen: Int
+  movement_speed: Int
+  physical_attack: Int
+  physical_defense: Int
+  spell_vamp_ratio: Int
+}
+
 input UpdateBattleSpellInput {
   cooldown: Float
   description: String
@@ -306,6 +345,7 @@ input UpdateEmblemInput {
 input UpdateHeroInput {
   alias: String
   avatar: String
+  base_stats: [CreateBaseStatInput!]
   control_effect: Float
   difficulty: Float
   durability: Float

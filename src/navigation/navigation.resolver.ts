@@ -56,15 +56,15 @@ export class NavigationResolver {
   async getUserNavigations(
     @Context()
     context: {
-      req: { user: { roles?: string[]; permissions?: string[] } };
+      req: { user: { role?: string[]; permission?: string[] } };
     },
   ): Promise<NavigationType[]> {
     const user = context.req.user as {
-      roles?: string[];
-      permissions?: string[];
+      role?: string[];
+      permission?: string[];
     };
-    const userRoles = user.roles || [];
-    const userPermissions = user.permissions || [];
+    const userRoles = user.role || [];
+    const userPermissions = user.permission || [];
 
     return this.navigationService.getNavigationsByRoleAndPermissions(
       userRoles,

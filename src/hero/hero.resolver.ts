@@ -16,22 +16,26 @@ export class HeroResolver {
   @Mutation(() => Hero)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.MEMBER, Role.SUPER_ADMIN)
-  createHero(@Args('input') input: CreateHeroInput) {
-    return this.heroService.create(input);
+  createHero(@Args('createHeroInput') createHeroInput: CreateHeroInput) {
+    return this.heroService.create(createHeroInput);
   }
 
   @Mutation(() => Hero)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.MEMBER, Role.SUPER_ADMIN)
-  createHeroWithSkill(@Args('input') input: CreateHeroInput) {
-    return this.heroService.createHeroWithSkill(input);
+  createHeroWithSkill(
+    @Args('createHeroInput') createHeroInput: CreateHeroInput,
+  ) {
+    return this.heroService.createHeroWithSkill(createHeroInput);
   }
 
   @Mutation(() => Hero)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.MEMBER, Role.SUPER_ADMIN)
-  createHeroWithSkillandSkillDetail(@Args('input') input: CreateHeroInput) {
-    return this.heroService.createHeroWithSkillandSkillDetail(input);
+  createHeroWithSkillandSkillDetail(
+    @Args('createHeroInput') createHeroInput: CreateHeroInput,
+  ) {
+    return this.heroService.createHeroWithSkillandSkillDetail(createHeroInput);
   }
 
   @Query(() => [Hero], { name: 'heroes' })
@@ -54,9 +58,9 @@ export class HeroResolver {
   @Roles(Role.MEMBER, Role.SUPER_ADMIN)
   updateHero(
     @Args('id', { type: () => ID }) id: string,
-    @Args('input') input: UpdateHeroInput,
+    @Args('updateHeroInput') updateHeroInput: UpdateHeroInput,
   ) {
-    return this.heroService.update(id, input);
+    return this.heroService.update(id, updateHeroInput);
   }
 
   @Mutation(() => Hero)

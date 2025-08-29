@@ -197,16 +197,23 @@ type LogoutResponse {
 }
 
 type Mutation {
-  addSkillDetailToSkill(input: [CreateSkillDetailInput!]!, skillId: ID!): [SkillDetail!]!
+  addSkillDetailToSkill(
+    input: [CreateSkillDetailInput!]!
+    skillId: ID!
+  ): [SkillDetail!]!
   addSkillToHero(heroId: ID!, input: CreateSkillInput!): Skill!
   createBaseStat(createBaseStatInput: CreateBaseStatInput!): BaseStat!
-  createBattleSpell(createBattleSpellInput: CreateBattleSpellInput!): BattleSpell!
+  createBattleSpell(
+    createBattleSpellInput: CreateBattleSpellInput!
+  ): BattleSpell!
   createEmblem(input: CreateEmblemInput!): Emblem!
   createHero(input: CreateHeroInput!): Hero!
   createHeroWithSkill(input: CreateHeroInput!): Hero!
   createHeroWithSkillandSkillDetail(input: CreateHeroInput!): Hero!
   createItem(input: CreateItemInput!): Item!
-  createNavigation(createNavigationInput: CreateNavigationInput!): NavigationType!
+  createNavigation(
+    createNavigationInput: CreateNavigationInput!
+  ): NavigationType!
   createSkill(input: CreateSkillInput!): Skill!
   createSkillDetail(input: CreateSkillDetailInput!): SkillDetail!
   deleteUser(userId: String!): Boolean!
@@ -224,15 +231,29 @@ type Mutation {
   removeSkillDetail(id: ID!): SkillDetail!
   seedNavigations: Boolean!
   updateBaseStat(id: ID!, updateBaseStatInput: UpdateBaseStatInput!): BaseStat!
-  updateBattleSpell(id: ID!, updateBattleSpellInput: UpdateBattleSpellInput!): BattleSpell!
+  updateBattleSpell(
+    id: ID!
+    updateBattleSpellInput: UpdateBattleSpellInput!
+  ): BattleSpell!
   updateEmblem(id: ID!, input: UpdateEmblemInput!): Emblem!
   updateHero(id: ID!, input: UpdateHeroInput!): Hero!
-  updateHeroWithSkills(fromHeroId: ID!, input: CreateSkillInput!, skillId: ID!, toHeroId: ID!): Skill!
+  updateHeroWithSkills(
+    fromHeroId: ID!
+    input: CreateSkillInput!
+    skillId: ID!
+    toHeroId: ID!
+  ): Skill!
   updateItem(id: ID!, input: UpdateItemInput!): Item!
-  updateNavigation(updateNavigationInput: UpdateNavigationInput!): NavigationType!
+  updateNavigation(
+    updateNavigationInput: UpdateNavigationInput!
+  ): NavigationType!
   updateSkill(id: ID!, input: UpdateSkillInput!): Skill!
   updateSkillDetail(id: ID!, input: UpdateSkillDetailInput!): SkillDetail!
-  updateSkillDetailToSkill(input: UpdateSkillDetailInput!, skillDetailId: ID!, skillId: ID!): SkillDetail!
+  updateSkillDetailToSkill(
+    input: UpdateSkillDetailInput!
+    skillDetailId: ID!
+    skillId: ID!
+  ): SkillDetail!
   updateUserRole(updateUserRoleInput: UpdateUserRoleInput!): User!
 }
 

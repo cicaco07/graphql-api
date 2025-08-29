@@ -9,37 +9,37 @@ export class Hero extends Document {
   @Prop({ required: true })
   name: string;
 
-  @Prop()
+  @Prop({ required: true })
   alias: string;
 
-  @Prop([String])
+  @Prop({ type: [String], required: true })
   role: string[];
 
-  @Prop([String])
+  @Prop({ type: [String], required: true })
   type: string[];
 
-  @Prop()
-  avatar: string;
+  @Prop({ required: true })
+  avatar?: string;
 
-  @Prop()
-  image: string;
+  @Prop({ required: true })
+  image?: string;
 
-  @Prop()
+  @Prop({ required: true })
   short_description: string;
 
-  @Prop()
+  @Prop({ required: true })
   release_date: Date;
 
-  @Prop()
+  @Prop({ required: true })
   durability: number;
 
-  @Prop()
+  @Prop({ required: true })
   offense: number;
 
-  @Prop()
+  @Prop({ required: true })
   control_effect: number;
 
-  @Prop()
+  @Prop({ required: true })
   difficulty: number;
 
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Skill' })

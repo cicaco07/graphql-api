@@ -41,7 +41,7 @@ registerEnumType(Priority, {
 });
 
 @ObjectType()
-export class PatchNote {
+export class PatchNoteEntity {
   @Field(() => ID)
   _id: string;
 
@@ -64,22 +64,22 @@ export class PatchNote {
   priority: Priority;
 
   @Field({ nullable: true })
-  targetEntity: string;
+  targetEntity?: string;
 
   @Field({ nullable: true })
-  targetEntityId: string;
+  targetEntityId?: string;
 
   @Field(() => [String], { nullable: true })
-  tags: string[];
+  tags?: string[];
 
   @Field({ nullable: true })
-  previousValue: string;
+  previousValue?: string;
 
   @Field({ nullable: true })
-  newValue: string;
+  newValue?: string;
 
   @Field(() => String, { nullable: true })
-  additionalData: Record<string, any>;
+  additionalData?: Record<string, any>;
 
   @Field()
   isActive: boolean;
@@ -90,12 +90,39 @@ export class PatchNote {
   @Field()
   updatedAt: Date;
 
-  @Field({ nullable: true })
+  @Field()
   publishedAt: Date;
 
   @Field()
   createdBy: string;
 
   @Field({ nullable: true })
-  updatedBy: string;
+  updatedBy?: string;
 }
+
+// @ObjectType()
+// export class TypeStats {
+//   @Field()
+//   _id: string;
+
+//   @Field(() => Int)
+//   count: number;
+// }
+
+// @ObjectType()
+// export class PaginatedPatchNotesResponse {
+//   @Field(() => [PatchNote])
+//   data: PatchNote[];
+
+//   @Field(() => Int)
+//   total: number;
+
+//   @Field(() => Int)
+//   page: number;
+
+//   @Field(() => Int)
+//   limit: number;
+
+//   @Field(() => Int)
+//   totalPages: number;
+// }

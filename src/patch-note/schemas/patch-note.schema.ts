@@ -70,6 +70,12 @@ export class PatchNote {
 
   @Prop()
   updatedBy: string;
+
+  @Prop({ default: Date.now })
+  createdAt: Date;
+
+  @Prop({ default: Date.now })
+  updatedAt: Date;
 }
 
 export const PatchNoteSchema = SchemaFactory.createForClass(PatchNote);

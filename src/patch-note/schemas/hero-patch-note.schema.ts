@@ -1,92 +1,44 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
 
 export type HeroPatchNoteDocument = HeroPatchNote & Document;
 
-@Schema({ _id: false })
-export class SkillChange {
+@Schema()
+export class HeroChangeDetail {
   @Prop({ required: true })
   name: string;
 
   @Prop({ required: true })
-  type: string;
-
-  @Prop({
-    required: true,
-    enum: ['new', 'buff', 'nerf', 'adjusted', 'reworked', 'removed'],
-  })
   change_type: string;
 
-  @Prop({ required: true })
-  description: string;
+  @Prop({ required: false })
+  description?: string;
 }
 
-@Schema({ _id: false })
+@Schema()
 export class HeroChange {
   @Prop({ required: true })
-  hero: string;
+  title: string;
 
-  @Prop()
-  alias: string;
+  @Prop({ required: false })
+  description?: string;
 
-  @Prop({
-    required: true,
-    enum: ['new', 'buff', 'nerf', 'adjusted', 'reworked', 'removed'],
-  })
-  change_type: string;
-
-  @Prop({ required: true })
-  description: string;
-
-  @Prop({ type: [SkillChange], default: [] })
-  skills?: SkillChange[];
-
-  @Prop({ type: [Object], default: [] })
-  changes?: Record<string, any>[];
+  @Prop({ type: [HeroChangeDetail], required: false })
+  changes?: HeroChangeDetail[];
 }
 
 @Schema({ timestamps: true })
 export class HeroPatchNote {
-  @Prop({ required: true })
-  version: string;
-
-  @Prop()
-  season?: number;
-
   @Prop({ required: true })
   title: string;
 
   @Prop({ required: true })
   description: string;
 
-  @Prop({
-    enum: ['Major Update', 'Minor Update', 'Hotfix', 'Balance Update'],
-    default: 'Balance Update',
-  })
-  type?: string;
-
-  @Prop({ type: [HeroChange], default: [] })
-  changes: HeroChange[];
-
-  @Prop({ default: true })
-  isActive: boolean;
-
-  @Prop()
-  publishedAt?: Date;
-
-  @Prop({ required: true })
-  createdBy: string;
-
-  @Prop()
-  updatedBy?: string;
-
-  @Prop({ default: Date.now })
-  createdAt: Date;
-
-  @Prop({ default: Date.now })
-  updatedAt: Date;
+  @Prop({ type: [HeroChange], required: false })
+  change_details: HeroChange[];
 }
 
 export const HeroPatchNoteSchema = SchemaFactory.createForClass(HeroPatchNote);
-export const SkillChangeSchema = SchemaFactory.createForClass(SkillChange);
 export const HeroChangeSchema = SchemaFactory.createForClass(HeroChange);
+export const HeroChangeDetailSchema =
+  SchemaFactory.createForClass(HeroChangeDetail);

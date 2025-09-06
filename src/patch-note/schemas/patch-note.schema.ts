@@ -1,81 +1,55 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import mongoose from 'mongoose';
+import { HeroPatchNote } from './hero-patch-note.schema';
+import { BattlefieldPatchNote } from './battlefield-patch-note.schema';
+import { SystemPatchNote } from './system-patch-note.schema';
+import { GameModePatchNote } from './game-mode-patch-note.schema';
 
 export type PatchNoteDocument = PatchNote & Document;
 
 @Schema({ timestamps: true })
 export class PatchNote {
   @Prop({ required: true })
-  version: string;
+  name: string;
 
   @Prop({ required: true })
-  title: string;
+  start_date: Date;
 
   @Prop({ required: true })
-  description: string;
+  end_date: Date;
 
   @Prop({
     required: true,
-    enum: [
-      'hero_change',
-      'skill_change',
-      'item_change',
-      'gameplay_change',
-      'feature_addition',
-      'feature_removal',
-      'bug_fix',
-      'balance_change',
-    ],
+    enum: ['major', 'minor', 'patch', 'hotfix'],
   })
   type: string;
 
-  @Prop({
-    required: true,
-    enum: ['buff', 'nerf', 'rework', 'new', 'removed', 'fixed', 'adjusted'],
-  })
-  changeType: string;
+  @Prop({ required: true })
+  season: number;
 
-  @Prop({
-    enum: ['low', 'medium', 'high', 'critical'],
-    default: 'medium',
-  })
-  priority: string;
+  @Prop({ default: Date.now })
+  created_at: Date;
 
-  @Prop()
-  targetEntity: string;
+  @Prop({ default: Date.now })
+  updated_at: Date;
 
-  @Prop()
-  targetEntityId: string;
+  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'HeroPatchNote' })
+  hero_changes: HeroPatchNote[];
 
-  @Prop([String])
-  tags: string[];
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'BattlefieldPatchNote' })
+  battlefield_changes: BattlefieldPatchNote[];
 
-  @Prop()
-  previousValue: string;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'SystemPatchNote' })
+  system_changes: SystemPatchNote[];
 
-  @Prop()
-  newValue: string;
-
-  @Prop({ type: Object })
-  additionalData: Record<string, any>;
-
-  @Prop({ default: true })
-  isActive: boolean;
-
-  @Prop()
-  publishedAt: Date;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'GameModePatchNote' })
+  game_mode_changes: GameModePatchNote[];
 
   @Prop({ required: true })
-  createdBy: string;
+  created_by: string;
 
-  @Prop()
-  updatedBy: string;
-
-  @Prop({ default: Date.now })
-  createdAt: Date;
-
-  @Prop({ default: Date.now })
-  updatedAt: Date;
+  @Prop({ required: false })
+  updated_by?: string;
 }
 
 export const PatchNoteSchema = SchemaFactory.createForClass(PatchNote);

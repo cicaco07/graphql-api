@@ -27,6 +27,9 @@ export class PatchNote {
   @Prop({ required: true })
   season: number;
 
+  @Prop({ required: true })
+  is_active: boolean;
+
   @Prop({ default: Date.now })
   created_at: Date;
 

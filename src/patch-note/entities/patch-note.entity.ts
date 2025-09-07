@@ -1,43 +1,18 @@
 import { ObjectType, Field, ID, registerEnumType } from '@nestjs/graphql';
+import { HeroPatchNoteEntity } from './hero-patch-note.entity';
+import { BattlefieldPatchNoteEntity } from './battlefield-patch-note.entity';
+import { SystemPatchNoteEntity } from './system-patch-note.entity';
+import { GameModePatchNoteEntity } from './game-mode-patch-note.entity';
 
 export enum PatchNoteType {
-  HERO_CHANGE = 'hero_change',
-  SKILL_CHANGE = 'skill_change',
-  ITEM_CHANGE = 'item_change',
-  GAMEPLAY_CHANGE = 'gameplay_change',
-  FEATURE_ADDITION = 'feature_addition',
-  FEATURE_REMOVAL = 'feature_removal',
-  BUG_FIX = 'bug_fix',
-  BALANCE_CHANGE = 'balance_change',
-}
-
-export enum ChangeType {
-  BUFF = 'buff',
-  NERF = 'nerf',
-  REWORK = 'rework',
-  NEW = 'new',
-  REMOVED = 'removed',
-  FIXED = 'fixed',
-  ADJUSTED = 'adjusted',
-}
-
-export enum Priority {
-  LOW = 'low',
-  MEDIUM = 'medium',
-  HIGH = 'high',
-  CRITICAL = 'critical',
+  MAJOR = 'major',
+  MINOR = 'minor',
+  PATCH = 'patch',
+  HOTFIX = 'hotfix',
 }
 
 registerEnumType(PatchNoteType, {
   name: 'PatchNoteType',
-});
-
-registerEnumType(ChangeType, {
-  name: 'ChangeType',
-});
-
-registerEnumType(Priority, {
-  name: 'Priority',
 });
 
 @ObjectType()
@@ -46,58 +21,49 @@ export class PatchNoteEntity {
   _id: string;
 
   @Field()
-  version: string;
+  name: string;
 
   @Field()
   title: string;
 
   @Field()
-  description: string;
+  start_date: Date;
+
+  @Field()
+  end_date: Date;
 
   @Field(() => PatchNoteType)
   type: PatchNoteType;
 
-  @Field(() => ChangeType)
-  changeType: ChangeType;
-
-  @Field(() => Priority)
-  priority: Priority;
-
-  @Field({ nullable: true })
-  targetEntity?: string;
-
-  @Field({ nullable: true })
-  targetEntityId?: string;
-
-  @Field(() => [String], { nullable: true })
-  tags?: string[];
-
-  @Field({ nullable: true })
-  previousValue?: string;
-
-  @Field({ nullable: true })
-  newValue?: string;
-
-  @Field(() => String, { nullable: true })
-  additionalData?: Record<string, any>;
+  @Field()
+  season: number;
 
   @Field()
-  isActive: boolean;
+  is_active: boolean;
 
   @Field()
-  createdAt: Date;
+  created_at: Date;
 
   @Field()
-  updatedAt: Date;
+  updated_at: Date;
+
+  @Field(() => [HeroPatchNoteEntity], { nullable: true })
+  hero_changes?: HeroPatchNoteEntity[];
+
+  @Field(() => [BattlefieldPatchNoteEntity], { nullable: true })
+  battlefield_changes?: BattlefieldPatchNoteEntity[];
+
+  @Field(() => [SystemPatchNoteEntity], { nullable: true })
+  system_changes?: SystemPatchNoteEntity[];
+
+  @Field(() => [GameModePatchNoteEntity], { nullable: true })
+  game_mode_changes?: GameModePatchNoteEntity[];
 
   @Field()
-  publishedAt: Date;
-
-  @Field()
-  createdBy: string;
+  created_by: string;
 
   @Field({ nullable: true })
-  updatedBy?: string;
+  updated_by?: string;
 }
 
 // @ObjectType()

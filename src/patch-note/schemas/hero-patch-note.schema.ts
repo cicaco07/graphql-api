@@ -7,7 +7,10 @@ export class HeroChangeDetail {
   @Prop({ required: true })
   name: string;
 
-  @Prop({ required: true })
+  @Prop({
+    required: true,
+    enum: ['new', 'buff', 'nerf', 'adjusted', 'rework', 'removed'],
+  })
   change_type: string;
 
   @Prop({ required: false })
@@ -17,13 +20,22 @@ export class HeroChangeDetail {
 @Schema()
 export class HeroChange {
   @Prop({ required: true })
-  title: string;
+  name: string;
+
+  @Prop({ required: false })
+  alias?: string;
+
+  @Prop({
+    required: true,
+    enum: ['new', 'buff', 'nerf', 'adjusted', 'rework', 'removed'],
+  })
+  change_type: string;
 
   @Prop({ required: false })
   description?: string;
 
   @Prop({ type: [HeroChangeDetail], required: false })
-  changes?: HeroChangeDetail[];
+  change_details?: HeroChangeDetail[];
 }
 
 @Schema({ timestamps: true })
@@ -35,7 +47,7 @@ export class HeroPatchNote {
   description: string;
 
   @Prop({ type: [HeroChange], required: false })
-  change_details: HeroChange[];
+  hero_changes: HeroChange[];
 }
 
 export const HeroPatchNoteSchema = SchemaFactory.createForClass(HeroPatchNote);

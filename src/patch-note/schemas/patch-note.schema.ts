@@ -5,8 +5,6 @@ import { BattlefieldPatchNote } from './battlefield-patch-note.schema';
 import { SystemPatchNote } from './system-patch-note.schema';
 import { GameModePatchNote } from './game-mode-patch-note.schema';
 
-export type PatchNoteDocument = PatchNote & Document;
-
 @Schema({ timestamps: true })
 export class PatchNote {
   @Prop({ required: true })
@@ -39,13 +37,13 @@ export class PatchNote {
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'HeroPatchNote' })
   hero_changes: HeroPatchNote[];
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'BattlefieldPatchNote' })
+  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'BattlefieldPatchNote' })
   battlefield_changes: BattlefieldPatchNote[];
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'SystemPatchNote' })
+  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'SystemPatchNote' })
   system_changes: SystemPatchNote[];
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'GameModePatchNote' })
+  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'GameModePatchNote' })
   game_mode_changes: GameModePatchNote[];
 
   @Prop({ required: true })

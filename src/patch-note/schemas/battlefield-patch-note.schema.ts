@@ -1,9 +1,7 @@
-import { Prop, Schema } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Schema as MongooseSchema } from 'mongoose';
 
-export type BattlefieldPatchNoteDocument = BattlefieldPatchNote & Document;
-
-@Schema({ timestamps: true })
+@Schema()
 export class BattlefieldPatchNote {
   @Prop({ required: true })
   title: string;
@@ -14,3 +12,6 @@ export class BattlefieldPatchNote {
   @Prop({ type: MongooseSchema.Types.Mixed, required: false })
   change_details: Record<string, any>;
 }
+
+export const BattlefieldPatchNoteSchema =
+  SchemaFactory.createForClass(BattlefieldPatchNote);

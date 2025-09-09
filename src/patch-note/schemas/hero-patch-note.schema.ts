@@ -1,7 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
-export type HeroPatchNoteDocument = HeroPatchNote & Document;
-
 @Schema()
 export class HeroChangeDetail {
   @Prop({ required: true })

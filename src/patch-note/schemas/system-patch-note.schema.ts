@@ -1,9 +1,7 @@
-import { Prop, Schema } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Schema as MongooseSchema } from 'mongoose';
 
-export type SystemPatchNoteDocument = SystemPatchNote & Document;
-
-@Schema({ timestamps: true })
+@Schema()
 export class SystemPatchNote {
   @Prop({ required: true })
   title: string;
@@ -14,3 +12,6 @@ export class SystemPatchNote {
   @Prop({ type: MongooseSchema.Types.Mixed, required: false })
   change_details: Record<string, any>;
 }
+
+export const SystemPatchNoteSchema =
+  SchemaFactory.createForClass(SystemPatchNote);

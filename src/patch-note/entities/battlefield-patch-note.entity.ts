@@ -1,8 +1,11 @@
-import { Field, ObjectType } from '@nestjs/graphql';
+import { Field, ID, ObjectType } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
 
 @ObjectType()
 export class BattlefieldPatchNoteEntity {
+  @Field(() => ID)
+  _id: string;
+
   @Field()
   title: string;
 

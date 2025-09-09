@@ -55,5 +55,5 @@ export class HeroPatchNoteEntity {
   description: string;
 
   @Field(() => [HeroChangeEntity])
-  change_details: HeroChangeEntity[];
+  hero_changes: HeroChangeEntity[];
 }

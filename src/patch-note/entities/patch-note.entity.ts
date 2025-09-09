@@ -24,9 +24,6 @@ export class PatchNoteEntity {
   name: string;
 
   @Field()
-  title: string;
-
-  @Field()
   start_date: Date;
 
   @Field()

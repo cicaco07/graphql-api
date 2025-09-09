@@ -1,123 +1,64 @@
-import { InputType, Field, Int } from '@nestjs/graphql';
-import {
-  IsNotEmpty,
-  IsString,
-  IsEnum,
-  IsOptional,
-  IsBoolean,
-  IsArray,
-  IsDateString,
-  IsInt,
-  ValidateNested,
-} from 'class-validator';
-import { Type } from 'class-transformer';
-import { ChangeType, PatchType } from '../entities/hero-patch-note.entity';
+import { Field, InputType } from '@nestjs/graphql';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { ChangeType } from '../entities/hero-patch-note.entity';
 
 @InputType()
-export class CreateSkillChangeInput {
+export class HeroChangeDetailInput {
   @Field()
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   name: string;
-
-  @Field()
-  @IsString()
-  @IsNotEmpty()
-  type: string;
 
   @Field(() => ChangeType)
   @IsEnum(ChangeType)
+  @IsNotEmpty()
   change_type: ChangeType;
 
   @Field()
-  @IsNotEmpty()
   @IsString()
-  description: string;
+  @IsOptional()
+  description?: string;
 }
 
 @InputType()
-export class CreateHeroChangeInput {
+export class HeroChangeInput {
   @Field()
-  @IsNotEmpty()
   @IsString()
-  hero: string;
+  @IsNotEmpty()
+  name: string;
 
   @Field({ nullable: true })
   @IsOptional()
-  @IsString()
   alias?: string;
 
   @Field(() => ChangeType)
   @IsEnum(ChangeType)
+  @IsNotEmpty()
   change_type: ChangeType;
 
   @Field()
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   description: string;
 
-  @Field(() => [CreateSkillChangeInput], { nullable: true })
+  @Field(() => [HeroChangeDetailInput], { nullable: true })
   @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CreateSkillChangeInput)
-  skills?: CreateSkillChangeInput[];
-
-  @Field(() => [String], { nullable: true })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  changes?: string[]; // JSON string array for additional changes
+  change_details?: HeroChangeDetailInput[];
 }
 
 @InputType()
 export class CreateHeroPatchNoteInput {
   @Field()
-  @IsNotEmpty()
   @IsString()
-  version: string;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsInt()
-  season?: number;
-
-  @Field()
   @IsNotEmpty()
-  @IsString()
   title: string;
 
   @Field()
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   description: string;
 
-  @Field(() => PatchType, {
-    nullable: true,
-    defaultValue: PatchType.BALANCE_UPDATE,
-  })
+  @Field(() => [HeroChangeInput], { nullable: true })
   @IsOptional()
-  @IsEnum(PatchType)
-  type?: PatchType;
-
-  @Field(() => [CreateHeroChangeInput])
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CreateHeroChangeInput)
-  changes: CreateHeroChangeInput[];
-
-  @Field({ nullable: true, defaultValue: true })
-  @IsOptional()
-  @IsBoolean()
-  isActive?: boolean;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsDateString()
-  publishedAt?: Date;
-
-  @Field()
-  @IsNotEmpty()
-  @IsString()
-  createdBy: string;
+  hero_changes?: HeroChangeInput[];
 }

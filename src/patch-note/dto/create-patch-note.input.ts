@@ -1,91 +1,72 @@
 import { InputType, Field } from '@nestjs/graphql';
 import {
-  IsArray,
   IsBoolean,
-  IsDateString,
+  IsDate,
   IsEnum,
   IsNotEmpty,
   IsOptional,
   IsString,
 } from 'class-validator';
-import {
-  ChangeType,
-  PatchNoteType,
-  Priority,
-} from '../entities/patch-note.entity';
+import { PatchNoteType } from '../entities/patch-note.entity';
+import { CreateHeroPatchNoteInput } from './create-hero-patch-note.input';
+import { CreateBattlefieldPatchNoteInput } from './create-battlefield-patch-note.input';
+import { CreateSystemPatchNoteInput } from './create-system-patch-note.input';
+import { CreateGameModePatchNoteInput } from './create-game-mode-patch-note.input';
 
 @InputType()
 export class CreatePatchNoteInput {
   @Field()
   @IsNotEmpty()
   @IsString()
-  version: string;
+  name: string;
 
   @Field()
   @IsNotEmpty()
-  @IsString()
-  title: string;
+  @IsDate()
+  start_date: Date;
 
   @Field()
   @IsNotEmpty()
-  @IsString()
-  description: string;
+  @IsDate()
+  end_date: Date;
 
   @Field(() => PatchNoteType)
+  @IsNotEmpty()
   @IsEnum(PatchNoteType)
   type: PatchNoteType;
 
-  @Field(() => ChangeType)
-  @IsEnum(ChangeType)
-  changeType: ChangeType;
+  @Field()
+  @IsNotEmpty()
+  season: number;
 
-  @Field(() => Priority, { nullable: true })
-  @IsOptional()
-  @IsEnum(Priority)
-  priority?: Priority;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  targetEntity?: string;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  targetEntityId?: string;
-
-  @Field(() => [String], { nullable: true })
-  @IsOptional()
-  @IsArray()
-  @IsString({ each: true })
-  tags?: string[];
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  previousValue?: string;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  newValue?: string;
-
-  @Field(() => String, { nullable: true })
-  @IsOptional()
-  additionalData?: Record<string, any>;
-
-  @Field({ nullable: true })
-  @IsOptional()
+  @Field()
+  @IsNotEmpty()
   @IsBoolean()
-  isActive?: boolean;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsDateString()
-  publishedAt?: Date;
+  is_active: boolean;
 
   @Field()
   @IsNotEmpty()
   @IsString()
-  createdBy: string;
+  created_by: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  updated_by?: string;
+
+  @Field(() => [CreateHeroPatchNoteInput], { nullable: true })
+  @IsOptional()
+  hero_changes?: CreateHeroPatchNoteInput[];
+
+  @Field(() => [CreateBattlefieldPatchNoteInput], { nullable: true })
+  @IsOptional()
+  battlefield_changes?: CreateBattlefieldPatchNoteInput[];
+
+  @Field(() => [CreateSystemPatchNoteInput], { nullable: true })
+  @IsOptional()
+  system_changes?: CreateSystemPatchNoteInput[];
+
+  @Field(() => [CreateGameModePatchNoteInput], { nullable: true })
+  @IsOptional()
+  game_mode_changes?: CreateGameModePatchNoteInput[];
 }

@@ -15,12 +15,19 @@ import { UpdateHeroPatchNoteInput } from './dto/update-hero-patch-note.input';
 import { UpdateBattlefieldPatchNoteInput } from './dto/update-battlefield-patch-note.input';
 import { UpdateSystemPatchNoteInput } from './dto/update-system-patch-note.input';
 import { UpdateGameModePatchNoteInput } from './dto/update-game-mode-patch-note.input';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/auth/enums/role.enum';
 
 @Resolver(() => PatchNoteEntity)
 export class PatchNoteResolver {
   constructor(private readonly patchNoteService: PatchNoteService) {}
 
   @Mutation(() => PatchNoteEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   async createPatchNote(
     @Args('createPatchNoteInput') createPatchNoteInput: CreatePatchNoteInput,
   ) {
@@ -28,6 +35,8 @@ export class PatchNoteResolver {
   }
 
   @Mutation(() => HeroPatchNoteEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   async createHeroPatchNote(
     @Args('patchNoteId') patchNoteId: string,
     @Args('createHeroPatchNoteInput')
@@ -40,6 +49,8 @@ export class PatchNoteResolver {
   }
 
   @Mutation(() => BattlefieldPatchNoteEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   async createBattlefieldPatchNote(
     @Args('patchNoteId') patchNoteId: string,
     @Args('createBattlefieldPatchNoteInput')
@@ -52,6 +63,8 @@ export class PatchNoteResolver {
   }
 
   @Mutation(() => SystemPatchNoteEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   async createSystemPatchNote(
     @Args('patchNoteId') patchNoteId: string,
     @Args('createSystemPatchNoteInput')
@@ -64,6 +77,8 @@ export class PatchNoteResolver {
   }
 
   @Mutation(() => GameModePatchNoteEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   async createGameModePatchNote(
     @Args('patchNoteId') patchNoteId: string,
     @Args('createGameModePatchNoteInput')
@@ -86,6 +101,8 @@ export class PatchNoteResolver {
   }
 
   @Mutation(() => PatchNoteEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   async updatePatchNote(
     @Args('id', { type: () => ID }) id: string,
     @Args('updatePatchNoteInput')
@@ -98,6 +115,8 @@ export class PatchNoteResolver {
   }
 
   @Mutation(() => HeroPatchNoteEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   async updateHeroPatchNote(
     @Args('id', { type: () => ID }) id: string,
     @Args('updateHeroPatchNoteInput')
@@ -110,6 +129,8 @@ export class PatchNoteResolver {
   }
 
   @Mutation(() => BattlefieldPatchNoteEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   async updateBattlefieldPatchNote(
     @Args('id', { type: () => ID }) id: string,
     @Args('updateBattlefieldPatchNoteInput')
@@ -122,6 +143,8 @@ export class PatchNoteResolver {
   }
 
   @Mutation(() => SystemPatchNoteEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   async updateSystemPatchNote(
     @Args('id', { type: () => ID }) id: string,
     @Args('updateSystemPatchNoteInput')
@@ -134,6 +157,8 @@ export class PatchNoteResolver {
   }
 
   @Mutation(() => GameModePatchNoteEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   async updateGameModePatchNote(
     @Args('id', { type: () => ID }) id: string,
     @Args('updateGameModePatchNoteInput')
@@ -146,26 +171,36 @@ export class PatchNoteResolver {
   }
 
   @Mutation(() => PatchNoteEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   async removePatchNote(@Args('id', { type: () => ID }) id: string) {
     return await this.patchNoteService.removePatchNote(id);
   }
 
   @Mutation(() => HeroPatchNoteEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   async removeHeroPatchNote(@Args('id', { type: () => ID }) id: string) {
     return await this.patchNoteService.removeHeroPatchNote(id);
   }
 
   @Mutation(() => BattlefieldPatchNoteEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   async removeBattlefieldPatchNote(@Args('id', { type: () => ID }) id: string) {
     return await this.patchNoteService.removeBattlefieldPatchNote(id);
   }
 
   @Mutation(() => SystemPatchNoteEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   async removeSystemPatchNote(@Args('id', { type: () => ID }) id: string) {
     return await this.patchNoteService.removeSystemPatchNote(id);
   }
 
   @Mutation(() => GameModePatchNoteEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
   async removeGameModePatchNote(@Args('id', { type: () => ID }) id: string) {
     return await this.patchNoteService.removeGameModePatchNote(id);
   }

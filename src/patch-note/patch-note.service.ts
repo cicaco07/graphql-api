@@ -1,246 +1,277 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, FilterQuery } from 'mongoose';
-import { PatchNote, PatchNoteDocument } from './schemas/patch-note.schema';
+import { PatchNote } from './schemas/patch-note.schema';
+import { Model } from 'mongoose';
+import { HeroPatchNote } from './schemas/hero-patch-note.schema';
+import { BattlefieldPatchNote } from './schemas/battlefield-patch-note.schema';
+import { GameModePatchNote } from './schemas/game-mode-patch-note.schema';
+import { SystemPatchNote } from './schemas/system-patch-note.schema';
 import { CreatePatchNoteInput } from './dto/create-patch-note.input';
+import { CreateHeroPatchNoteInput } from './dto/create-hero-patch-note.input';
 import { UpdatePatchNoteInput } from './dto/update-patch-note.input';
-import {
-  ChangeType,
-  PatchNoteEntity,
-  PatchNoteType,
-  Priority,
-} from './entities/patch-note.entity';
-
-export interface FilterPatchNoteInput {
-  version?: string;
-  types?: string[];
-  changeTypes?: string[];
-  priorities?: string[];
-  targetEntity?: string;
-  tags?: string[];
-  isActive?: boolean;
-  search?: string;
-  page?: number;
-  limit?: number;
-  sortBy?: string;
-  sortOrder?: 'ASC' | 'DESC';
-}
-
-export interface PaginatedPatchNotes {
-  data: PatchNote[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+import { CreateBattlefieldPatchNoteInput } from './dto/create-battlefield-patch-note.input';
+import { UpdateHeroPatchNoteInput } from './dto/update-hero-patch-note.input';
+import { UpdateBattlefieldPatchNoteInput } from './dto/update-battlefield-patch-note.input';
+import { UpdateSystemPatchNoteInput } from './dto/update-system-patch-note.input';
+import { UpdateGameModePatchNoteInput } from './dto/update-game-mode-patch-note.input';
 
 @Injectable()
 export class PatchNoteService {
   constructor(
     @InjectModel(PatchNote.name)
-    private patchNoteModel: Model<PatchNoteDocument>,
+    private patchNoteModel: Model<PatchNote>,
+    @InjectModel(HeroPatchNote.name)
+    private heroModel: Model<HeroPatchNote>,
+    @InjectModel(BattlefieldPatchNote.name)
+    private battlefieldModel: Model<BattlefieldPatchNote>,
+    @InjectModel(GameModePatchNote.name)
+    private gameModeModel: Model<GameModePatchNote>,
+    @InjectModel(SystemPatchNote.name)
+    private systemModel: Model<SystemPatchNote>,
   ) {}
 
-  async create(
+  async createPatchNote(
     createPatchNoteInput: CreatePatchNoteInput,
-  ): Promise<PatchNoteEntity> {
-    try {
-      const createdPatchNote = new this.patchNoteModel({
-        ...createPatchNoteInput,
-        publishedAt: createPatchNoteInput.publishedAt || new Date(),
-      });
+  ): Promise<PatchNote> {
+    const createdPatchNote = new this.patchNoteModel({
+      ...createPatchNoteInput,
+      season: Number(createPatchNoteInput.season),
+      created_at: new Date(),
+      updated_at: new Date(),
+    });
 
-      const saved = await createdPatchNote.save();
-      return this.transformToEntity(saved);
-    } catch (error) {
-      throw new BadRequestException(
-        `Failed to create patch note: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      );
-    }
+    return createdPatchNote.save();
   }
 
-  async findAll(
-    filter: FilterPatchNoteInput = {},
-  ): Promise<PaginatedPatchNotes> {
-    const {
-      page = 1,
-      limit = 10,
-      sortBy = 'createdAt',
-      sortOrder = 'DESC',
-      search,
-      ...filterOptions
-    } = filter;
-
-    // Build filter query
-    const query: FilterQuery<PatchNoteDocument> = {};
-
-    // Apply filters
-    if (filterOptions.version) {
-      query.version = filterOptions.version;
+  async createHeroPatchNote(
+    patchNoteId: string,
+    createHeroPatchNoteInput: CreateHeroPatchNoteInput,
+  ): Promise<HeroPatchNote> {
+    const patchNote = await this.patchNoteModel.findById(patchNoteId);
+    if (!patchNote) {
+      throw new NotFoundException('PatchNote not found');
     }
 
-    if (filterOptions.types && filterOptions.types.length > 0) {
-      query.type = { $in: filterOptions.types };
+    const heroPatchNote = await this.heroModel.create({
+      ...createHeroPatchNoteInput,
+      patch_note: patchNoteId,
+    });
+
+    (patchNote.hero_changes as any[]).push(heroPatchNote._id);
+    await patchNote.save();
+
+    return heroPatchNote;
+  }
+
+  async createBattlefieldPatchNote(
+    patchNoteId: string,
+    createBattlefieldPatchNoteInput: CreateBattlefieldPatchNoteInput,
+  ): Promise<BattlefieldPatchNote> {
+    const patchNote = await this.patchNoteModel.findById(patchNoteId);
+    if (!patchNote) {
+      throw new NotFoundException('PatchNote not found');
     }
 
-    if (filterOptions.changeTypes && filterOptions.changeTypes.length > 0) {
-      query.changeType = { $in: filterOptions.changeTypes };
+    const battlefieldPatchNote = await this.battlefieldModel.create({
+      ...createBattlefieldPatchNoteInput,
+      patch_note: patchNoteId,
+    });
+
+    (patchNote.battlefield_changes as any[]).push(battlefieldPatchNote._id);
+    await patchNote.save();
+
+    return battlefieldPatchNote;
+  }
+
+  async createSystemPatchNote(
+    patchNoteId: string,
+    createSystemPatchNoteInput: any,
+  ): Promise<SystemPatchNote> {
+    const patchNote = await this.patchNoteModel.findById(patchNoteId);
+    if (!patchNote) {
+      throw new NotFoundException('PatchNote not found');
     }
 
-    if (filterOptions.priorities && filterOptions.priorities.length > 0) {
-      query.priority = { $in: filterOptions.priorities };
+    const systemPatchNote = await this.systemModel.create({
+      ...createSystemPatchNoteInput,
+      patch_note: patchNoteId,
+    });
+
+    (patchNote.system_changes as any[]).push(systemPatchNote._id);
+    await patchNote.save();
+
+    return systemPatchNote;
+  }
+
+  async createGameModePatchNote(
+    patchNoteId: string,
+    createGameModePatchNoteInput: any,
+  ): Promise<GameModePatchNote> {
+    const patchNote = await this.patchNoteModel.findById(patchNoteId);
+    if (!patchNote) {
+      throw new NotFoundException('PatchNote not found');
     }
 
-    if (filterOptions.targetEntity) {
-      query.targetEntity = {
-        $regex: filterOptions.targetEntity,
-        $options: 'i',
-      };
-    }
+    const gameModePatchNote = await this.gameModeModel.create({
+      ...createGameModePatchNoteInput,
+      patch_note: patchNoteId,
+    });
 
-    if (filterOptions.tags && filterOptions.tags.length > 0) {
-      query.tags = { $in: filterOptions.tags };
-    }
+    (patchNote.game_mode_changes as any[]).push(gameModePatchNote._id);
+    await patchNote.save();
 
-    if (filterOptions.isActive !== undefined) {
-      query.isActive = filterOptions.isActive;
-    }
+    return gameModePatchNote;
+  }
 
-    // Search functionality
-    if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { targetEntity: { $regex: search, $options: 'i' } },
-      ];
-    }
-
-    // Calculate pagination
-    const skip = (page - 1) * limit;
-    const sortDirection = sortOrder === 'DESC' ? -1 : 1;
-
-    // Execute queries
-    const [data, total] = await Promise.all([
-      this.patchNoteModel
-        .find(query)
-        .sort({ [sortBy]: sortDirection })
-        .skip(skip)
-        .limit(limit)
-        .exec(),
-      this.patchNoteModel.countDocuments(query).exec(),
-    ]);
-
-    return {
-      data,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    };
+  async findAll(): Promise<PatchNote[]> {
+    return this.patchNoteModel
+      .find({ deleted_at: null })
+      .populate('hero_changes')
+      .populate('battlefield_changes')
+      .populate('system_changes')
+      .populate('game_mode_changes')
+      .exec();
   }
 
   async findOne(id: string): Promise<PatchNote> {
-    const patchNote = await this.patchNoteModel.findById(id).exec();
-
+    const patchNote = await this.patchNoteModel
+      .findOne({ _id: id, deleted_at: null })
+      .populate('hero_changes')
+      .populate('battlefield_changes')
+      .populate('system_changes')
+      .populate('game_mode_changes')
+      .exec();
     if (!patchNote) {
-      throw new NotFoundException(`Patch note with ID ${id} not found`);
+      throw new NotFoundException(`PatchNote with ID "${id}" not found`);
     }
-
     return patchNote;
   }
 
-  async findByVersion(version: string): Promise<PatchNote[]> {
-    return await this.patchNoteModel
-      .find({ version, isActive: true })
-      .sort({ createdAt: -1 })
-      .exec();
-  }
-
-  async findByTargetEntity(targetEntity: string): Promise<PatchNote[]> {
-    return await this.patchNoteModel
-      .find({
-        targetEntity: { $regex: targetEntity, $options: 'i' },
-        isActive: true,
-      })
-      .sort({ createdAt: -1 })
-      .exec();
-  }
-
-  async findByTags(tags: string[]): Promise<PatchNote[]> {
-    return await this.patchNoteModel
-      .find({
-        tags: { $in: tags },
-        isActive: true,
-      })
-      .sort({ createdAt: -1 })
-      .exec();
-  }
-
-  async update(updatePatchNoteInput: UpdatePatchNoteInput): Promise<PatchNote> {
-    const { _id, ...updateData } = updatePatchNoteInput;
-
-    const updatedPatchNote = await this.patchNoteModel
-      .findByIdAndUpdate(_id, updateData, { new: true })
-      .exec();
-
-    if (!updatedPatchNote) {
-      throw new NotFoundException(`Patch note with ID ${_id} not found`);
+  async updatePatchNote(
+    id: string,
+    updatePatchNoteInput: UpdatePatchNoteInput,
+  ): Promise<PatchNote> {
+    const patchNote = await this.patchNoteModel.findByIdAndUpdate(
+      id,
+      updatePatchNoteInput,
+      { new: true },
+    );
+    if (!patchNote) {
+      throw new NotFoundException(`PatchNote with ID "${id}" not found`);
     }
-
-    return updatedPatchNote;
+    return patchNote;
   }
 
-  async remove(id: string): Promise<boolean> {
-    const result = await this.patchNoteModel.findByIdAndDelete(id).exec();
-
-    if (!result) {
-      throw new NotFoundException(`Patch note with ID ${id} not found`);
+  async updateHeroPatchNote(
+    id: string,
+    updateHeroPatchNoteInput: UpdateHeroPatchNoteInput,
+  ): Promise<HeroPatchNote> {
+    const heroPatchNote = await this.heroModel.findByIdAndUpdate(
+      id,
+      updateHeroPatchNoteInput,
+      { new: true },
+    );
+    if (!heroPatchNote) {
+      throw new NotFoundException(`HeroPatchNote with ID "${id}" not found`);
     }
-
-    return true;
+    return heroPatchNote;
   }
 
-  async softDelete(id: string, userId: string): Promise<PatchNote> {
-    const updatedPatchNote = await this.patchNoteModel
-      .findByIdAndUpdate(
-        id,
-        { isActive: false, updatedBy: userId },
-        { new: true },
-      )
-      .exec();
-
-    if (!updatedPatchNote) {
-      throw new NotFoundException(`Patch note with ID ${id} not found`);
+  async updateBattlefieldPatchNote(
+    id: string,
+    updateBattlefieldPatchNoteInput: UpdateBattlefieldPatchNoteInput,
+  ): Promise<BattlefieldPatchNote> {
+    const battlefieldPatchNote = await this.battlefieldModel.findByIdAndUpdate(
+      id,
+      updateBattlefieldPatchNoteInput,
+      { new: true },
+    );
+    if (!battlefieldPatchNote) {
+      throw new NotFoundException(
+        `BattlefieldPatchNote with ID "${id}" not found`,
+      );
     }
-
-    return updatedPatchNote;
+    return battlefieldPatchNote;
   }
 
-  private transformToEntity(doc: PatchNoteDocument): PatchNoteEntity {
-    return {
-      _id: (doc._id as string).toString(),
-      version: doc.version,
-      title: doc.title,
-      description: doc.description,
-      type: doc.type as PatchNoteType,
-      changeType: doc.changeType as ChangeType,
-      priority: doc.priority as Priority,
-      targetEntity: doc.targetEntity,
-      targetEntityId: doc.targetEntityId,
-      tags: doc.tags,
-      previousValue: doc.previousValue,
-      newValue: doc.newValue,
-      additionalData: doc.additionalData ? doc.additionalData : undefined,
-      isActive: doc.isActive,
-      publishedAt: doc.publishedAt,
-      createdBy: doc.createdBy,
-      updatedBy: doc.updatedBy,
-      createdAt: doc.createdAt,
-      updatedAt: doc.updatedAt,
-    };
+  async updateSystemPatchNote(
+    id: string,
+    updateSystemPatchNoteInput: UpdateSystemPatchNoteInput,
+  ): Promise<SystemPatchNote> {
+    const systemPatchNote = await this.systemModel.findByIdAndUpdate(
+      id,
+      updateSystemPatchNoteInput,
+      { new: true },
+    );
+    if (!systemPatchNote) {
+      throw new NotFoundException(`SystemPatchNote with ID "${id}" not found`);
+    }
+    return systemPatchNote;
+  }
+
+  async updateGameModePatchNote(
+    id: string,
+    updateGameModePatchNoteInput: UpdateGameModePatchNoteInput,
+  ): Promise<GameModePatchNote> {
+    const gameModePatchNote = await this.gameModeModel.findByIdAndUpdate(
+      id,
+      updateGameModePatchNoteInput,
+      { new: true },
+    );
+    if (!gameModePatchNote) {
+      throw new NotFoundException(
+        `GameModePatchNote with ID "${id}" not found`,
+      );
+    }
+    return gameModePatchNote;
+  }
+
+  async removePatchNote(id: string): Promise<PatchNote> {
+    const patchNote = await this.patchNoteModel.findByIdAndUpdate(
+      id,
+      { deleted_at: new Date() },
+      { new: true },
+    );
+    if (!patchNote) {
+      throw new NotFoundException(`PatchNote with ID "${id}" not found`);
+    }
+    return patchNote;
+  }
+
+  async removeHeroPatchNote(id: string): Promise<HeroPatchNote> {
+    const heroPatchNote = await this.heroModel.findByIdAndDelete(id);
+    if (!heroPatchNote) {
+      throw new NotFoundException(`HeroPatchNote with ID "${id}" not found`);
+    }
+    return heroPatchNote;
+  }
+
+  async removeBattlefieldPatchNote(id: string): Promise<BattlefieldPatchNote> {
+    const battlefieldPatchNote =
+      await this.battlefieldModel.findByIdAndDelete(id);
+    if (!battlefieldPatchNote) {
+      throw new NotFoundException(
+        `BattlefieldPatchNote with ID "${id}" not found`,
+      );
+    }
+    return battlefieldPatchNote;
+  }
+
+  async removeSystemPatchNote(id: string): Promise<SystemPatchNote> {
+    const systemPatchNote = await this.systemModel.findByIdAndDelete(id);
+    if (!systemPatchNote) {
+      throw new NotFoundException(`SystemPatchNote with ID "${id}" not found`);
+    }
+    return systemPatchNote;
+  }
+
+  async removeGameModePatchNote(id: string): Promise<GameModePatchNote> {
+    const gameModePatchNote = await this.gameModeModel.findByIdAndDelete(id);
+    if (!gameModePatchNote) {
+      throw new NotFoundException(
+        `GameModePatchNote with ID "${id}" not found`,
+      );
+    }
+    return gameModePatchNote;
   }
 }

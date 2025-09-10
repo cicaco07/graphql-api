@@ -28,12 +28,6 @@ export class PatchNote {
   @Prop({ required: true })
   is_active: boolean;
 
-  @Prop({ default: Date.now })
-  created_at: Date;
-
-  @Prop({ default: Date.now })
-  updated_at: Date;
-
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'HeroPatchNote' })
   hero_changes: HeroPatchNote[];
 
@@ -51,6 +45,9 @@ export class PatchNote {
 
   @Prop({ required: false })
   updated_by?: string;
+
+  @Prop({ required: false })
+  deleted_at?: Date;
 }
 
 export const PatchNoteSchema = SchemaFactory.createForClass(PatchNote);

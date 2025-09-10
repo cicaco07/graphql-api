@@ -38,12 +38,6 @@ export class PatchNoteEntity {
   @Field()
   is_active: boolean;
 
-  @Field()
-  created_at: Date;
-
-  @Field()
-  updated_at: Date;
-
   @Field(() => [HeroPatchNoteEntity], { nullable: true })
   hero_changes?: HeroPatchNoteEntity[];
 
@@ -61,6 +55,9 @@ export class PatchNoteEntity {
 
   @Field({ nullable: true })
   updated_by?: string;
+
+  @Field({ nullable: true })
+  deleted_at?: Date;
 }
 
 // @ObjectType()

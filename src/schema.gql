@@ -154,7 +154,7 @@ input CreateNavigationInput {
 
 input CreatePatchNoteInput {
   battlefield_changes: [CreateBattlefieldPatchNoteInput!]
-  created_by: String!
+  created_by: String
   end_date: DateTime!
   game_mode_changes: [CreateGameModePatchNoteInput!]
   hero_changes: [CreateHeroPatchNoteInput!]
@@ -371,7 +371,7 @@ type NavigationType {
 type PatchNoteEntity {
   _id: ID!
   battlefield_changes: [BattlefieldPatchNoteEntity!]
-  created_by: String!
+  created_by: String
   deleted_at: DateTime
   end_date: DateTime!
   game_mode_changes: [GameModePatchNoteEntity!]

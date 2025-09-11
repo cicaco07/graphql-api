@@ -20,6 +20,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enums/role.enum';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 
 @Resolver(() => PatchNoteEntity)
 export class PatchNoteResolver {
@@ -30,8 +31,12 @@ export class PatchNoteResolver {
   @Roles(Role.SUPER_ADMIN)
   async createPatchNote(
     @Args('createPatchNoteInput') createPatchNoteInput: CreatePatchNoteInput,
+    @CurrentUser() user: any,
   ) {
-    return await this.patchNoteService.createPatchNote(createPatchNoteInput);
+    return await this.patchNoteService.createPatchNote(
+      createPatchNoteInput,
+      (user as { _id: string })._id,
+    );
   }
 
   @Mutation(() => HeroPatchNoteEntity)
@@ -107,10 +112,12 @@ export class PatchNoteResolver {
     @Args('id', { type: () => ID }) id: string,
     @Args('updatePatchNoteInput')
     updatePatchNoteInput: UpdatePatchNoteInput,
+    @CurrentUser() user: any,
   ) {
     return await this.patchNoteService.updatePatchNote(
       id,
       updatePatchNoteInput,
+      (user as { _id: string })._id,
     );
   }
 

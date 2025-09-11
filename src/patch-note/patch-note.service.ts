@@ -32,10 +32,12 @@ export class PatchNoteService {
 
   async createPatchNote(
     createPatchNoteInput: CreatePatchNoteInput,
+    userId: string,
   ): Promise<PatchNote> {
     const createdPatchNote = new this.patchNoteModel({
       ...createPatchNoteInput,
       season: Number(createPatchNoteInput.season),
+      created_by: userId,
       created_at: new Date(),
       updated_at: new Date(),
     });
@@ -150,10 +152,15 @@ export class PatchNoteService {
   async updatePatchNote(
     id: string,
     updatePatchNoteInput: UpdatePatchNoteInput,
+    userId: string,
   ): Promise<PatchNote> {
     const patchNote = await this.patchNoteModel.findByIdAndUpdate(
       id,
-      updatePatchNoteInput,
+      {
+        ...updatePatchNoteInput,
+        updated_by: userId,
+        updated_at: new Date(),
+      },
       { new: true },
     );
     if (!patchNote) {

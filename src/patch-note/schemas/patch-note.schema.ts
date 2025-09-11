@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import { HeroPatchNote } from './hero-patch-note.schema';
 import { BattlefieldPatchNote } from './battlefield-patch-note.schema';
 import { SystemPatchNote } from './system-patch-note.schema';
@@ -40,10 +40,10 @@ export class PatchNote {
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'GameModePatchNote' })
   game_mode_changes: GameModePatchNote[];
 
-  @Prop({ required: true })
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   created_by: string;
 
-  @Prop({ required: false })
+  @Prop({ type: Types.ObjectId, ref: 'User', required: false })
   updated_by?: string;
 
   @Prop({ required: false })

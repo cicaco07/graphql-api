@@ -50,8 +50,8 @@ export class PatchNoteEntity {
   @Field(() => [GameModePatchNoteEntity], { nullable: true })
   game_mode_changes?: GameModePatchNoteEntity[];
 
-  @Field()
-  created_by: string;
+  @Field({ nullable: true })
+  created_by?: string;
 
   @Field({ nullable: true })
   updated_by?: string;

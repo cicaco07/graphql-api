@@ -44,10 +44,10 @@ export class CreatePatchNoteInput {
   @IsBoolean()
   is_active: boolean;
 
-  @Field()
-  @IsNotEmpty()
+  @Field({ nullable: true })
+  @IsOptional()
   @IsString()
-  created_by: string;
+  created_by?: string;
 
   @Field({ nullable: true })
   @IsOptional()

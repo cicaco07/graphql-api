@@ -36,6 +36,22 @@ type BattleSpell {
   updatedAt: DateTime!
 }
 
+type BattlefieldPatchNoteEntity {
+  _id: ID!
+  change_details: JSON
+  description: String!
+  title: String!
+}
+
+enum ChangeType {
+  ADJUSTED
+  BUFF
+  NERF
+  NEW
+  REMOVED
+  REWORK
+}
+
 input CreateBaseStatInput {
   attack_range: Int!
   attack_speed: Int!
@@ -62,6 +78,12 @@ input CreateBattleSpellInput {
   tag: String!
 }
 
+input CreateBattlefieldPatchNoteInput {
+  change_details: JSON!
+  description: String!
+  title: String!
+}
+
 input CreateEmblemInput {
   attributes: JSON
   benefit: String
@@ -70,6 +92,12 @@ input CreateEmblemInput {
   icon: String!
   name: String!
   type: String!
+}
+
+input CreateGameModePatchNoteInput {
+  change_details: JSON!
+  description: String!
+  title: String!
 }
 
 input CreateHeroInput {
@@ -87,6 +115,12 @@ input CreateHeroInput {
   short_description: String!
   skills: [CreateSkillInput!]
   type: [String!]!
+}
+
+input CreateHeroPatchNoteInput {
+  description: String!
+  hero_changes: [HeroChangeInput!]
+  title: String!
 }
 
 input CreateItemInput {
@@ -118,6 +152,21 @@ input CreateNavigationInput {
   route: String
 }
 
+input CreatePatchNoteInput {
+  battlefield_changes: [CreateBattlefieldPatchNoteInput!]
+  created_by: String
+  end_date: DateTime!
+  game_mode_changes: [CreateGameModePatchNoteInput!]
+  hero_changes: [CreateHeroPatchNoteInput!]
+  is_active: Boolean!
+  name: String!
+  season: Float!
+  start_date: DateTime!
+  system_changes: [CreateSystemPatchNoteInput!]
+  type: PatchNoteType!
+  updated_by: String
+}
+
 input CreateSkillDetailInput {
   attributes: JSON!
   level: Int!
@@ -132,6 +181,12 @@ input CreateSkillInput {
   skills_detail: [CreateSkillDetailInput!]
   tag: [String!]!
   type: String!
+}
+
+input CreateSystemPatchNoteInput {
+  change_details: JSON!
+  description: String!
+  title: String!
 }
 
 """
@@ -150,6 +205,13 @@ type Emblem {
   type: String!
 }
 
+type GameModePatchNoteEntity {
+  _id: ID!
+  change_details: JSON
+  description: String!
+  title: String!
+}
+
 type Hero {
   _id: ID!
   alias: String!
@@ -166,6 +228,41 @@ type Hero {
   short_description: String!
   skills: [Skill!]
   type: [String!]!
+}
+
+type HeroChangeDetailEntity {
+  change_type: ChangeType!
+  description: String!
+  name: String!
+}
+
+input HeroChangeDetailInput {
+  change_type: ChangeType!
+  description: String!
+  name: String!
+}
+
+type HeroChangeEntity {
+  alias: String
+  change_details: [HeroChangeDetailEntity!]
+  change_type: ChangeType!
+  description: String!
+  name: String!
+}
+
+input HeroChangeInput {
+  alias: String
+  change_details: [HeroChangeDetailInput!]
+  change_type: ChangeType!
+  description: String!
+  name: String!
+}
+
+type HeroPatchNoteEntity {
+  _id: ID!
+  description: String!
+  hero_changes: [HeroChangeEntity!]!
+  title: String!
 }
 
 type Item {
@@ -197,25 +294,23 @@ type LogoutResponse {
 }
 
 type Mutation {
-  addSkillDetailToSkill(
-    input: [CreateSkillDetailInput!]!
-    skillId: ID!
-  ): [SkillDetail!]!
+  addSkillDetailToSkill(input: [CreateSkillDetailInput!]!, skillId: ID!): [SkillDetail!]!
   addSkillToHero(heroId: ID!, input: CreateSkillInput!): Skill!
   createBaseStat(createBaseStatInput: CreateBaseStatInput!): BaseStat!
-  createBattleSpell(
-    createBattleSpellInput: CreateBattleSpellInput!
-  ): BattleSpell!
+  createBattleSpell(createBattleSpellInput: CreateBattleSpellInput!): BattleSpell!
+  createBattlefieldPatchNote(createBattlefieldPatchNoteInput: CreateBattlefieldPatchNoteInput!, patchNoteId: String!): BattlefieldPatchNoteEntity!
   createEmblem(input: CreateEmblemInput!): Emblem!
-  createHero(input: CreateHeroInput!): Hero!
-  createHeroWithSkill(input: CreateHeroInput!): Hero!
-  createHeroWithSkillandSkillDetail(input: CreateHeroInput!): Hero!
+  createGameModePatchNote(createGameModePatchNoteInput: CreateGameModePatchNoteInput!, patchNoteId: String!): GameModePatchNoteEntity!
+  createHero(createHeroInput: CreateHeroInput!): Hero!
+  createHeroPatchNote(createHeroPatchNoteInput: CreateHeroPatchNoteInput!, patchNoteId: String!): HeroPatchNoteEntity!
+  createHeroWithSkill(createHeroInput: CreateHeroInput!): Hero!
+  createHeroWithSkillandSkillDetail(createHeroInput: CreateHeroInput!): Hero!
   createItem(input: CreateItemInput!): Item!
-  createNavigation(
-    createNavigationInput: CreateNavigationInput!
-  ): NavigationType!
+  createNavigation(createNavigationInput: CreateNavigationInput!): NavigationType!
+  createPatchNote(createPatchNoteInput: CreatePatchNoteInput!): PatchNoteEntity!
   createSkill(input: CreateSkillInput!): Skill!
   createSkillDetail(input: CreateSkillDetailInput!): SkillDetail!
+  createSystemPatchNote(createSystemPatchNoteInput: CreateSystemPatchNoteInput!, patchNoteId: String!): SystemPatchNoteEntity!
   deleteUser(userId: String!): Boolean!
   login(loginInput: LoginInput!): AuthResponse!
   logout: LogoutResponse!
@@ -223,37 +318,33 @@ type Mutation {
   register(registerInput: RegisterInput!): AuthResponse!
   removeBaseStat(id: ID!): BaseStat!
   removeBattleSpell(id: ID!): Boolean!
+  removeBattlefieldPatchNote(id: ID!): BattlefieldPatchNoteEntity!
   removeEmblem(id: ID!): Emblem!
+  removeGameModePatchNote(id: ID!): GameModePatchNoteEntity!
   removeHero(id: ID!): Hero!
+  removeHeroPatchNote(id: ID!): HeroPatchNoteEntity!
   removeItem(id: ID!): Item!
   removeNavigation(id: ID!): Boolean!
+  removePatchNote(id: ID!): PatchNoteEntity!
   removeSkill(id: ID!): Skill!
   removeSkillDetail(id: ID!): SkillDetail!
+  removeSystemPatchNote(id: ID!): SystemPatchNoteEntity!
   seedNavigations: Boolean!
   updateBaseStat(id: ID!, updateBaseStatInput: UpdateBaseStatInput!): BaseStat!
-  updateBattleSpell(
-    id: ID!
-    updateBattleSpellInput: UpdateBattleSpellInput!
-  ): BattleSpell!
+  updateBattleSpell(id: ID!, updateBattleSpellInput: UpdateBattleSpellInput!): BattleSpell!
+  updateBattlefieldPatchNote(id: ID!, updateBattlefieldPatchNoteInput: UpdateBattlefieldPatchNoteInput!): BattlefieldPatchNoteEntity!
   updateEmblem(id: ID!, input: UpdateEmblemInput!): Emblem!
-  updateHero(id: ID!, input: UpdateHeroInput!): Hero!
-  updateHeroWithSkills(
-    fromHeroId: ID!
-    input: CreateSkillInput!
-    skillId: ID!
-    toHeroId: ID!
-  ): Skill!
+  updateGameModePatchNote(id: ID!, updateGameModePatchNoteInput: UpdateGameModePatchNoteInput!): GameModePatchNoteEntity!
+  updateHero(id: ID!, updateHeroInput: UpdateHeroInput!): Hero!
+  updateHeroPatchNote(id: ID!, updateHeroPatchNoteInput: UpdateHeroPatchNoteInput!): HeroPatchNoteEntity!
+  updateHeroWithSkills(fromHeroId: ID!, input: CreateSkillInput!, skillId: ID!, toHeroId: ID!): Skill!
   updateItem(id: ID!, input: UpdateItemInput!): Item!
-  updateNavigation(
-    updateNavigationInput: UpdateNavigationInput!
-  ): NavigationType!
+  updateNavigation(updateNavigationInput: UpdateNavigationInput!): NavigationType!
+  updatePatchNote(id: ID!, updatePatchNoteInput: UpdatePatchNoteInput!): PatchNoteEntity!
   updateSkill(id: ID!, input: UpdateSkillInput!): Skill!
   updateSkillDetail(id: ID!, input: UpdateSkillDetailInput!): SkillDetail!
-  updateSkillDetailToSkill(
-    input: UpdateSkillDetailInput!
-    skillDetailId: ID!
-    skillId: ID!
-  ): SkillDetail!
+  updateSkillDetailToSkill(input: UpdateSkillDetailInput!, skillDetailId: ID!, skillId: ID!): SkillDetail!
+  updateSystemPatchNote(id: ID!, updateSystemPatchNoteInput: UpdateSystemPatchNoteInput!): SystemPatchNoteEntity!
   updateUserRole(updateUserRoleInput: UpdateUserRoleInput!): User!
 }
 
@@ -277,6 +368,30 @@ type NavigationType {
   updatedAt: DateTime!
 }
 
+type PatchNoteEntity {
+  _id: ID!
+  battlefield_changes: [BattlefieldPatchNoteEntity!]
+  created_by: String
+  deleted_at: DateTime
+  end_date: DateTime!
+  game_mode_changes: [GameModePatchNoteEntity!]
+  hero_changes: [HeroPatchNoteEntity!]
+  is_active: Boolean!
+  name: String!
+  season: Float!
+  start_date: DateTime!
+  system_changes: [SystemPatchNoteEntity!]
+  type: PatchNoteType!
+  updated_by: String
+}
+
+enum PatchNoteType {
+  HOTFIX
+  MAJOR
+  MINOR
+  PATCH
+}
+
 type Query {
   baseStat(id: ID!): BaseStat!
   battleSpell(id: ID!): BattleSpell!
@@ -296,6 +411,8 @@ type Query {
   item(id: ID!): Item!
   items: [Item!]!
   me: User!
+  patchNote(id: String!): PatchNoteEntity!
+  patchNotes: [PatchNoteEntity!]!
   skill(id: ID!): Skill!
   skillDetail(id: ID!): SkillDetail!
   skillDetails: [SkillDetail!]!
@@ -327,6 +444,13 @@ type SkillDetail {
   level: Float
 }
 
+type SystemPatchNoteEntity {
+  _id: ID!
+  change_details: JSON
+  description: String!
+  title: String!
+}
+
 input UpdateBaseStatInput {
   attack_range: Int
   attack_speed: Int
@@ -353,6 +477,12 @@ input UpdateBattleSpellInput {
   tag: String
 }
 
+input UpdateBattlefieldPatchNoteInput {
+  change_details: JSON
+  description: String
+  title: String
+}
+
 input UpdateEmblemInput {
   attributes: JSON
   benefit: String
@@ -361,6 +491,12 @@ input UpdateEmblemInput {
   icon: String
   name: String
   type: String
+}
+
+input UpdateGameModePatchNoteInput {
+  change_details: JSON
+  description: String
+  title: String
 }
 
 input UpdateHeroInput {
@@ -378,6 +514,12 @@ input UpdateHeroInput {
   short_description: String
   skills: [CreateSkillInput!]
   type: [String!]
+}
+
+input UpdateHeroPatchNoteInput {
+  description: String
+  hero_changes: [HeroChangeInput!]
+  title: String
 }
 
 input UpdateItemInput {
@@ -410,6 +552,21 @@ input UpdateNavigationInput {
   route: String
 }
 
+input UpdatePatchNoteInput {
+  battlefield_changes: [CreateBattlefieldPatchNoteInput!]
+  created_by: String
+  end_date: DateTime
+  game_mode_changes: [CreateGameModePatchNoteInput!]
+  hero_changes: [CreateHeroPatchNoteInput!]
+  is_active: Boolean
+  name: String
+  season: Float
+  start_date: DateTime
+  system_changes: [CreateSystemPatchNoteInput!]
+  type: PatchNoteType
+  updated_by: String
+}
+
 input UpdateSkillDetailInput {
   attributes: JSON
   level: Int
@@ -424,6 +581,12 @@ input UpdateSkillInput {
   skills_detail: [CreateSkillDetailInput!]
   tag: [String!]
   type: String
+}
+
+input UpdateSystemPatchNoteInput {
+  change_details: JSON
+  description: String
+  title: String
 }
 
 input UpdateUserRoleInput {

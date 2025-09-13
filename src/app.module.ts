@@ -18,6 +18,7 @@ import { MulterModule } from '@nestjs/platform-express';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { NavigationModule } from './navigation/navigation.module';
 import { BaseStatModule } from './base-stat/base-stat.module';
+import { PatchNoteModule } from './patch-note/patch-note.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { BaseStatModule } from './base-stat/base-stat.module';
     BattleSpellModule,
     NavigationModule,
     BaseStatModule,
+    PatchNoteModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: 'GraphQLJSON', useValue: GraphQLJSON }],

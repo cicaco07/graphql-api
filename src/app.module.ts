@@ -19,17 +19,34 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { NavigationModule } from './navigation/navigation.module';
 import { BaseStatModule } from './base-stat/base-stat.module';
 import { PatchNoteModule } from './patch-note/patch-note.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      autoSchemaFile:
+        process.env.NODE_ENV === 'production'
+          ? true // In-memory schema generation untuk production
+          : join(process.cwd(), 'src/schema.gql'),
       resolvers: { JSON: GraphQLJSON },
       context: ({ req }: { req: Request }) => ({ req }),
       sortSchema: true,
       playground: true,
       introspection: true,
+      ...(process.env.NODE_ENV === 'production' && {
+        // Disable CSRF prevention jika diperlukan
+        csrfPrevention: false,
+
+        // CORS configuration
+        cors: {
+          origin: true,
+          credentials: true,
+        },
+      }),
     }),
     MulterModule.register({
       dest: './uploads',
@@ -46,9 +63,7 @@ import { PatchNoteModule } from './patch-note/patch-note.module';
         dotfiles: 'deny',
       },
     }),
-    MongooseModule.forRoot(
-      process.env.MONGO_URI || 'mongodb://localhost:27017/ml',
-    ),
+    MongooseModule.forRoot(process.env.MONGO_URI as string),
     HeroModule,
     SkillModule,
     SkillDetailModule,

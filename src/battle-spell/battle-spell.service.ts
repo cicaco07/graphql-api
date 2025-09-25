@@ -4,8 +4,8 @@ import { UpdateBattleSpellInput } from './dto/update-battle-spell.input';
 import { InjectModel } from '@nestjs/mongoose';
 import { BattleSpell } from './schemas/battle-spell.schema';
 import { Model } from 'mongoose';
-import * as path from 'path';
-import * as fs from 'fs';
+// import * as path from 'path';
+// import * as fs from 'fs';
 
 @Injectable()
 export class BattleSpellService {
@@ -40,16 +40,16 @@ export class BattleSpellService {
     id: string,
     updateBattleSpellInput: UpdateBattleSpellInput,
   ): Promise<BattleSpell> {
-    const existingBattleSpell = await this.findOne(id);
+    // const existingBattleSpell = await this.findOne(id);
 
-    if (
-      updateBattleSpellInput.icon &&
-      updateBattleSpellInput.icon !== existingBattleSpell.icon
-    ) {
-      if (existingBattleSpell.icon) {
-        this.deleteImageFile(existingBattleSpell.icon);
-      }
-    }
+    // if (
+    //   updateBattleSpellInput.icon &&
+    //   updateBattleSpellInput.icon !== existingBattleSpell.icon
+    // ) {
+    //   if (existingBattleSpell.icon) {
+    //     this.deleteImageFile(existingBattleSpell.icon);
+    //   }
+    // }
 
     const updatedBattleSpell = await this.battleSpellModel
       .findByIdAndUpdate(id, updateBattleSpellInput, { new: true })
@@ -62,24 +62,24 @@ export class BattleSpellService {
     return updatedBattleSpell;
   }
 
-  private deleteImageFile(imagePath: string): void {
-    try {
-      const fullPath = path.join(process.cwd(), imagePath.replace(/^\//, ''));
-      if (fs.existsSync(fullPath)) {
-        fs.unlinkSync(fullPath);
-      }
-    } catch (error) {
-      console.error('Error deleting image file:', error);
-    }
-  }
+  // private deleteImageFile(imagePath: string): void {
+  //   try {
+  //     const fullPath = path.join(process.cwd(), imagePath.replace(/^\//, ''));
+  //     if (fs.existsSync(fullPath)) {
+  //       fs.unlinkSync(fullPath);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error deleting image file:', error);
+  //   }
+  // }
 
   async remove(id: string): Promise<boolean> {
-    const battleSpell = await this.findOne(id);
+    // const battleSpell = await this.findOne(id);
 
-    // Hapus file ikon
-    if (battleSpell.icon) {
-      this.deleteImageFile(battleSpell.icon);
-    }
+    // // Hapus file ikon
+    // if (battleSpell.icon) {
+    //   this.deleteImageFile(battleSpell.icon);
+    // }
 
     await this.battleSpellModel.findByIdAndDelete(id).exec();
     return true;

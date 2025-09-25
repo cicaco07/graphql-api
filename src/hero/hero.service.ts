@@ -6,8 +6,6 @@ import { CreateHeroInput } from './dto/create-hero.input';
 import { UpdateHeroInput } from './dto/update-hero.input';
 import { Skill } from '../skill/schemas/skill.schema';
 import { SkillDetail } from '../skill-detail/schemas/skill-detail.schema';
-import * as path from 'path';
-import * as fs from 'fs';
 
 @Injectable()
 export class HeroService {
@@ -117,46 +115,16 @@ export class HeroService {
     return hero;
   }
 
-  async update(id: string, UpdateHeroInput: UpdateHeroInput): Promise<Hero> {
-    const existingHero = await this.findById(id);
-
-    if (
-      UpdateHeroInput.avatar &&
-      UpdateHeroInput.avatar !== existingHero.avatar
-    ) {
-      if (existingHero.avatar) {
-        this.deleteImageFile(existingHero.avatar);
-      }
-    }
-
-    if (UpdateHeroInput.image && UpdateHeroInput.image !== existingHero.image) {
-      if (existingHero.image) {
-        this.deleteImageFile(existingHero.image);
-      }
-    }
-
-    const updatedHero = await this.heroModel
-      .findByIdAndUpdate(id, UpdateHeroInput, {
+  async update(id: string, updateHeroInput: UpdateHeroInput): Promise<Hero> {
+    const updated = await this.heroModel.findByIdAndUpdate(
+      id,
+      updateHeroInput,
+      {
         new: true,
-      })
-      .exec();
-
-    if (!updatedHero) {
-      throw new NotFoundException(`Hero with ID "${id}" not found`);
-    }
-
-    return updatedHero;
-  }
-
-  private deleteImageFile(imagePath: string): void {
-    try {
-      const fullPath = path.join(process.cwd(), imagePath.replace(/^\//, ''));
-      if (fs.existsSync(fullPath)) {
-        fs.unlinkSync(fullPath);
-      }
-    } catch (error) {
-      console.error('Error deleting image file:', error);
-    }
+      },
+    );
+    if (!updated) throw new NotFoundException('Hero not found');
+    return updated;
   }
 
   async remove(id: string): Promise<Hero> {
@@ -164,14 +132,6 @@ export class HeroService {
       .findByIdAndDelete(id)
       .populate('skills');
     if (!deleted) throw new NotFoundException('Hero not found');
-
-    if (deleted.avatar) {
-      this.deleteImageFile(deleted.avatar);
-    }
-
-    if (deleted.image) {
-      this.deleteImageFile(deleted.image);
-    }
 
     const skills: Skill[] = deleted.skills || [];
 

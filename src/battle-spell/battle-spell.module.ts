@@ -3,7 +3,7 @@ import { BattleSpellService } from './battle-spell.service';
 import { BattleSpellResolver } from './battle-spell.resolver';
 import { MongooseModule } from '@nestjs/mongoose';
 import { BattleSpell, BattleSpellSchema } from './schemas/battle-spell.schema';
-import { BattleSpellController } from './battle-spell.controller';
+// import { BattleSpellController } from './battle-spell.controller';
 
 @Module({
   imports: [
@@ -11,7 +11,7 @@ import { BattleSpellController } from './battle-spell.controller';
       { name: BattleSpell.name, schema: BattleSpellSchema },
     ]),
   ],
-  controllers: [BattleSpellController],
+  // controllers: [BattleSpellController],
   providers: [BattleSpellResolver, BattleSpellService],
   exports: [BattleSpellService],
 })

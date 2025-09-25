@@ -19,10 +19,10 @@ export class Hero extends Document {
   type: string[];
 
   @Prop({ required: true })
-  avatar?: string;
+  avatar: string;
 
   @Prop({ required: true })
-  image?: string;
+  image: string;
 
   @Prop({ required: true })
   short_description: string;

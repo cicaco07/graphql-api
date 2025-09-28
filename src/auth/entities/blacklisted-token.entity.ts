@@ -1,6 +1,6 @@
-import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { ObjectType, Field, ID } from '@nestjs/graphql';
 
 export type BlacklistedTokenDocument = BlacklistedToken & Document;
 
@@ -10,24 +10,30 @@ export class BlacklistedToken {
   @Field(() => ID)
   _id: string;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, index: true })
   @Field()
   token: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, index: true })
   @Field()
   userId: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, index: true })
   @Field()
   expiresAt: Date;
 
+  @Prop({ default: false })
+  @Field({ defaultValue: false })
+  isAllTokens: boolean;
+
   @Field()
   createdAt: Date;
+
+  @Field()
+  updatedAt: Date;
 }
 
 export const BlacklistedTokenSchema =
   SchemaFactory.createForClass(BlacklistedToken);
 
-// Create TTL index untuk auto-delete expired tokens
 BlacklistedTokenSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });

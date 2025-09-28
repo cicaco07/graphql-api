@@ -19,18 +19,20 @@ import { BattleSpellModule } from './battle-spell/battle-spell.module';
 import { NavigationModule } from './navigation/navigation.module';
 import { BaseStatModule } from './base-stat/base-stat.module';
 import { PatchNoteModule } from './patch-note/patch-note.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '.env',
+      cache: true,
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile:
         process.env.NODE_ENV === 'production'
-          ? true // In-memory schema generation untuk production
+          ? true
           : join(process.cwd(), 'src/schema.gql'),
       resolvers: { JSON: GraphQLJSON },
       context: ({ req }: { req: Request }) => ({ req }),
@@ -38,10 +40,7 @@ import { ConfigModule } from '@nestjs/config';
       playground: true,
       introspection: true,
       ...(process.env.NODE_ENV === 'production' && {
-        // Disable CSRF prevention jika diperlukan
         csrfPrevention: false,
-
-        // CORS configuration
         cors: {
           origin: true,
           credentials: true,
@@ -63,7 +62,15 @@ import { ConfigModule } from '@nestjs/config';
     //     dotfiles: 'deny',
     //   },
     // }),
-    MongooseModule.forRoot(process.env.MONGO_URI as string),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        uri:
+          configService.get<string>('MONGO_URI') ||
+          'mongodb://localhost:27017/ml',
+      }),
+      inject: [ConfigService],
+    }),
     HeroModule,
     SkillModule,
     SkillDetailModule,

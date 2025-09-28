@@ -1,11 +1,15 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthResolver } from './auth.resolver';
-import { User, UserSchema } from './entities/user.entity';
 import { JwtStrategy } from './jwt.strategy';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { RolesGuard } from './guards/roles.guard';
+import { LogoutGuard } from './guards/logout.guard';
+import { User, UserSchema } from './entities/user.entity';
 import {
   BlacklistedToken,
   BlacklistedTokenSchema,
@@ -14,17 +18,40 @@ import { TokenService } from './services/token.service';
 
 @Module({
   imports: [
-    PassportModule,
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'your-secret-key',
-      signOptions: { expiresIn: '1d' },
+    ConfigModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: {
+          expiresIn: configService.get<string>('JWT_EXPIRES_IN') || '7d',
+        },
+      }),
+      inject: [ConfigService],
     }),
     MongooseModule.forFeature([
       { name: User.name, schema: UserSchema },
       { name: BlacklistedToken.name, schema: BlacklistedTokenSchema },
     ]),
   ],
-  providers: [AuthResolver, AuthService, TokenService, JwtStrategy],
-  exports: [AuthService, TokenService],
+  providers: [
+    AuthService,
+    AuthResolver,
+    JwtStrategy,
+    JwtAuthGuard,
+    RolesGuard,
+    LogoutGuard,
+    TokenService,
+  ],
+  exports: [
+    AuthService,
+    JwtStrategy,
+    PassportModule,
+    JwtAuthGuard,
+    RolesGuard,
+    LogoutGuard,
+    TokenService,
+  ],
 })
 export class AuthModule {}

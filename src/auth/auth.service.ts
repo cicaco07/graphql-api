@@ -7,6 +7,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
 import { User, UserDocument } from './entities/user.entity';
 import {
@@ -24,8 +25,27 @@ export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private jwtService: JwtService,
+    private configService: ConfigService,
     private tokenService: TokenService,
   ) {}
+
+  generateToken(user: any) {
+    const payload: JwtPayload = {
+      sub: user._id || user.userId,
+      email: user.email,
+      role: user.role || Role.USER,
+    };
+
+    const secret = this.configService.get<string>('JWT_SECRET');
+    const expiresIn = this.configService.get<string>('JWT_EXPIRES_IN') || '7d';
+
+    return {
+      access_token: this.jwtService.sign(payload, {
+        secret,
+        expiresIn,
+      }),
+    };
+  }
 
   async register(registerInput: RegisterInput): Promise<AuthResponse> {
     const { name, email, password, role = Role.USER } = registerInput;
@@ -56,7 +76,13 @@ export class AuthService {
       role: user.role,
     };
 
-    const access_token = this.jwtService.sign(payload);
+    const secret = this.configService.get<string>('JWT_SECRET');
+    const expiresIn = this.configService.get<string>('JWT_EXPIRES_IN') || '7d';
+
+    const access_token = this.jwtService.sign(payload, {
+      secret,
+      expiresIn,
+    });
 
     return {
       access_token,
@@ -94,7 +120,13 @@ export class AuthService {
       role: user.role,
     };
 
-    const access_token = this.jwtService.sign(payload);
+    const secret = this.configService.get<string>('JWT_SECRET');
+    const expiresIn = this.configService.get<string>('JWT_EXPIRES_IN') || '7d';
+
+    const access_token = this.jwtService.sign(payload, {
+      secret,
+      expiresIn,
+    });
 
     return {
       access_token,
@@ -150,17 +182,22 @@ export class AuthService {
     }
   }
 
-  /**
-   * Logout dari semua device (blacklist semua token user)
-   */
-  logoutEverywhere(userId: string): { message: string } {
+  async logoutEverywhere(userId: string): Promise<{ message: string }> {
     try {
-      this.tokenService.blacklistAllUserTokens(userId);
+      await this.tokenService.blacklistAllUserTokens(userId);
       return {
         message: 'Logged out from all devices successfully',
       };
     } catch {
       throw new UnauthorizedException('Logout everywhere failed');
     }
+  }
+
+  async validateUser(payload: JwtPayload): Promise<User> {
+    const user = await this.userModel.findById(payload.sub).select('-password');
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    return user;
   }
 }

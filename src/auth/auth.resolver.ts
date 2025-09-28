@@ -1,49 +1,63 @@
 import { Resolver, Mutation, Args, Query, Context } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { User } from './entities/user.entity';
-import { AuthResponse, LogoutResponse } from './dto/auth.response';
 import {
   RegisterInput,
   LoginInput,
   UpdateUserRoleInput,
 } from './dto/auth.input';
+import { AuthResponse } from './dto/auth.response';
+import { User } from './entities/user.entity';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
+import { LogoutGuard } from './guards/logout.guard';
 import { Roles } from './decorators/roles.decorator';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { Role } from './enums/role.enum';
 import { ExtractJwt } from 'passport-jwt';
-import { LogoutGuard } from './guards/logout.guard';
 
 @Resolver(() => User)
 export class AuthResolver {
-  constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Mutation(() => AuthResponse)
-  async register(
-    @Args('registerInput') registerInput: RegisterInput,
-  ): Promise<AuthResponse> {
+  async register(@Args('registerInput') registerInput: RegisterInput) {
     return this.authService.register(registerInput);
   }
 
   @Mutation(() => AuthResponse)
-  async login(
-    @Args('loginInput') loginInput: LoginInput,
-  ): Promise<AuthResponse> {
+  async login(@Args('loginInput') loginInput: LoginInput) {
     return this.authService.login(loginInput);
+  }
+
+  @Mutation(() => String)
+  @UseGuards(JwtAuthGuard, LogoutGuard)
+  async logout(@CurrentUser() user: User, @Context() context: { req: any }) {
+    const token = ExtractJwt.fromAuthHeaderAsBearerToken()(context.req);
+    if (!token) {
+      throw new Error('Token not found');
+    }
+    const result = await this.authService.logout(token, user._id);
+    return result.message;
+  }
+
+  @Mutation(() => String)
+  @UseGuards(JwtAuthGuard)
+  async logoutEverywhere(@CurrentUser() user: User) {
+    const result = await this.authService.logoutEverywhere(user._id);
+    return result.message;
   }
 
   @Query(() => User)
   @UseGuards(JwtAuthGuard)
-  me(@CurrentUser() user: User): User {
+  me(@CurrentUser() user: User) {
     return user;
   }
 
   @Query(() => [User])
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
-  async getAllUsers(): Promise<User[]> {
+  async getAllUsers() {
     return this.authService.getAllUsers();
   }
 
@@ -52,55 +66,14 @@ export class AuthResolver {
   @Roles(Role.SUPER_ADMIN)
   async updateUserRole(
     @Args('updateUserRoleInput') updateUserRoleInput: UpdateUserRoleInput,
-  ): Promise<User> {
+  ) {
     return this.authService.updateUserRole(updateUserRoleInput);
   }
 
   @Mutation(() => Boolean)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)
-  async deleteUser(@Args('userId') userId: string): Promise<boolean> {
+  async deleteUser(@Args('userId') userId: string) {
     return this.authService.deleteUser(userId);
-  }
-
-  @Mutation(() => LogoutResponse)
-  @UseGuards(LogoutGuard)
-  async logout(
-    @CurrentUser() user: User,
-    @Context() context: any,
-  ): Promise<LogoutResponse> {
-    const request = context.req;
-    const token = ExtractJwt.fromAuthHeaderAsBearerToken()(request);
-
-    if (!token) {
-      throw new Error('No token found in request');
-    }
-
-    let userId: string | undefined = undefined;
-    if ('_id' in user && typeof user._id === 'string') {
-      userId = user._id;
-    } else if ('sub' in user && typeof user.sub === 'string') {
-      userId = user.sub;
-    }
-
-    if (!userId) {
-      throw new Error('User id not found in token');
-    }
-
-    return this.authService.logout(token, userId);
-  }
-
-  @Mutation(() => LogoutResponse)
-  @UseGuards(JwtAuthGuard)
-  async logoutEverywhere(@CurrentUser() user: User): Promise<LogoutResponse> {
-    return this.authService.logoutEverywhere(user._id);
-  }
-
-  // Optional: Method untuk check token status
-  @Query(() => Boolean)
-  @UseGuards(JwtAuthGuard)
-  isTokenValid(): boolean {
-    // Jika sampai sini berarti token valid (sudah di-check di guard)
-    return true;
   }
 }

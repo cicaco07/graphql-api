@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
 @Schema({ timestamps: true })
-export class BattleSpell {
+export class BattleSpell extends Document {
   @Prop({ required: true })
   name: string;
 
@@ -10,19 +10,13 @@ export class BattleSpell {
   description: string;
 
   @Prop({ required: false })
-  icon?: string; // Path to uploaded image file
+  icon?: string;
 
   @Prop({ required: true, type: Number })
-  cooldown: number; // in seconds
+  cooldown: number;
 
   @Prop({ required: true })
   tag: string;
-
-  @Prop({ default: Date.now })
-  createdAt?: Date;
-
-  @Prop({ default: Date.now })
-  updatedAt?: Date;
 }
 
 export const BattleSpellSchema = SchemaFactory.createForClass(BattleSpell);

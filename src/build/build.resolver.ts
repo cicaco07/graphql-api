@@ -116,6 +116,16 @@ export class BuildResolver {
     return await this.buildService.findOfficial(limit, offset);
   }
 
+  @Mutation(() => BuildEntity, { name: 'updateBuild' })
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MEMBER, Role.SUPER_ADMIN)
+  async updateBuild(
+    @Args('id', { type: () => ID }) id: string,
+    @Args('updateBuildInput') updateBuildInput: CreateBuildInput,
+  ) {
+    return await this.buildService.update(id, updateBuildInput);
+  }
+
   @Mutation(() => Boolean, { name: 'removeBuild' })
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.MEMBER, Role.SUPER_ADMIN)

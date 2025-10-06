@@ -14,6 +14,7 @@ import { Emblem } from 'src/emblem/schemas/emblem.schema';
 import { BattleSpell } from 'src/battle-spell/schemas/battle-spell.schema';
 import { CreateBuildInput } from './dto/create-build.input';
 import { User } from 'src/auth/schemas/user.schema';
+import { UpdateBuildInput } from './dto/update-build.input';
 // import { BuildRating } from './entities/build.entity';
 
 @Injectable()
@@ -240,6 +241,103 @@ export class BuildService {
       .limit(limit)
       .skip(offset)
       .exec();
+  }
+
+  async update(id: string, updateBuildInput: UpdateBuildInput): Promise<Build> {
+    const build = await this.buildModel.findById(id);
+    if (!build) {
+      throw new NotFoundException(`Build with ID ${id} not found`);
+    }
+
+    const hero = await this.heroModel.findById(updateBuildInput.heroId);
+    if (!hero) {
+      throw new NotFoundException(
+        `Hero with ID ${updateBuildInput.heroId} not found`,
+      );
+    }
+
+    const itemIds = updateBuildInput.items?.map((item) => item.itemId) || [];
+    const items = await this.itemModel.find({ _id: { $in: itemIds } });
+    if (items.length !== itemIds.length) {
+      const foundItemIds = items
+        .map((item) => item._id?.toString() || '')
+        .filter((id) => id !== '');
+      const missingItemIds = itemIds.filter((id) => !foundItemIds.includes(id));
+      throw new NotFoundException(
+        `Items not found: ${missingItemIds.join(', ')}`,
+      );
+    }
+
+    const emblems = await this.emblemModel.find({
+      _id: { $in: updateBuildInput.emblemIds || [] },
+    });
+    if (emblems.length !== (updateBuildInput.emblemIds?.length || 0)) {
+      const foundEmblemIds = emblems
+        .map((emblem) => emblem._id?.toString() || '')
+        .filter((id) => id !== '');
+      const missingEmblemIds = (updateBuildInput.emblemIds || []).filter(
+        (id) => !foundEmblemIds.includes(id),
+      );
+      throw new NotFoundException(
+        `Emblems not found: ${missingEmblemIds.join(', ')}`,
+      );
+    }
+
+    const battleSpells = await this.battleSpellModel.find({
+      _id: { $in: updateBuildInput.battleSpellIds || [] },
+    });
+    if (
+      battleSpells.length !== (updateBuildInput.battleSpellIds?.length || 0)
+    ) {
+      const foundSpellIds = battleSpells
+        .map((spell) => spell._id?.toString() || '')
+        .filter((id) => id !== '');
+      const missingSpellIds = (updateBuildInput.battleSpellIds || []).filter(
+        (id) => !foundSpellIds.includes(id),
+      );
+      throw new NotFoundException(
+        `Battle spells not found: ${missingSpellIds.join(', ')}`,
+      );
+    }
+
+    const orders = updateBuildInput.items?.map((item) => item.order) || [];
+    const uniqueOrders = [...new Set(orders)];
+    if (orders.length !== uniqueOrders.length) {
+      throw new BadRequestException('Item orders must be unique');
+    }
+
+    const sortedOrders = orders.sort((a, b) => a - b);
+    for (let i = 0; i < sortedOrders.length; i++) {
+      if (sortedOrders[i] !== i + 1) {
+        throw new BadRequestException(
+          'Item orders must be sequential starting from 1',
+        );
+      }
+    }
+
+    const buildItems =
+      updateBuildInput.items?.map((item) => ({
+        item: item.itemId,
+        order: item.order,
+      })) || [];
+
+    const updatedData: Partial<Build> = {
+      name: updateBuildInput.name,
+      role: updateBuildInput.role,
+      description: updateBuildInput.description,
+      hero: hero,
+      items: buildItems.map((item) => ({
+        item: items.find((i) => i._id?.toString() === item.item)!,
+        order: item.order,
+      })),
+      emblems: emblems,
+      battle_spells: battleSpells,
+    };
+
+    Object.assign(build, updatedData);
+    await build.save();
+
+    return this.findOne(build._id.toString());
   }
 
   async remove(id: string): Promise<boolean> {

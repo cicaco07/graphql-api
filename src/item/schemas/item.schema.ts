@@ -1,13 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-@Schema()
+@Schema({ timestamps: true })
 export class Item extends Document {
   @Prop({ required: true })
   name: string;
 
   @Prop({ required: false })
-  tag: string;
+  tag?: string;
 
   @Prop({ required: true })
   type: string;
@@ -22,16 +22,16 @@ export class Item extends Document {
   image: string;
 
   @Prop({ required: false })
-  story: string;
+  story?: string;
 
   @Prop({ type: [String], required: false })
-  description: string[];
+  description?: string[];
 
   @Prop({ required: false })
-  tips: string;
+  tips?: string;
 
   @Prop({ required: false })
-  parent_items: string[];
+  parent_items?: string[];
 }
 
 export const ItemSchema = SchemaFactory.createForClass(Item);

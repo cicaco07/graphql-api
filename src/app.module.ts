@@ -20,6 +20,7 @@ import { NavigationModule } from './navigation/navigation.module';
 import { BaseStatModule } from './base-stat/base-stat.module';
 import { PatchNoteModule } from './patch-note/patch-note.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { BuildModule } from './build/build.module';
 
 @Module({
   imports: [
@@ -82,6 +83,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     NavigationModule,
     BaseStatModule,
     PatchNoteModule,
+    BuildModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: 'GraphQLJSON', useValue: GraphQLJSON }],

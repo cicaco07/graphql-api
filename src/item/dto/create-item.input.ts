@@ -1,15 +1,49 @@
 import { InputType, Field } from '@nestjs/graphql';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 @InputType()
 export class CreateItemInput {
-  @Field() name: string;
-  @Field({ nullable: true }) tag?: string;
-  @Field() type: string;
-  @Field(() => [String]) attributes: string[];
-  @Field() price: number;
-  @Field() image: string;
-  @Field({ nullable: true }) story?: string;
-  @Field(() => [String], { nullable: true }) description?: string[];
-  @Field({ nullable: true }) tips?: string;
-  @Field(() => [String], { nullable: true }) parent_items?: string[];
+  @Field()
+  @IsString()
+  @IsNotEmpty()
+  name: string;
+
+  @Field({ nullable: true })
+  @IsString()
+  @IsOptional()
+  tag?: string;
+
+  @Field()
+  @IsString()
+  @IsNotEmpty()
+  type: string;
+
+  @Field(() => [String])
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
+  attributes: string[];
+
+  @Field()
+  @IsNotEmpty()
+  price: number;
+
+  @Field()
+  @IsNotEmpty()
+  image: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  story?: string;
+
+  @Field(() => [String], { nullable: true })
+  @IsOptional()
+  description?: string[];
+
+  @Field({ nullable: true })
+  @IsOptional()
+  tips?: string;
+
+  @Field(() => [String], { nullable: true })
+  @IsOptional()
+  parent_items?: string[];
 }

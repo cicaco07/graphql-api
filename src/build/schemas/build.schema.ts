@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
-import { User } from 'src/auth/schemas/user.schema';
+import { User } from 'src/auth/entities/user.entity';
+// import { User } from 'src/auth/schemas/user.schema';
 import { BattleSpell } from 'src/battle-spell/schemas/battle-spell.schema';
 import { Emblem } from 'src/emblem/schemas/emblem.schema';
 import { Hero } from 'src/hero/schemas/hero.schema';

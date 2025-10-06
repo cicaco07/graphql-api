@@ -54,29 +54,6 @@ export class BuildResolver {
     return await this.buildService.findByHero(heroId, limit, offset);
   }
 
-  // @Query(() => [BuildEntity], { name: 'buildsByUser' })
-  // async findByUser(
-  //   @Args('userId', { type: () => ID }) userId: string,
-  //   @Args('limit', { type: () => Int, defaultValue: 10 }) limit?: number,
-  //   @Args('offset', { type: () => Int, defaultValue: 0 }) offset?: number,
-  // ) {
-  //   return await this.buildService.findByUser(userId, limit, offset);
-  // }
-
-  // @Query(() => [BuildEntity], { name: 'myBuilds' })
-  // @UseGuards(JwtAuthGuard)
-  // async findMyBuilds(
-  //   @CurrentUser() user: any,
-  //   @Args('limit', { type: () => Int, defaultValue: 10 }) limit?: number,
-  //   @Args('offset', { type: () => Int, defaultValue: 0 }) offset?: number,
-  // ) {
-  //   return await this.buildService.findMyBuilds(
-  //     (user as { id: string }).id,
-  //     limit,
-  //     offset,
-  //   );
-  // }
-
   @Query(() => [BuildEntity], { name: 'buildsByUser' })
   async findByUser(
     @Args('userId', { type: () => ID }) userId: string,

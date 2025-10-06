@@ -4,13 +4,14 @@ import { BuildResolver } from './build.resolver';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Build, BuildSchema } from './schemas/build.schema';
 import { Hero, HeroSchema } from 'src/hero/schemas/hero.schema';
-import { User, UserSchema } from 'src/auth/schemas/user.schema';
+// import { User, UserSchema } from 'src/auth/schemas/user.schema';
 import { Item, ItemSchema } from 'src/item/schemas/item.schema';
 import {
   BattleSpell,
   BattleSpellSchema,
 } from 'src/battle-spell/schemas/battle-spell.schema';
 import { Emblem, EmblemSchema } from 'src/emblem/schemas/emblem.schema';
+import { User, UserSchema } from 'src/auth/entities/user.entity';
 
 @Module({
   imports: [

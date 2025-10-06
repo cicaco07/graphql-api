@@ -13,8 +13,9 @@ import { Item } from 'src/item/schemas/item.schema';
 import { Emblem } from 'src/emblem/schemas/emblem.schema';
 import { BattleSpell } from 'src/battle-spell/schemas/battle-spell.schema';
 import { CreateBuildInput } from './dto/create-build.input';
-import { User } from 'src/auth/schemas/user.schema';
+// import { User } from 'src/auth/schemas/user.schema';
 import { UpdateBuildInput } from './dto/update-build.input';
+import { User } from 'src/auth/entities/user.entity';
 // import { BuildRating } from './entities/build.entity';
 
 @Injectable()

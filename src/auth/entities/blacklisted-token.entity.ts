@@ -10,15 +10,15 @@ export class BlacklistedToken {
   @Field(() => ID)
   _id: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   @Field()
   token: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   @Field()
   userId: string;
 
-  @Prop({ required: true, index: true })
+  @Prop({ required: true })
   @Field()
   expiresAt: Date;
 

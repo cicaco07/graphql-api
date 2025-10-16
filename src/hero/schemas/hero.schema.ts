@@ -19,6 +19,15 @@ export class Hero extends Document {
   type: string[];
 
   @Prop({ required: true })
+  speciality: string;
+
+  @Prop({ required: true })
+  region: string;
+
+  @Prop({ required: true })
+  hero_order: number;
+
+  @Prop({ required: true })
   avatar: string;
 
   @Prop({ required: true })
@@ -28,7 +37,7 @@ export class Hero extends Document {
   short_description: string;
 
   @Prop({ required: true })
-  release_date: Date;
+  release_date: string;
 
   @Prop({ required: true })
   durability: number;

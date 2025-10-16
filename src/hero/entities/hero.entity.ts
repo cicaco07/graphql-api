@@ -20,6 +20,15 @@ export class Hero {
   type: string[];
 
   @Field()
+  speciality: string;
+
+  @Field()
+  region: string;
+
+  @Field()
+  hero_order: number;
+
+  @Field()
   avatar: string;
 
   @Field()
@@ -29,7 +38,7 @@ export class Hero {
   short_description: string;
 
   @Field()
-  release_date: Date;
+  release_date: string;
 
   @Field()
   durability: number;

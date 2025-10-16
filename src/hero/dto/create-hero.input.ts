@@ -36,6 +36,21 @@ export class CreateHeroInput {
   @Field()
   @IsNotEmpty()
   @IsString()
+  speciality: string;
+
+  @Field()
+  @IsNotEmpty()
+  @IsString()
+  region: string;
+
+  @Field()
+  @IsNotEmpty()
+  @IsNumber()
+  hero_order: number;
+
+  @Field()
+  @IsNotEmpty()
+  @IsString()
   avatar: string;
 
   @Field()

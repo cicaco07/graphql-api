@@ -2,6 +2,7 @@ import { InputType, Field } from '@nestjs/graphql';
 import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
   ValidateNested,
@@ -27,7 +28,7 @@ export class CreateSkillInput {
 
   @Field({ nullable: true })
   @IsOptional()
-  @IsString()
+  @IsNumber()
   attack_effect?: number;
 
   @Field()

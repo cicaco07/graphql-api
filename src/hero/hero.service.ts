@@ -87,6 +87,7 @@ export class HeroService {
           path: 'skills_detail',
         },
       })
+      .sort({ hero_order: 1 })
       .exec();
   }
 
@@ -97,6 +98,7 @@ export class HeroService {
         path: 'skills',
         populate: { path: 'skills_detail' },
       })
+      .sort({ hero_order: 1 })
       .exec();
 
     if (!heroes) throw new NotFoundException('Hero not found');

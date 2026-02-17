@@ -21,6 +21,7 @@ import { BaseStatModule } from './base-stat/base-stat.module';
 import { PatchNoteModule } from './patch-note/patch-note.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BuildModule } from './build/build.module';
+import { TournamentModule } from './tournament/tournament.module';
 
 @Module({
   imports: [
@@ -84,6 +85,7 @@ import { BuildModule } from './build/build.module';
     BaseStatModule,
     PatchNoteModule,
     BuildModule,
+    TournamentModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: 'GraphQLJSON', useValue: GraphQLJSON }],

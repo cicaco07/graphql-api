@@ -2,7 +2,10 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Tournament, TournamentDocument } from '../schemas/tournament.schema';
-import { TournamentStage, TournamentStageDocument } from '../schemas/tournament-stage.schema';
+import {
+  TournamentStage,
+  TournamentStageDocument,
+} from '../schemas/tournament-stage.schema';
 import { HeroStats, HeroStatsDocument } from '../schemas/hero-stats.schema';
 import { SyncLog, SyncLogDocument } from '../schemas/sync-log.schema';
 import { CreateTournamentInput } from '../dto/create-tournament.input';
@@ -10,10 +13,13 @@ import { CreateTournamentInput } from '../dto/create-tournament.input';
 @Injectable()
 export class TournamentService {
   constructor(
-    @InjectModel(Tournament.name)       private tournamentModel: Model<TournamentDocument>,
-    @InjectModel(TournamentStage.name)  private stageModel:      Model<TournamentStageDocument>,
-    @InjectModel(HeroStats.name)        private heroStatsModel:  Model<HeroStatsDocument>,
-    @InjectModel(SyncLog.name)          private syncLogModel:    Model<SyncLogDocument>,
+    @InjectModel(Tournament.name)
+    private tournamentModel: Model<TournamentDocument>,
+    @InjectModel(TournamentStage.name)
+    private stageModel: Model<TournamentStageDocument>,
+    @InjectModel(HeroStats.name)
+    private heroStatsModel: Model<HeroStatsDocument>,
+    @InjectModel(SyncLog.name) private syncLogModel: Model<SyncLogDocument>,
   ) {}
 
   async create(input: CreateTournamentInput) {
@@ -22,9 +28,12 @@ export class TournamentService {
 
   async findAll(filters: { tier?: string; status?: string }) {
     const q: any = {};
-    if (filters.tier)   q.tier   = filters.tier;
+    if (filters.tier) q.tier = filters.tier;
     if (filters.status) q.status = filters.status;
-    return this.tournamentModel.find(q).sort({ tierLevel: 1, startDate: -1 }).exec();
+    return this.tournamentModel
+      .find(q)
+      .sort({ tierLevel: 1, startDate: -1 })
+      .exec();
   }
 
   async findOne(id: string) {
@@ -47,9 +56,18 @@ export class TournamentService {
     limit = 50,
   ) {
     const q: any = { tournamentId: new Types.ObjectId(tournamentId) };
-    q.stageId = stageId ? new Types.ObjectId(stageId) : null;
+    if (stageId) {
+      q.stageId = new Types.ObjectId(stageId);
+    }
 
-    const allowedSort = ['picksAndBans', 'picks', 'bans', 'winRate', 'presenceRate', 'banRate'];
+    const allowedSort = [
+      'picksAndBans',
+      'picks',
+      'bans',
+      'winRate',
+      'presenceRate',
+      'banRate',
+    ];
     const sort = allowedSort.includes(sortBy) ? sortBy : 'picksAndBans';
 
     return this.heroStatsModel

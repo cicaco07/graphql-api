@@ -2,7 +2,10 @@ import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Tournament, TournamentDocument } from '../schemas/tournament.schema';
-import { TournamentStage, TournamentStageDocument } from '../schemas/tournament-stage.schema';
+import {
+  TournamentStage,
+  TournamentStageDocument,
+} from '../schemas/tournament-stage.schema';
 import { HeroStats, HeroStatsDocument } from '../schemas/hero-stats.schema';
 import { SyncLog, SyncLogDocument } from '../schemas/sync-log.schema';
 import { ScraperService } from './scraper.service';
@@ -21,12 +24,15 @@ export class SyncService {
   private readonly logger = new Logger(SyncService.name);
 
   constructor(
-    @InjectModel(Tournament.name) private tournamentModel: Model<TournamentDocument>,
-    @InjectModel(TournamentStage.name) private stageModel: Model<TournamentStageDocument>,
-    @InjectModel(HeroStats.name) private heroStatsModel: Model<HeroStatsDocument>,
+    @InjectModel(Tournament.name)
+    private tournamentModel: Model<TournamentDocument>,
+    @InjectModel(TournamentStage.name)
+    private stageModel: Model<TournamentStageDocument>,
+    @InjectModel(HeroStats.name)
+    private heroStatsModel: Model<HeroStatsDocument>,
     @InjectModel(SyncLog.name) private syncLogModel: Model<SyncLogDocument>,
     private readonly scraperService: ScraperService,
-  ) { }
+  ) {}
 
   // ─── Sync penuh satu tournament (semua stages) ──────────────────────────
   async syncTournament(tournamentId: string): Promise<SyncResult> {
@@ -52,7 +58,9 @@ export class SyncService {
 
     try {
       // 1. Scrape & upsert stages
-      const scrapedStages = await this.scraperService.scrapeStages(tournament.liquipediaSlug);
+      const scrapedStages = await this.scraperService.scrapeStages(
+        tournament.liquipediaSlug,
+      );
       const savedStages = await this.upsertStages(tournamentId, scrapedStages);
 
       // 2. Sync hero stats per stage
@@ -79,7 +87,11 @@ export class SyncService {
 
       await this.syncLogModel.updateOne(
         { _id: log._id },
-        { status: errors.length ? 'failed' : 'success', itemsSynced: totalSynced, finishedAt: now },
+        {
+          status: errors.length ? 'failed' : 'success',
+          itemsSynced: totalSynced,
+          finishedAt: now,
+        },
       );
 
       return {
@@ -101,7 +113,13 @@ export class SyncService {
         { _id: log._id },
         { status: 'failed', errorMessage: errMsg, finishedAt: new Date() },
       );
-      return { success: false, message: errMsg, itemsSynced: 0, syncedAt: new Date(), errors: [errMsg] };
+      return {
+        success: false,
+        message: errMsg,
+        itemsSynced: 0,
+        syncedAt: new Date(),
+        errors: [errMsg],
+      };
     }
   }
 
@@ -126,13 +144,25 @@ export class SyncService {
         { _id: log._id },
         { status: 'success', itemsSynced: count, finishedAt: now },
       );
-      return { success: true, message: `${count} hero stats synced`, itemsSynced: count, syncedAt: now, errors: [] };
+      return {
+        success: true,
+        message: `${count} hero stats synced`,
+        itemsSynced: count,
+        syncedAt: now,
+        errors: [],
+      };
     } catch (err: any) {
       await this.syncLogModel.updateOne(
         { _id: log._id },
         { status: 'failed', errorMessage: err.message, finishedAt: new Date() },
       );
-      return { success: false, message: err.message, itemsSynced: 0, syncedAt: new Date(), errors: [err.message] };
+      return {
+        success: false,
+        message: err.message,
+        itemsSynced: 0,
+        syncedAt: new Date(),
+        errors: [err.message],
+      };
     }
   }
 
@@ -151,8 +181,13 @@ export class SyncService {
   }
 
   // ─── Internal: Sync hero stats untuk satu stage ──────────────────────────
-  private async syncHeroStatsForStage(tournamentId: string, stage: TournamentStageDocument): Promise<number> {
-    const scraped = await this.scraperService.scrapeHeroStats(stage.liquipediaUrl);
+  private async syncHeroStatsForStage(
+    tournamentId: string,
+    stage: TournamentStageDocument,
+  ): Promise<number> {
+    const scraped = await this.scraperService.scrapeHeroStats(
+      stage.liquipediaUrl,
+    );
     if (!scraped.length) return 0;
 
     const totalGames = scraped.reduce((s, h) => s + h.picks, 0) / 5; // 5 heroes per team
@@ -162,7 +197,8 @@ export class SyncService {
     for (const h of scraped) {
       const pickRate = totalGames > 0 ? (h.picks / (totalGames * 2)) * 100 : 0;
       const banRate = totalGames > 0 ? (h.bans / (totalGames * 2)) * 100 : 0;
-      const presenceRate = totalGames > 0 ? (h.picksAndBans / (totalGames * 2)) * 100 : 0;
+      const presenceRate =
+        totalGames > 0 ? (h.picksAndBans / (totalGames * 2)) * 100 : 0;
 
       await this.heroStatsModel.findOneAndUpdate(
         {

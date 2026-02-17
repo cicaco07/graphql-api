@@ -221,6 +221,11 @@ export class ScraperService {
   // ── Public: detect stages dari tournament ────────────────────────────────
 
   async scrapeStages(liquipediaSlug: string): Promise<ScrapedStage[]> {
+    // Build URL statistics — support slug flat maupun nested
+    // Contoh:
+    //   "M7_World_Championship"  → .../M7_World_Championship/Statistics
+    //   "MSC/2025"               → .../MSC/2025/Statistics
+    //   "MPL/Indonesia/Season_16"→ .../MPL/Indonesia/Season_16/Statistics
     const baseUrl = `${this.BASE}/mobilelegends/${liquipediaSlug}/Statistics`;
     this.logger.log(`Detecting stages: ${baseUrl}`);
 
@@ -237,26 +242,53 @@ export class ScraperService {
       order: order++,
     });
 
-    // Cari link stage lain — pattern URL: /Statistics/StageName
-    // Filter ketat: harus path yang diawali slug tournament
-    const stagePattern = new RegExp(`/${liquipediaSlug}/Statistics/`, 'i');
+    // ── Deteksi stage links ──────────────────────────────────────────────────
+    // Pattern lama terlalu ketat — hanya cocok untuk slug flat
+    // Pattern baru: cari semua link yang:
+    //   1. Path-nya mengandung "/Statistics/" (ada sub-stage)
+    //   2. Bukan link navigasi (Page, Talk, Edit, History, dll.)
+    //   3. Bukan link yang sudah ada di daftar
+
+    const NAV_TEXTS = new Set([
+      'page',
+      'talk',
+      'edit',
+      'history',
+      'what links here',
+      'related changes',
+      'upload file',
+      'special pages',
+      'printable version',
+      'permanent link',
+      'page information',
+      'what links here globally',
+    ]);
+
     const seen = new Set<string>(['overall']);
 
     $('a[href]').each((_, el) => {
       const href = $(el).attr('href') || '';
       const text = $(el).text().trim();
 
-      if (!text || !stagePattern.test(href)) return;
+      if (!text) return;
+      if (NAV_TEXTS.has(text.toLowerCase())) return;
+
+      // Harus mengandung "/Statistics/" di path (bukan di query string)
+      const pathPart = href.split('?')[0];
+      if (!pathPart.includes('/Statistics/')) return;
+
       const slug = this.toSlug(text);
       if (seen.has(slug)) return;
 
       seen.add(slug);
       const fullUrl = href.startsWith('http') ? href : `${this.BASE}${href}`;
+
       stages.push({ name: text, slug, liquipediaUrl: fullUrl, order: order++ });
+      this.logger.log(`  Found stage: "${text}" → ${fullUrl}`);
     });
 
     this.logger.log(
-      `Found ${stages.length} stage(s): ${stages.map((s) => s.name).join(', ')}`,
+      `Total ${stages.length} stage(s): ${stages.map((s) => s.name).join(', ')}`,
     );
     return stages;
   }

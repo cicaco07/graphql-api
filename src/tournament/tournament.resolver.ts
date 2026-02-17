@@ -9,6 +9,7 @@ import {
   SyncLogType,
 } from './types/tournament.type';
 import { CreateTournamentInput } from './dto/create-tournament.input';
+import { UpdateTournamentInput } from './dto/update-tournament.input';
 import { TournamentTier } from './enum/tournament-tier.enum';
 import { TournamentStatus } from './enum/tournament-status.enum';
 
@@ -17,7 +18,7 @@ export class TournamentResolver {
   constructor(
     private readonly tournamentService: TournamentService,
     private readonly syncService: SyncService,
-  ) {}
+  ) { }
 
   // ─── Queries ─────────────────────────────────────────────────────────────
 
@@ -72,6 +73,14 @@ export class TournamentResolver {
     return this.tournamentService.create(input);
   }
 
+  @Mutation(() => TournamentType)
+  updateTournament(
+    @Args('id', { type: () => ID }) id: string,
+    @Args('input') input: UpdateTournamentInput,
+  ) {
+    return this.tournamentService.update(id, input);
+  }
+
   @Mutation(() => SyncResultType, {
     description: 'Sinkronisasi penuh satu tournament dari Liquipedia',
   })
@@ -89,7 +98,7 @@ export class TournamentResolver {
     return this.syncService.syncStage(tournamentId, stageId);
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => TournamentType)
   deleteTournament(@Args('id', { type: () => ID }) id: string) {
     return this.tournamentService.remove(id);
   }

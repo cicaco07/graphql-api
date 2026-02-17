@@ -9,6 +9,7 @@ import {
 import { HeroStats, HeroStatsDocument } from '../schemas/hero-stats.schema';
 import { SyncLog, SyncLogDocument } from '../schemas/sync-log.schema';
 import { CreateTournamentInput } from '../dto/create-tournament.input';
+import { UpdateTournamentInput } from '../dto/update-tournament.input';
 
 @Injectable()
 export class TournamentService {
@@ -20,7 +21,7 @@ export class TournamentService {
     @InjectModel(HeroStats.name)
     private heroStatsModel: Model<HeroStatsDocument>,
     @InjectModel(SyncLog.name) private syncLogModel: Model<SyncLogDocument>,
-  ) {}
+  ) { }
 
   async create(input: CreateTournamentInput) {
     return this.tournamentModel.create(input);
@@ -38,6 +39,14 @@ export class TournamentService {
 
   async findOne(id: string) {
     const t = await this.tournamentModel.findById(id).exec();
+    if (!t) throw new NotFoundException(`Tournament ${id} not found`);
+    return t;
+  }
+
+  async update(id: string, input: UpdateTournamentInput) {
+    const t = await this.tournamentModel
+      .findByIdAndUpdate(id, { $set: input }, { new: true })
+      .exec();
     if (!t) throw new NotFoundException(`Tournament ${id} not found`);
     return t;
   }
@@ -85,17 +94,19 @@ export class TournamentService {
       .exec();
   }
 
-  async remove(id: string): Promise<boolean> {
+  async remove(id: string) {
     const session = await this.tournamentModel.db.startSession();
     session.startTransaction();
     try {
       const tid = new Types.ObjectId(id);
+      const tournament = await this.tournamentModel.findById(id).session(session).exec();
+      if (!tournament) throw new NotFoundException(`Tournament ${id} not found`);
       await this.heroStatsModel.deleteMany({ tournamentId: tid }, { session });
       await this.stageModel.deleteMany({ tournamentId: tid }, { session });
       await this.syncLogModel.deleteMany({ tournamentId: tid }, { session });
       await this.tournamentModel.findByIdAndDelete(id, { session });
       await session.commitTransaction();
-      return true;
+      return tournament;
     } catch (e) {
       await session.abortTransaction();
       throw e;

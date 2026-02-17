@@ -5,6 +5,7 @@ import {
   IsUrl,
   IsOptional,
   Matches,
+  IsInt,
 } from 'class-validator';
 import { TournamentTier } from '../enum/tournament-tier.enum';
 import { TournamentStatus } from '../enum/tournament-status.enum';
@@ -14,7 +15,7 @@ export class CreateTournamentInput {
   @Field() @IsNotEmpty() name: string;
   @Field() @IsNotEmpty() slug: string; // slug internal app, tidak boleh "/"
   @Field() @IsEnum(TournamentTier) tier: TournamentTier;
-  @Field(() => Int) tierLevel: number;
+  @Field(() => Int) @IsNotEmpty() @IsInt() tierLevel: number;
   @Field({ nullable: true }) @IsOptional() region?: string;
   @Field({ nullable: true }) @IsOptional() prizePool?: string;
   @Field({ nullable: true }) @IsOptional() startDate?: Date;

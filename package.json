@@ -22,6 +22,9 @@
     "seed:users": "npm run seed users",
     "seed:default": "npm run seed default",
     "seed:test": "npm run seed test",
+    "seed:builds": "npm run seed builds",
+    "seed:builds:clear": "npm run seed builds:clear",
+    "seed:builds:reseed": "npm run seed builds:reseed",
     "seed:clear": "npm run seed clear",
     "seed:reset": "npm run seed reset"
   },

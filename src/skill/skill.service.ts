@@ -28,7 +28,7 @@ export class SkillService {
 
     const skill = await this.skillModel.create({ ...input, hero: heroId });
 
-    (hero.skills as any[]).push(skill._id);
+    hero.skills.push(skill._id as any);
     await hero.save();
 
     return skill;
@@ -49,14 +49,14 @@ export class SkillService {
     const skill = await this.skillModel.findById(skillId);
     if (!skill) throw new NotFoundException('Skill not found');
 
-    if (fromHero == toHero) {
+    // If moving to the same hero, just update the skill
+    if (fromHeroId === toHeroId) {
       return await this.update(skillId, input);
-    } else if (fromHero != toHero) {
-      await this.remove(skillId);
-      return await this.addSkillToHero(toHeroId, input);
-    } else {
-      throw new NotFoundException('Hero not found');
     }
+
+    // If moving to different hero, remove from old and add to new
+    await this.remove(skillId);
+    return await this.addSkillToHero(toHeroId, input);
   }
 
   async findAll(): Promise<Skill[]> {

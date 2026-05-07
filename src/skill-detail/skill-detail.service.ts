@@ -34,7 +34,7 @@ export class SkillDetailService {
       }),
     );
 
-    (skill.skills_detail as any[]).push(...details.map((d) => d._id));
+    skill.skills_detail.push(...details.map((d) => d._id as any));
     await skill.save();
 
     return details;
@@ -69,14 +69,23 @@ export class SkillDetailService {
     const skill = await this.skillModel.findById(skillId);
     if (!skill) throw new NotFoundException('Skill not found');
 
-    const detail = await this.skillDetailModel.findByIdAndUpdate(
+    const detail = await this.skillDetailModel.findById(skillDetailId);
+    if (!detail) throw new NotFoundException('Skill detail not found');
+
+    // Verify that the skill detail belongs to the specified skill
+    if (detail.skill.toString() !== skillId) {
+      throw new NotFoundException('Skill detail does not belong to this skill');
+    }
+
+    const updated = await this.skillDetailModel.findByIdAndUpdate(
       skillDetailId,
       input,
       { new: true },
     );
-    if (!detail) throw new NotFoundException('Skill detail not found');
 
-    return detail;
+    if (!updated) throw new NotFoundException('Skill detail not found');
+
+    return updated;
   }
 
   async remove(id: string): Promise<SkillDetail> {

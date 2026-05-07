@@ -47,35 +47,60 @@ export class HeroService {
 
     const createdHero = await this.heroModel.create(heroData);
 
+    const createdSkills = await this.createSkillsWithDetails(
+      skills,
+      createdHero._id,
+    );
+
+    createdHero.skills = createdSkills;
+    await createdHero.save();
+
+    return this.findById(String(createdHero._id));
+  }
+
+  private async createSkillsWithDetails(
+    skills: any[],
+    heroId: any,
+  ): Promise<Skill[]> {
     const createdSkills: Skill[] = [];
 
     for (const skillInput of skills) {
       const { skills_detail = [], ...skillData } = skillInput;
       const skill = await this.skillModel.create({
         ...skillData,
-        hero: createdHero._id,
+        hero: heroId,
       });
 
-      const detailIds: any[] = [];
-
-      for (const detail of skills_detail) {
-        const newDetail = await this.skillDetailModel.create({
-          ...detail,
-          skill: skill._id,
-        });
-        detailIds.push(newDetail._id);
+      if (skills_detail.length > 0) {
+        const detailIds = await this.createSkillDetails(
+          skills_detail,
+          skill._id,
+        );
+        skill.set('skills_detail', detailIds);
+        await skill.save();
       }
-
-      skill.set('skills_detail', detailIds);
-      await skill.save();
 
       createdSkills.push(skill);
     }
 
-    createdHero.skills = createdSkills;
-    await createdHero.save();
+    return createdSkills;
+  }
 
-    return this.findById(String(createdHero._id));
+  private async createSkillDetails(
+    skillDetails: any[],
+    skillId: any,
+  ): Promise<any[]> {
+    const detailIds: any[] = [];
+
+    for (const detail of skillDetails) {
+      const newDetail = await this.skillDetailModel.create({
+        ...detail,
+        skill: skillId,
+      });
+      detailIds.push(newDetail._id);
+    }
+
+    return detailIds;
   }
 
   async findAll(): Promise<Hero[]> {
@@ -136,15 +161,14 @@ export class HeroService {
     if (!deleted) throw new NotFoundException('Hero not found');
 
     const skills: Skill[] = deleted.skills || [];
-
-    await this.skillModel.deleteMany({ hero: id });
-
     const skillIds = skills.map((skill) => skill._id);
-    await this.skillDetailModel.deleteMany({ skill: { $in: skillIds } });
 
-    for (const skill of skills) {
-      await this.skillModel.findByIdAndDelete(skill._id);
-    }
+    // Delete all related skills and skill details in one operation
+    await Promise.all([
+      this.skillModel.deleteMany({ hero: id }),
+      this.skillDetailModel.deleteMany({ skill: { $in: skillIds } }),
+    ]);
+
     return deleted;
   }
 }

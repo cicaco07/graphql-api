@@ -2,8 +2,8 @@ import { InputType, Field } from '@nestjs/graphql';
 import { CreateSkillInput } from '../../skill/dto/create-skill.input';
 import { CreateBaseStatInput } from 'src/base-stat/dto/create-base-stat.input';
 import {
-  IsArray,
   IsNotEmpty,
+  IsArray,
   IsNumber,
   IsOptional,
   IsString,
@@ -95,10 +95,9 @@ export class CreateHeroInput {
   @Type(() => CreateSkillInput)
   skills?: CreateSkillInput[];
 
-  @Field(() => [CreateBaseStatInput], { nullable: true })
+  @Field(() => CreateBaseStatInput, { nullable: true })
   @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
+  @ValidateNested()
   @Type(() => CreateBaseStatInput)
-  base_stats?: CreateBaseStatInput[];
+  baseStat?: CreateBaseStatInput;
 }

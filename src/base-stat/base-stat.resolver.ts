@@ -22,7 +22,17 @@ export class BaseStatResolver {
     return this.baseStatService.create(createBaseStatInput);
   }
 
-  @Query(() => [BaseStat], { name: 'baseStat' })
+  @Mutation(() => BaseStat)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.MEMBER, Role.SUPER_ADMIN)
+  addBaseStatToHero(
+    @Args('heroId', { type: () => ID }) heroId: string,
+    @Args('createBaseStatInput') createBaseStatInput: CreateBaseStatInput,
+  ) {
+    return this.baseStatService.addBaseStatToHero(heroId, createBaseStatInput);
+  }
+
+  @Query(() => [BaseStat], { name: 'baseStats' })
   findAll() {
     return this.baseStatService.findAll();
   }
@@ -30,6 +40,11 @@ export class BaseStatResolver {
   @Query(() => BaseStat, { name: 'baseStat' })
   findOne(@Args('id', { type: () => ID }) id: string) {
     return this.baseStatService.findOne(id);
+  }
+
+  @Query(() => BaseStat, { name: 'baseStatByHero' })
+  findByHero(@Args('heroId', { type: () => ID }) heroId: string) {
+    return this.baseStatService.findByHero(heroId);
   }
 
   @Mutation(() => BaseStat)

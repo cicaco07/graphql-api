@@ -54,8 +54,8 @@ export class Hero extends Document {
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Skill' })
   skills: Skill[];
 
-  @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'BaseStat' })
-  baseStat: BaseStat[];
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'BaseStat' })
+  baseStat: BaseStat;
 }
 
 export const HeroSchema = SchemaFactory.createForClass(Hero);

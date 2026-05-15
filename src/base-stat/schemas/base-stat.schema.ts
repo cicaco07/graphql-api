@@ -1,8 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import mongoose from 'mongoose';
+import { Hero } from 'src/hero/schemas/hero.schema';
 
 @Schema({ timestamps: true })
 export class BaseStat extends Document {
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Hero', required: true, unique: true })
+  hero: Hero;
+
   @Prop({ required: true })
   hp: number;
 

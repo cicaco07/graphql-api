@@ -55,6 +55,6 @@ export class Hero {
   @Field(() => [Skill], { nullable: true })
   skills?: Skill[];
 
-  @Field(() => [BaseStat], { nullable: true })
-  base_stats?: BaseStat[];
+  @Field(() => BaseStat, { nullable: true })
+  baseStat?: BaseStat;
 }

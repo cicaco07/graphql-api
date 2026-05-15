@@ -8,6 +8,10 @@ import {
   SkillDetail,
   SkillDetailSchema,
 } from 'src/skill-detail/schemas/skill-detail.schema';
+import {
+  BaseStat,
+  BaseStatSchema,
+} from 'src/base-stat/schemas/base-stat.schema';
 
 @Module({
   imports: [
@@ -15,6 +19,7 @@ import {
       { name: Hero.name, schema: HeroSchema },
       { name: Skill.name, schema: SkillSchema },
       { name: SkillDetail.name, schema: SkillDetailSchema },
+      { name: BaseStat.name, schema: BaseStatSchema },
     ]),
   ],
   providers: [HeroResolver, HeroService],

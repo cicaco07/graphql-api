@@ -6,6 +6,7 @@ import { CreateHeroInput } from './dto/create-hero.input';
 import { UpdateHeroInput } from './dto/update-hero.input';
 import { Skill } from '../skill/schemas/skill.schema';
 import { SkillDetail } from '../skill-detail/schemas/skill-detail.schema';
+import { BaseStat } from '../base-stat/schemas/base-stat.schema';
 
 @Injectable()
 export class HeroService {
@@ -13,6 +14,7 @@ export class HeroService {
     @InjectModel(Hero.name) private heroModel: Model<Hero>,
     @InjectModel(Skill.name) private skillModel: Model<Skill>,
     @InjectModel(SkillDetail.name) private skillDetailModel: Model<SkillDetail>,
+    @InjectModel(BaseStat.name) private baseStatModel: Model<BaseStat>,
   ) {}
 
   async create(createHeroInput: CreateHeroInput): Promise<Hero> {
@@ -43,7 +45,7 @@ export class HeroService {
   async createHeroWithSkillandSkillDetail(
     createHeroInput: CreateHeroInput,
   ): Promise<Hero> {
-    const { skills = [], ...heroData } = createHeroInput;
+    const { skills = [], baseStat, ...heroData } = createHeroInput;
 
     const createdHero = await this.heroModel.create(heroData);
 
@@ -53,6 +55,16 @@ export class HeroService {
     );
 
     createdHero.skills = createdSkills;
+
+    if (baseStat) {
+      const { heroId: _heroId, ...baseStatData } = baseStat;
+      const createdBaseStat = await this.baseStatModel.create({
+        ...baseStatData,
+        hero: createdHero._id,
+      });
+      createdHero.set('baseStat', createdBaseStat._id);
+    }
+
     await createdHero.save();
 
     return this.findById(String(createdHero._id));
@@ -112,22 +124,23 @@ export class HeroService {
           path: 'skills_detail',
         },
       })
+      .populate('baseStat')
       .sort({ hero_order: 1 })
       .exec();
   }
 
   async findById(id: string): Promise<Hero> {
-    const heroes = await this.heroModel
+    const hero = await this.heroModel
       .findById(id)
       .populate({
         path: 'skills',
         populate: { path: 'skills_detail' },
       })
-      .sort({ hero_order: 1 })
+      .populate('baseStat')
       .exec();
 
-    if (!heroes) throw new NotFoundException('Hero not found');
-    return heroes;
+    if (!hero) throw new NotFoundException('Hero not found');
+    return hero;
   }
 
   async findByName(name: string): Promise<Hero[]> {
@@ -136,7 +149,8 @@ export class HeroService {
       .populate({
         path: 'skills',
         populate: { path: 'skills_detail' },
-      });
+      })
+      .populate('baseStat');
 
     if (hero.length === 0) throw new NotFoundException('No heroes found');
     return hero;
@@ -163,10 +177,10 @@ export class HeroService {
     const skills: Skill[] = deleted.skills || [];
     const skillIds = skills.map((skill) => skill._id);
 
-    // Delete all related skills and skill details in one operation
     await Promise.all([
       this.skillModel.deleteMany({ hero: id }),
       this.skillDetailModel.deleteMany({ skill: { $in: skillIds } }),
+      this.baseStatModel.deleteOne({ hero: id }),
     ]);
 
     return deleted;

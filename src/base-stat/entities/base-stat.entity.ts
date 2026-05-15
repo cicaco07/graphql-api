@@ -1,7 +1,14 @@
-import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { ObjectType, Field, Int, ID } from '@nestjs/graphql';
+import { Hero } from 'src/hero/entities/hero.entity';
 
 @ObjectType()
 export class BaseStat {
+  @Field(() => ID)
+  _id: string;
+
+  @Field(() => Hero)
+  hero: Hero;
+
   @Field(() => Int)
   hp: number;
 
@@ -46,4 +53,5 @@ export class BaseStat {
 
   @Field(() => Int)
   attack_range: number;
+
 }

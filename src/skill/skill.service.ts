@@ -28,8 +28,10 @@ export class SkillService {
 
     const skill = await this.skillModel.create({ ...input, hero: heroId });
 
-    hero.skills.push(skill._id as any);
-    await hero.save();
+    await this.heroModel.updateOne(
+      { _id: heroId },
+      { $addToSet: { skills: skill._id } },
+    );
 
     return skill;
   }

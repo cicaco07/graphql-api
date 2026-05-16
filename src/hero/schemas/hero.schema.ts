@@ -54,7 +54,11 @@ export class Hero extends Document {
   @Prop({ type: [mongoose.Schema.Types.ObjectId], ref: 'Skill' })
   skills: Skill[];
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'BaseStat' })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'BaseStat',
+    set: (value: unknown) => (Array.isArray(value) && value.length === 0 ? undefined : value),
+  })
   baseStat: BaseStat;
 }
 

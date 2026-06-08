@@ -1,4 +1,4 @@
-import { ObjectType, Field, Int, ID } from '@nestjs/graphql';
+import { ObjectType, Field, Int, Float, ID } from '@nestjs/graphql';
 import { Hero } from 'src/hero/entities/hero.entity';
 
 @ObjectType()
@@ -54,4 +54,33 @@ export class BaseStat {
   @Field(() => Int)
   attack_range: number;
 
+  @Field(() => Float, { nullable: true })
+  hp_growth: number;
+
+  @Field(() => Float, { nullable: true })
+  mana_growth: number;
+
+  @Field(() => Float, { nullable: true })
+  energy_growth: number;
+
+  @Field(() => Float, { nullable: true })
+  hp_regen_growth: number;
+
+  @Field(() => Float, { nullable: true })
+  mana_regen_growth: number;
+
+  @Field(() => Float, { nullable: true })
+  energy_regen_growth: number;
+
+  @Field(() => Float, { nullable: true })
+  physical_attack_growth: number;
+
+  @Field(() => Float, { nullable: true })
+  physical_defense_growth: number;
+
+  @Field(() => Float, { nullable: true })
+  magic_defense_growth: number;
+
+  @Field(() => Float, { nullable: true })
+  attack_speed_growth: number;
 }

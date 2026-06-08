@@ -1,5 +1,5 @@
-import { InputType, Int, Field, ID } from '@nestjs/graphql';
-import { IsInt, IsMongoId } from 'class-validator';
+import { InputType, Int, Float, Field, ID } from '@nestjs/graphql';
+import { IsInt, IsMongoId, IsNumber, IsOptional } from 'class-validator';
 
 @InputType()
 export class CreateBaseStatInput {
@@ -66,4 +66,54 @@ export class CreateBaseStatInput {
   @Field(() => Int)
   @IsInt()
   attack_range: number;
+
+  @Field(() => Float, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  hp_growth?: number;
+
+  @Field(() => Float, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  mana_growth?: number;
+
+  @Field(() => Float, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  energy_growth?: number;
+
+  @Field(() => Float, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  hp_regen_growth?: number;
+
+  @Field(() => Float, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  mana_regen_growth?: number;
+
+  @Field(() => Float, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  energy_regen_growth?: number;
+
+  @Field(() => Float, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  physical_attack_growth?: number;
+
+  @Field(() => Float, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  physical_defense_growth?: number;
+
+  @Field(() => Float, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  magic_defense_growth?: number;
+
+  @Field(() => Float, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  attack_speed_growth?: number;
 }

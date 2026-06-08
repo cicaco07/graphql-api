@@ -52,6 +52,36 @@ export class BaseStat extends Document {
 
   @Prop()
   attack_range: number;
+
+  @Prop()
+  hp_growth: number;
+
+  @Prop()
+  mana_growth: number;
+
+  @Prop()
+  energy_growth: number;
+
+  @Prop()
+  hp_regen_growth: number;
+
+  @Prop()
+  mana_regen_growth: number;
+
+  @Prop()
+  energy_regen_growth: number;
+
+  @Prop()
+  physical_attack_growth: number;
+
+  @Prop()
+  physical_defense_growth: number;
+
+  @Prop()
+  magic_defense_growth: number;
+
+  @Prop()
+  attack_speed_growth: number;
 }
 
 export const BaseStatSchema = SchemaFactory.createForClass(BaseStat);

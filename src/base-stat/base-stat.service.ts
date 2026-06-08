@@ -1,4 +1,8 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateBaseStatInput } from './dto/create-base-stat.input';
 import { UpdateBaseStatInput } from './dto/update-base-stat.input';
 import { InjectModel } from '@nestjs/mongoose';
@@ -14,7 +18,10 @@ export class BaseStatService {
   ) {}
 
   async create(createBaseStatInput: CreateBaseStatInput): Promise<BaseStat> {
-    return this.addBaseStatToHero(createBaseStatInput.heroId, createBaseStatInput);
+    return this.addBaseStatToHero(
+      createBaseStatInput.heroId,
+      createBaseStatInput,
+    );
   }
 
   async addBaseStatToHero(
@@ -51,8 +58,11 @@ export class BaseStatService {
   }
 
   async findByHero(heroId: string): Promise<BaseStat> {
-    const baseStat = await this.baseStatModel.findOne({ hero: heroId }).populate('hero');
-    if (!baseStat) throw new NotFoundException('BaseStat not found for this hero');
+    const baseStat = await this.baseStatModel
+      .findOne({ hero: heroId })
+      .populate('hero');
+    if (!baseStat)
+      throw new NotFoundException('BaseStat not found for this hero');
     return baseStat;
   }
 
@@ -84,14 +94,16 @@ export class BaseStatService {
       await hero.save();
     }
 
-    const baseStat = await this.baseStatModel.findByIdAndUpdate(
-      id,
-      {
-        ...statData,
-        ...(heroId ? { hero: heroId } : {}),
-      },
-      { new: true },
-    ).populate('hero');
+    const baseStat = await this.baseStatModel
+      .findByIdAndUpdate(
+        id,
+        {
+          ...statData,
+          ...(heroId ? { hero: heroId } : {}),
+        },
+        { new: true },
+      )
+      .populate('hero');
     if (!baseStat) throw new NotFoundException('BaseStat not found');
     return baseStat;
   }

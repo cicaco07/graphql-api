@@ -20,7 +20,8 @@ export class Tournament {
   @Prop() endDate: Date;
   @Prop({ required: true }) liquipediaUrl: string;
   @Prop({ required: true }) liquipediaSlug: string;
-  @Prop({ enum: TournamentStatus, default: TournamentStatus.UPCOMING }) status: TournamentStatus;
+  @Prop({ enum: TournamentStatus, default: TournamentStatus.UPCOMING })
+  status: TournamentStatus;
   @Prop() lastSyncedAt: Date;
   @Prop({ enum: SyncStatus, default: SyncStatus.IDLE }) syncStatus: SyncStatus;
   @Prop() syncError: string;

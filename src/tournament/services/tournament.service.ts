@@ -21,7 +21,7 @@ export class TournamentService {
     @InjectModel(HeroStats.name)
     private heroStatsModel: Model<HeroStatsDocument>,
     @InjectModel(SyncLog.name) private syncLogModel: Model<SyncLogDocument>,
-  ) { }
+  ) {}
 
   async create(input: CreateTournamentInput) {
     return this.tournamentModel.create(input);
@@ -99,8 +99,12 @@ export class TournamentService {
     session.startTransaction();
     try {
       const tid = new Types.ObjectId(id);
-      const tournament = await this.tournamentModel.findById(id).session(session).exec();
-      if (!tournament) throw new NotFoundException(`Tournament ${id} not found`);
+      const tournament = await this.tournamentModel
+        .findById(id)
+        .session(session)
+        .exec();
+      if (!tournament)
+        throw new NotFoundException(`Tournament ${id} not found`);
       await this.heroStatsModel.deleteMany({ tournamentId: tid }, { session });
       await this.stageModel.deleteMany({ tournamentId: tid }, { session });
       await this.syncLogModel.deleteMany({ tournamentId: tid }, { session });

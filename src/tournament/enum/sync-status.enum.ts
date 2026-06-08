@@ -1,6 +1,6 @@
 export enum SyncStatus {
-  IDLE    = 'idle',
+  IDLE = 'idle',
   SYNCING = 'syncing',
   SUCCESS = 'success',
-  FAILED  = 'failed',
+  FAILED = 'failed',
 }

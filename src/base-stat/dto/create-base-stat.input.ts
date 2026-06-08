@@ -1,5 +1,5 @@
-import { InputType, Int, Float, Field, ID } from '@nestjs/graphql';
-import { IsInt, IsMongoId, IsNumber, IsOptional } from 'class-validator';
+import { InputType, Float, Field, ID } from '@nestjs/graphql';
+import { IsMongoId, IsNumber, IsOptional } from 'class-validator';
 
 @InputType()
 export class CreateBaseStatInput {
@@ -7,64 +7,64 @@ export class CreateBaseStatInput {
   @IsMongoId()
   heroId: string;
 
-  @Field(() => Int)
-  @IsInt()
+  @Field(() => Float)
+  @IsNumber()
   hp: number;
 
-  @Field(() => Int)
-  @IsInt()
+  @Field(() => Float)
+  @IsNumber()
   mana: number;
 
-  @Field(() => Int)
-  @IsInt()
+  @Field(() => Float)
+  @IsNumber()
   energy: number;
 
-  @Field(() => Int)
-  @IsInt()
+  @Field(() => Float)
+  @IsNumber()
   hp_regen: number;
 
-  @Field(() => Int)
-  @IsInt()
+  @Field(() => Float)
+  @IsNumber()
   mana_regen: number;
 
-  @Field(() => Int)
-  @IsInt()
+  @Field(() => Float)
+  @IsNumber()
   energy_regen: number;
 
-  @Field(() => Int)
-  @IsInt()
+  @Field(() => Float)
+  @IsNumber()
   physical_attack: number;
 
-  @Field(() => Int)
-  @IsInt()
+  @Field(() => Float)
+  @IsNumber()
   physical_defense: number;
 
-  @Field(() => Int)
-  @IsInt()
+  @Field(() => Float)
+  @IsNumber()
   magic_power: number;
 
-  @Field(() => Int)
-  @IsInt()
+  @Field(() => Float)
+  @IsNumber()
   magic_defense: number;
 
-  @Field(() => Int)
-  @IsInt()
+  @Field(() => Float)
+  @IsNumber()
   attack_speed: number;
 
-  @Field(() => Int)
-  @IsInt()
+  @Field(() => Float)
+  @IsNumber()
   movement_speed: number;
 
-  @Field(() => Int)
-  @IsInt()
+  @Field(() => Float)
+  @IsNumber()
   attack_speed_ratio: number;
 
-  @Field(() => Int)
-  @IsInt()
+  @Field(() => Float)
+  @IsNumber()
   spell_vamp_ratio: number;
 
-  @Field(() => Int)
-  @IsInt()
+  @Field(() => Float)
+  @IsNumber()
   attack_range: number;
 
   @Field(() => Float, { nullable: true })

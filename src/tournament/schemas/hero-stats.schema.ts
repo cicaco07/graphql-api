@@ -5,8 +5,10 @@ export type HeroStatsDocument = HeroStats & Document;
 
 @Schema({ timestamps: true })
 export class HeroStats {
-  @Prop({ type: Types.ObjectId, ref: 'Tournament', required: true }) tournamentId: Types.ObjectId;
-  @Prop({ type: Types.ObjectId, ref: 'TournamentStage', default: null }) stageId: Types.ObjectId | null;
+  @Prop({ type: Types.ObjectId, ref: 'Tournament', required: true })
+  tournamentId: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: 'TournamentStage', default: null })
+  stageId: Types.ObjectId | null;
   @Prop({ required: true }) heroName: string;
   @Prop({ required: true }) heroSlug: string;
   @Prop() heroImageUrl: string;
@@ -35,4 +37,7 @@ export class HeroStats {
 }
 
 export const HeroStatsSchema = SchemaFactory.createForClass(HeroStats);
-HeroStatsSchema.index({ tournamentId: 1, stageId: 1, heroSlug: 1 }, { unique: true });
+HeroStatsSchema.index(
+  { tournamentId: 1, stageId: 1, heroSlug: 1 },
+  { unique: true },
+);

@@ -88,7 +88,10 @@ describe('SkillResolver', () => {
 
       mockSkillService.addSkillToHero.mockResolvedValue(mockSkill);
 
-      const result = await resolver.addSkillToHero(mockHeroId, createSkillInput);
+      const result = await resolver.addSkillToHero(
+        mockHeroId,
+        createSkillInput,
+      );
 
       expect(service.addSkillToHero).toHaveBeenCalledWith(
         mockHeroId,
@@ -162,7 +165,10 @@ describe('SkillResolver', () => {
 
       const result = await resolver.updateSkill(mockSkillId, updateSkillInput);
 
-      expect(service.update).toHaveBeenCalledWith(mockSkillId, updateSkillInput);
+      expect(service.update).toHaveBeenCalledWith(
+        mockSkillId,
+        updateSkillInput,
+      );
       expect(result).toEqual(updatedSkill);
     });
   });

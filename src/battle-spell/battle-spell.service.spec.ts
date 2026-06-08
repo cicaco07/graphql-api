@@ -99,8 +99,11 @@ describe('BattleSpellService', () => {
 
   describe('findAll', () => {
     it('should return an array of battle spells', async () => {
-      const battleSpells = [mockBattleSpell, { ...mockBattleSpell, _id: '507f1f77bcf86cd799439012' }];
-      
+      const battleSpells = [
+        mockBattleSpell,
+        { ...mockBattleSpell, _id: '507f1f77bcf86cd799439012' },
+      ];
+
       mockBattleSpellModel.find.mockReturnValue({
         exec: jest.fn().mockResolvedValue(battleSpells),
       });
@@ -126,7 +129,7 @@ describe('BattleSpellService', () => {
   describe('findOne', () => {
     it('should return a battle spell by id', async () => {
       const id = '507f1f77bcf86cd799439011';
-      
+
       mockBattleSpellModel.findById.mockReturnValue({
         exec: jest.fn().mockResolvedValue(mockBattleSpell),
       });
@@ -139,7 +142,7 @@ describe('BattleSpellService', () => {
 
     it('should throw NotFoundException when battle spell not found', async () => {
       const id = '507f1f77bcf86cd799439011';
-      
+
       mockBattleSpellModel.findById.mockReturnValue({
         exec: jest.fn().mockResolvedValue(null),
       });

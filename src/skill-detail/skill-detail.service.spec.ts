@@ -193,9 +193,9 @@ describe('SkillDetailService', () => {
     it('should throw NotFoundException if skill detail not found', async () => {
       mockSkillDetailModel.findByIdAndUpdate.mockResolvedValue(null);
 
-      await expect(
-        service.update('invalid-id', { level: 2 }),
-      ).rejects.toThrow(NotFoundException);
+      await expect(service.update('invalid-id', { level: 2 })).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 

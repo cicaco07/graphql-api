@@ -1,5 +1,5 @@
 export enum TournamentStatus {
-  UPCOMING  = 'upcoming',
-  ONGOING   = 'ongoing',
+  UPCOMING = 'upcoming',
+  ONGOING = 'ongoing',
   COMPLETED = 'completed',
 }

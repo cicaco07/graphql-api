@@ -1,7 +1,8 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
 
-const URL  = 'https://liquipedia.net/mobilelegends/M7_World_Championship/Statistics';
+const URL =
+  'https://liquipedia.net/mobilelegends/M7_World_Championship/Statistics';
 const BASE = 'https://liquipedia.net';
 
 async function debug() {
@@ -20,9 +21,15 @@ async function debug() {
   // ── 1. Cek semua table yang ada di halaman ──────────────────────────────
   console.log('\n📋 Tables found on page:');
   $('table').each((i, el) => {
-    const cls    = $(el).attr('class') || '(no class)';
-    const rows   = $(el).find('tr').length;
-    const sample = $(el).find('tr').eq(1).text().substring(0, 80).replace(/\s+/g, ' ').trim();
+    const cls = $(el).attr('class') || '(no class)';
+    const rows = $(el).find('tr').length;
+    const sample = $(el)
+      .find('tr')
+      .eq(1)
+      .text()
+      .substring(0, 80)
+      .replace(/\s+/g, ' ')
+      .trim();
     console.log(`  [${i}] class="${cls}" | rows=${rows} | sample: "${sample}"`);
   });
 
@@ -41,7 +48,11 @@ async function debug() {
   // Cari tabel pertama yang punya header "Hero"
   let targetTable: cheerio.Cheerio<any> | null = null;
   $('table').each((_, el) => {
-    const headerText = $(el).find('th').map((_, th) => $(th).text().trim()).get().join('|');
+    const headerText = $(el)
+      .find('th')
+      .map((_, th) => $(th).text().trim())
+      .get()
+      .join('|');
     if (headerText.includes('Hero') && headerText.includes('Bans')) {
       targetTable = $(el);
       return false; // break
@@ -62,10 +73,16 @@ async function debug() {
 
   // ── 4. Parse header untuk detect kolom ──────────────────────────────────
   console.log('Header rows:');
-  (targetTable as cheerio.Cheerio<any>).find('tr').slice(0, 3).each((ri, row) => {
-    const cols = $(row).find('th, td').map((_, c) => $(c).text().trim().replace(/\s+/g, ' ')).get();
-    console.log(`  Row[${ri}]:`, cols);
-  });
+  (targetTable as cheerio.Cheerio<any>)
+    .find('tr')
+    .slice(0, 3)
+    .each((ri, row) => {
+      const cols = $(row)
+        .find('th, td')
+        .map((_, c) => $(c).text().trim().replace(/\s+/g, ' '))
+        .get();
+      console.log(`  Row[${ri}]:`, cols);
+    });
 
   // ── 5. Parse data rows ───────────────────────────────────────────────────
   console.log('\nData rows (first 5):');
@@ -97,33 +114,40 @@ async function debug() {
     // [18] = P&B %T
     // [19] = details (collapsible)
 
-    const heroCell  = cells.eq(1);
-    const heroName  = heroCell.find('a').last().text().trim();
+    const heroCell = cells.eq(1);
+    const heroName = heroCell.find('a').last().text().trim();
     if (!heroName) return;
 
     const imgSrc = heroCell.find('img').attr('src') || '';
     const heroImageUrl = imgSrc
-      ? (imgSrc.startsWith('http') ? imgSrc : `${BASE}${imgSrc}`)
+      ? imgSrc.startsWith('http')
+        ? imgSrc
+        : `${BASE}${imgSrc}`
       : '';
 
     const parseNum = (c: cheerio.Cheerio<any>) =>
-      parseFloat((c.text().trim().replace(/[^0-9.]/g, '')) || '0') || 0;
+      parseFloat(
+        c
+          .text()
+          .trim()
+          .replace(/[^0-9.]/g, '') || '0',
+      ) || 0;
 
     const hero = {
       heroName,
       heroImageUrl,
-      picks:          parseNum(cells.eq(2)),
-      wins:           parseNum(cells.eq(3)),
-      losses:         parseNum(cells.eq(4)),
-      winRate:        parseNum(cells.eq(5)),   // "50.00%" → 50
-      pickRateRaw:    cells.eq(6).text().trim(), // "%T kolom"
-      blueSidePicks:  parseNum(cells.eq(7)),
-      blueSideWins:   parseNum(cells.eq(8)),
-      redSidePicks:   parseNum(cells.eq(11)),
-      redSideWins:    parseNum(cells.eq(12)),
-      bans:           parseNum(cells.eq(15)),
-      banRateRaw:     cells.eq(16).text().trim(),
-      picksAndBans:   parseNum(cells.eq(17)),
+      picks: parseNum(cells.eq(2)),
+      wins: parseNum(cells.eq(3)),
+      losses: parseNum(cells.eq(4)),
+      winRate: parseNum(cells.eq(5)), // "50.00%" → 50
+      pickRateRaw: cells.eq(6).text().trim(), // "%T kolom"
+      blueSidePicks: parseNum(cells.eq(7)),
+      blueSideWins: parseNum(cells.eq(8)),
+      redSidePicks: parseNum(cells.eq(11)),
+      redSideWins: parseNum(cells.eq(12)),
+      bans: parseNum(cells.eq(15)),
+      banRateRaw: cells.eq(16).text().trim(),
+      picksAndBans: parseNum(cells.eq(17)),
       presenceRateRaw: cells.eq(18).text().trim(),
     };
 
@@ -134,4 +158,4 @@ async function debug() {
   console.log(`\n✅ Total heroes parsed: ${heroes.length}`);
 }
 
-debug().catch(err => console.error('❌ Fatal error:', err.message));
+debug().catch((err) => console.error('❌ Fatal error:', err.message));

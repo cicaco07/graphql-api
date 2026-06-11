@@ -18,7 +18,7 @@ export class TournamentResolver {
   constructor(
     private readonly tournamentService: TournamentService,
     private readonly syncService: SyncService,
-  ) { }
+  ) {}
 
   // ─── Queries ─────────────────────────────────────────────────────────────
 

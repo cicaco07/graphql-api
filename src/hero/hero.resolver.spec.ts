@@ -170,9 +170,8 @@ describe('HeroResolver', () => {
         mockHero,
       );
 
-      const result = await resolver.createHeroWithSkillandSkillDetail(
-        createHeroInput,
-      );
+      const result =
+        await resolver.createHeroWithSkillandSkillDetail(createHeroInput);
 
       expect(service.createHeroWithSkillandSkillDetail).toHaveBeenCalledWith(
         createHeroInput,

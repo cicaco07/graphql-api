@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { ItemTier } from '../enums/item-tier.enum';
 
 @Schema({ timestamps: true })
 export class Item extends Document {
@@ -11,6 +12,9 @@ export class Item extends Document {
 
   @Prop({ required: true })
   type: string;
+
+  @Prop({ required: true, enum: ItemTier })
+  tier: ItemTier;
 
   @Prop({ type: [String], required: true })
   attributes: string[];

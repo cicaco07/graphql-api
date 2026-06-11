@@ -57,7 +57,8 @@ export class Hero extends Document {
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'BaseStat',
-    set: (value: unknown) => (Array.isArray(value) && value.length === 0 ? undefined : value),
+    set: (value: unknown) =>
+      Array.isArray(value) && value.length === 0 ? undefined : value,
   })
   baseStat: BaseStat;
 }

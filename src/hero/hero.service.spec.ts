@@ -241,9 +241,8 @@ describe('HeroService', () => {
 
       jest.spyOn(service, 'findById').mockResolvedValue(mockHero as any);
 
-      const result = await service.createHeroWithSkillandSkillDetail(
-        createHeroInput,
-      );
+      const result =
+        await service.createHeroWithSkillandSkillDetail(createHeroInput);
 
       expect(heroModel.create).toHaveBeenCalled();
       expect(skillModel.create).toHaveBeenCalled();

@@ -1,5 +1,6 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { ItemTier } from '../enums/item-tier.enum';
 
 @InputType()
 export class CreateItemInput {
@@ -17,6 +18,11 @@ export class CreateItemInput {
   @IsString()
   @IsNotEmpty()
   type: string;
+
+  @Field(() => ItemTier)
+  @IsEnum(ItemTier)
+  @IsNotEmpty()
+  tier: ItemTier;
 
   @Field(() => [String])
   @IsString({ each: true })

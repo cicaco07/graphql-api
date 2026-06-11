@@ -1,4 +1,9 @@
-import { ObjectType, Field, Int, ID } from '@nestjs/graphql';
+import { ObjectType, Field, Int, ID, registerEnumType } from '@nestjs/graphql';
+import { ItemTier } from '../enums/item-tier.enum';
+
+registerEnumType(ItemTier, {
+  name: 'ItemTier',
+});
 
 @ObjectType()
 export class Item {
@@ -6,6 +11,7 @@ export class Item {
   @Field() name: string;
   @Field({ nullable: true }) tag: string;
   @Field() type: string;
+  @Field(() => ItemTier) tier: ItemTier;
   @Field(() => [String]) attributes: string[];
   @Field(() => Int) price: number;
   @Field() image: string;

@@ -122,7 +122,7 @@ export class BuildService {
   }
 
   async findAll(): Promise<Build[]> {
-    return await this.buildModel
+    const builds = await this.buildModel
       .find()
       .populate('hero')
       .populate('user')
@@ -131,6 +131,12 @@ export class BuildService {
       .populate('battle_spells')
       .sort({ createdAt: -1 })
       .exec();
+
+    return builds.map((build) => {
+      const filtered = build.items?.filter((i: any) => i.item != null) || [];
+      build.items = filtered;
+      return build;
+    });
   }
 
   async findOne(id: string): Promise<Build> {
@@ -147,6 +153,7 @@ export class BuildService {
       throw new NotFoundException(`Build with ID ${id} not found`);
     }
 
+    build.items = build.items?.filter((i: any) => i.item != null) || [];
     return build;
   }
 
@@ -322,23 +329,19 @@ export class BuildService {
         order: item.order,
       })) || [];
 
-    const updatedData: Partial<Build> = {
-      name: updateBuildInput.name,
-      role: updateBuildInput.role,
-      description: updateBuildInput.description,
-      hero: hero,
-      items: buildItems.map((item) => ({
-        item: items.find((i) => i._id?.toString() === item.item)!,
-        order: item.order,
-      })),
-      emblems: emblems,
-      battle_spells: battleSpells,
-    };
+    await this.buildModel.findByIdAndUpdate(id, {
+      $set: {
+        name: updateBuildInput.name,
+        role: updateBuildInput.role,
+        description: updateBuildInput.description,
+        hero: updateBuildInput.heroId,
+        items: buildItems,
+        emblems: updateBuildInput.emblemIds,
+        battle_spells: updateBuildInput.battleSpellIds,
+      },
+    });
 
-    Object.assign(build, updatedData);
-    await build.save();
-
-    return this.findOne(build._id.toString());
+    return this.findOne(id);
   }
 
   async remove(id: string): Promise<boolean> {

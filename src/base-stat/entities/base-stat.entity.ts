@@ -46,13 +46,34 @@ export class BaseStat {
   movement_speed: number;
 
   @Field(() => Float)
-  attack_speed_ratio: number;
-
-  @Field(() => Float)
   spell_vamp_ratio: number;
 
   @Field(() => Float)
   attack_range: number;
+
+  @Field(() => Float)
+  crit_rate: number;
+
+  @Field(() => Float)
+  crit_damage: number;
+
+  @Field(() => Float)
+  physical_pen: number;
+
+  @Field(() => Float)
+  magical_pen: number;
+
+  @Field(() => Float)
+  lifesteal: number;
+
+  @Field(() => Float)
+  resilience: number;
+
+  @Field(() => Float)
+  crit_damage_reduction: number;
+
+  @Field(() => Float)
+  received_heal: number;
 
   @Field(() => Float, { nullable: true })
   hp_growth: number;
@@ -83,4 +104,7 @@ export class BaseStat {
 
   @Field(() => Float, { nullable: true })
   attack_speed_growth: number;
+
+  @Field(() => Float, { nullable: true })
+  magic_power_growth: number;
 }

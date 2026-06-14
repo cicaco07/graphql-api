@@ -50,13 +50,34 @@ export class BaseStat extends Document {
   movement_speed: number;
 
   @Prop()
-  attack_speed_ratio: number;
-
-  @Prop()
   spell_vamp_ratio: number;
 
   @Prop()
   attack_range: number;
+
+  @Prop()
+  crit_rate: number;
+
+  @Prop()
+  crit_damage: number;
+
+  @Prop()
+  physical_pen: number;
+
+  @Prop()
+  magical_pen: number;
+
+  @Prop()
+  lifesteal: number;
+
+  @Prop()
+  resilience: number;
+
+  @Prop()
+  crit_damage_reduction: number;
+
+  @Prop()
+  received_heal: number;
 
   @Prop()
   hp_growth: number;
@@ -87,6 +108,9 @@ export class BaseStat extends Document {
 
   @Prop()
   attack_speed_growth: number;
+
+  @Prop()
+  magic_power_growth: number;
 }
 
 export const BaseStatSchema = SchemaFactory.createForClass(BaseStat);

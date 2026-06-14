@@ -25,6 +25,7 @@
     "seed:builds": "npm run seed builds",
     "seed:builds:clear": "npm run seed builds:clear",
     "seed:builds:reseed": "npm run seed builds:reseed",
+    "seed:base-stats:migrate": "npm run seed base-stats:migrate",
     "seed:clear": "npm run seed clear",
     "seed:reset": "npm run seed reset"
   },

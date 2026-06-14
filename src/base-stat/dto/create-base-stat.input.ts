@@ -57,15 +57,43 @@ export class CreateBaseStatInput {
 
   @Field(() => Float)
   @IsNumber()
-  attack_speed_ratio: number;
-
-  @Field(() => Float)
-  @IsNumber()
   spell_vamp_ratio: number;
 
   @Field(() => Float)
   @IsNumber()
   attack_range: number;
+
+  @Field(() => Float)
+  @IsNumber()
+  crit_rate: number;
+
+  @Field(() => Float)
+  @IsNumber()
+  crit_damage: number;
+
+  @Field(() => Float)
+  @IsNumber()
+  physical_pen: number;
+
+  @Field(() => Float)
+  @IsNumber()
+  magical_pen: number;
+
+  @Field(() => Float)
+  @IsNumber()
+  lifesteal: number;
+
+  @Field(() => Float)
+  @IsNumber()
+  resilience: number;
+
+  @Field(() => Float)
+  @IsNumber()
+  crit_damage_reduction: number;
+
+  @Field(() => Float)
+  @IsNumber()
+  received_heal: number;
 
   @Field(() => Float, { nullable: true })
   @IsOptional()
@@ -116,4 +144,9 @@ export class CreateBaseStatInput {
   @IsOptional()
   @IsNumber()
   attack_speed_growth?: number;
+
+  @Field(() => Float, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  magic_power_growth?: number;
 }

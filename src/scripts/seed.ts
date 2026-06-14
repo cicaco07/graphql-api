@@ -4,6 +4,7 @@ import { AppModule } from '../app.module';
 import { SeederService } from '../database/seeders/seeder.service';
 import { UserSeeder } from '../database/seeders/user.seeder';
 import { BuildSeeder } from '../database/seeders/build.seeder';
+import { BaseStatSeeder } from '../database/seeders/base-stat.seeder';
 
 async function bootstrap() {
   const logger = new Logger('Seeder');
@@ -15,6 +16,7 @@ async function bootstrap() {
     const seederService = app.get(SeederService);
     const userSeeder = app.get(UserSeeder);
     const buildSeeder = app.get(BuildSeeder);
+    const baseStatSeeder = app.get(BaseStatSeeder);
 
     // Get command line argument
     const command = process.argv[2];
@@ -38,6 +40,9 @@ async function bootstrap() {
       case 'builds:reseed':
         await buildSeeder.reseedBuilds();
         break;
+      case 'base-stats:migrate':
+        await baseStatSeeder.migrateNewFields();
+        break;
       case 'clear':
         await seederService.clearUsers();
         break;
@@ -46,14 +51,15 @@ async function bootstrap() {
         break;
       default:
         logger.log('Available commands:');
-        logger.log('- npm run seed users         : Seed sample users');
-        logger.log('- npm run seed default       : Seed default users only');
-        logger.log('- npm run seed test          : Seed test users');
-        logger.log('- npm run seed builds        : Seed builds');
-        logger.log('- npm run seed builds:clear  : Clear all builds');
-        logger.log('- npm run seed builds:reseed : Clear and reseed builds');
-        logger.log('- npm run seed clear         : Clear all users');
-        logger.log('- npm run seed reset         : Clear and reseed users');
+        logger.log('- npm run seed users              : Seed sample users');
+        logger.log('- npm run seed default            : Seed default users only');
+        logger.log('- npm run seed test               : Seed test users');
+        logger.log('- npm run seed builds             : Seed builds');
+        logger.log('- npm run seed builds:clear       : Clear all builds');
+        logger.log('- npm run seed builds:reseed      : Clear and reseed builds');
+        logger.log('- npm run seed base-stats:migrate : Migrate base-stat new fields with default 0');
+        logger.log('- npm run seed clear              : Clear all users');
+        logger.log('- npm run seed reset              : Clear and reseed users');
         break;
     }
 

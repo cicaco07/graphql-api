@@ -12,6 +12,8 @@ import {
 import { SeederService } from './seeders/seeder.service';
 import { UserSeeder } from './seeders/user.seeder';
 import { BuildSeeder } from './seeders/build.seeder';
+import { BaseStatSeeder } from './seeders/base-stat.seeder';
+import { BaseStat, BaseStatSchema } from '../base-stat/schemas/base-stat.schema';
 
 @Module({
   imports: [
@@ -22,9 +24,10 @@ import { BuildSeeder } from './seeders/build.seeder';
       { name: Item.name, schema: ItemSchema },
       { name: Emblem.name, schema: EmblemSchema },
       { name: BattleSpell.name, schema: BattleSpellSchema },
+      { name: BaseStat.name, schema: BaseStatSchema },
     ]),
   ],
-  providers: [SeederService, UserSeeder, BuildSeeder],
-  exports: [SeederService, UserSeeder, BuildSeeder],
+  providers: [SeederService, UserSeeder, BuildSeeder, BaseStatSeeder],
+  exports: [SeederService, UserSeeder, BuildSeeder, BaseStatSeeder],
 })
 export class DatabaseModule {}

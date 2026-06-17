@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { GraphQLModule } from '@nestjs/graphql';
@@ -22,6 +23,8 @@ import { PatchNoteModule } from './patch-note/patch-note.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { BuildModule } from './build/build.module';
 import { TournamentModule } from './tournament/tournament.module';
+import { AuditLogModule } from './audit-log/audit-log.module';
+import { AuditInterceptor } from './common/interceptors/audit.interceptor';
 
 @Module({
   imports: [
@@ -86,8 +89,13 @@ import { TournamentModule } from './tournament/tournament.module';
     PatchNoteModule,
     BuildModule,
     TournamentModule,
+    AuditLogModule,
   ],
   controllers: [AppController],
-  providers: [AppService, { provide: 'GraphQLJSON', useValue: GraphQLJSON }],
+  providers: [
+    AppService,
+    { provide: 'GraphQLJSON', useValue: GraphQLJSON },
+    { provide: APP_INTERCEPTOR, useClass: AuditInterceptor },
+  ],
 })
 export class AppModule {}

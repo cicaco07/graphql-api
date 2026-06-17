@@ -13,7 +13,10 @@ import { SeederService } from './seeders/seeder.service';
 import { UserSeeder } from './seeders/user.seeder';
 import { BuildSeeder } from './seeders/build.seeder';
 import { BaseStatSeeder } from './seeders/base-stat.seeder';
-import { BaseStat, BaseStatSchema } from '../base-stat/schemas/base-stat.schema';
+import {
+  BaseStat,
+  BaseStatSchema,
+} from '../base-stat/schemas/base-stat.schema';
 
 @Module({
   imports: [

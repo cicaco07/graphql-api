@@ -52,14 +52,22 @@ async function bootstrap() {
       default:
         logger.log('Available commands:');
         logger.log('- npm run seed users              : Seed sample users');
-        logger.log('- npm run seed default            : Seed default users only');
+        logger.log(
+          '- npm run seed default            : Seed default users only',
+        );
         logger.log('- npm run seed test               : Seed test users');
         logger.log('- npm run seed builds             : Seed builds');
         logger.log('- npm run seed builds:clear       : Clear all builds');
-        logger.log('- npm run seed builds:reseed      : Clear and reseed builds');
-        logger.log('- npm run seed base-stats:migrate : Migrate base-stat new fields with default 0');
+        logger.log(
+          '- npm run seed builds:reseed      : Clear and reseed builds',
+        );
+        logger.log(
+          '- npm run seed base-stats:migrate : Migrate base-stat new fields with default 0',
+        );
         logger.log('- npm run seed clear              : Clear all users');
-        logger.log('- npm run seed reset              : Clear and reseed users');
+        logger.log(
+          '- npm run seed reset              : Clear and reseed users',
+        );
         break;
     }
 

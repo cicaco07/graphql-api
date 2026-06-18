@@ -22,7 +22,7 @@ export class AuditLog extends Document {
   @Prop({ default: true })
   success: boolean;
 
-  @Prop({ default: null })
+  @Prop({ type: String, default: null })
   errorMessage: string | null;
 
   createdAt: Date;

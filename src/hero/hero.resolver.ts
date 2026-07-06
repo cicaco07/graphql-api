@@ -3,6 +3,8 @@ import { HeroService } from './hero.service';
 import { Hero } from './entities/hero.entity';
 import { CreateHeroInput } from './dto/create-hero.input';
 import { UpdateHeroInput } from './dto/update-hero.input';
+import { HeroFilterInput } from './dto/hero-filter.input';
+import { PaginatedHeroes } from './entities/paginated-heroes.entity';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -38,9 +40,9 @@ export class HeroResolver {
     return this.heroService.createHeroWithSkillandSkillDetail(createHeroInput);
   }
 
-  @Query(() => [Hero], { name: 'heroes' })
-  findAll() {
-    return this.heroService.findAll();
+  @Query(() => PaginatedHeroes, { name: 'heroes' })
+  findAll(@Args('filter', { nullable: true }) filter?: HeroFilterInput) {
+    return this.heroService.findAll(filter ?? {});
   }
 
   @Query(() => [Hero], { name: 'heroByName' })

@@ -8,6 +8,7 @@ import { Model } from 'mongoose';
 import { CreateHeroInput } from './dto/create-hero.input';
 import { UpdateHeroInput } from './dto/update-hero.input';
 import { NotFoundException } from '@nestjs/common';
+import { BaseStat } from 'src/base-stat/schemas/base-stat.schema';
 
 describe('HeroService', () => {
   let service: HeroService;
@@ -61,6 +62,7 @@ describe('HeroService', () => {
     findById: jest.fn(),
     findByIdAndUpdate: jest.fn(),
     findByIdAndDelete: jest.fn(),
+    countDocuments: jest.fn(),
   };
 
   const mockSkillModel = {
@@ -72,6 +74,11 @@ describe('HeroService', () => {
   const mockSkillDetailModel = {
     create: jest.fn(),
     deleteMany: jest.fn(),
+  };
+
+  const mockBaseStatModel = {
+    create: jest.fn(),
+    deleteOne: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -89,6 +96,10 @@ describe('HeroService', () => {
         {
           provide: getModelToken(SkillDetail.name),
           useValue: mockSkillDetailModel,
+        },
+        {
+          provide: getModelToken(BaseStat.name),
+          useValue: mockBaseStatModel,
         },
       ],
     }).compile();
@@ -258,13 +269,23 @@ describe('HeroService', () => {
       mockHeroModel.find.mockReturnValue({
         populate: jest.fn().mockReturnThis(),
         sort: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
         exec: jest.fn().mockResolvedValue(mockHeroes),
+      });
+      mockHeroModel.countDocuments = jest.fn().mockReturnValue({
+        exec: jest.fn().mockResolvedValue(mockHeroes.length),
       });
 
       const result = await service.findAll();
 
       expect(heroModel.find).toHaveBeenCalled();
-      expect(result).toEqual(mockHeroes);
+      expect(result).toEqual({
+        items: mockHeroes,
+        total: mockHeroes.length,
+        limit: 10,
+        offset: 0,
+      });
     });
   });
 
@@ -300,7 +321,8 @@ describe('HeroService', () => {
       const mockHeroes = [mockHero];
 
       mockHeroModel.find.mockReturnValue({
-        populate: jest.fn().mockResolvedValue(mockHeroes),
+        populate: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue(mockHeroes),
       });
 
       const result = await service.findByName('Test');
@@ -311,7 +333,8 @@ describe('HeroService', () => {
 
     it('should throw NotFoundException if no heroes found', async () => {
       mockHeroModel.find.mockReturnValue({
-        populate: jest.fn().mockResolvedValue([]),
+        populate: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue([]),
       });
 
       await expect(service.findByName('NonExistent')).rejects.toThrow(

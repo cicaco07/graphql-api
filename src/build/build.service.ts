@@ -6,7 +6,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { FilterQuery, Model, Types } from 'mongoose';
 import { Build } from './schemas/build.schema';
 import { Hero } from 'src/hero/schemas/hero.schema';
 import { Item } from 'src/item/schemas/item.schema';
@@ -15,6 +15,10 @@ import { BattleSpell } from 'src/battle-spell/schemas/battle-spell.schema';
 import { CreateBuildInput } from './dto/create-build.input';
 // import { User } from 'src/auth/schemas/user.schema';
 import { UpdateBuildInput } from './dto/update-build.input';
+import {
+  BuildFilterInput,
+  PopularBuildFilterInput,
+} from './dto/build-filter.input';
 import { User } from 'src/auth/entities/user.entity';
 // import { BuildRating } from './entities/build.entity';
 
@@ -121,22 +125,32 @@ export class BuildService {
     return this.findOne(build._id.toString());
   }
 
-  async findAll(): Promise<Build[]> {
-    const builds = await this.buildModel
-      .find()
-      .populate('hero')
-      .populate('user')
-      .populate('items.item')
-      .populate('emblems')
-      .populate('battle_spells')
-      .sort({ createdAt: -1 })
-      .exec();
+  async findAll(filter: BuildFilterInput = {}) {
+    const query = this.buildFilterToQuery(filter);
+    const limit = filter.limit ?? 10;
+    const offset = filter.offset ?? 0;
 
-    return builds.map((build) => {
-      const filtered = build.items?.filter((i: any) => i.item != null) || [];
-      build.items = filtered;
-      return build;
-    });
+    const [builds, total] = await Promise.all([
+      this.buildModel
+        .find(query)
+        .populate('hero')
+        .populate('user')
+        .populate('items.item')
+        .populate('emblems')
+        .populate('battle_spells')
+        .sort({ createdAt: -1 })
+        .limit(limit)
+        .skip(offset)
+        .exec(),
+      this.buildModel.countDocuments(query).exec(),
+    ]);
+
+    return {
+      items: this.removeMissingItems(builds),
+      total,
+      limit,
+      offset,
+    };
   }
 
   async findOne(id: string): Promise<Build> {
@@ -176,19 +190,36 @@ export class BuildService {
       .exec();
   }
 
-  // async findPopular(limit = 10, offset = 0): Promise<Build[]> {
-  //   return await this.buildModel
-  //     .find({ totalRatings: { $gte: 5 } })
-  //     .populate('hero')
-  //     .populate('user')
-  //     .populate('items.item')
-  //     .populate('emblems')
-  //     .populate('battle_spells')
-  //     .sort({ rating: -1, totalRatings: -1 })
-  //     .limit(limit)
-  //     .skip(offset)
-  //     .exec();
-  // }
+  async findPopular(filter: PopularBuildFilterInput = {}) {
+    const query: FilterQuery<Build> = { totalRatings: { $gt: 0 } };
+    const limit = filter.limit ?? 10;
+    const offset = filter.offset ?? 0;
+
+    if (filter.heroId) query.hero = new Types.ObjectId(filter.heroId);
+    if (filter.role) query.role = filter.role;
+
+    const [builds, total] = await Promise.all([
+      this.buildModel
+        .find(query)
+        .populate('hero')
+        .populate('user')
+        .populate('items.item')
+        .populate('emblems')
+        .populate('battle_spells')
+        .sort({ rating: -1, totalRatings: -1, createdAt: -1 })
+        .limit(limit)
+        .skip(offset)
+        .exec(),
+      this.buildModel.countDocuments(query).exec(),
+    ]);
+
+    return {
+      items: this.removeMissingItems(builds),
+      total,
+      limit,
+      offset,
+    };
+  }
 
   async findByUser(userId: string, limit = 10, offset = 0): Promise<Build[]> {
     const isValidObjectId = Types.ObjectId.isValid(userId);
@@ -358,40 +389,67 @@ export class BuildService {
     return true;
   }
 
-  // async rateBuild(
-  //   buildId: string,
-  //   rating: number,
-  //   userId: string,
-  // ): Promise<Build> {
-  //   const build = await this.buildModel.findById(buildId);
+  async rateBuild(
+    buildId: string,
+    rating: number,
+    userId: string,
+  ): Promise<Build> {
+    if (rating < 1 || rating > 5) {
+      throw new BadRequestException('Rating must be between 1 and 5');
+    }
 
-  //   if (!build) {
-  //     throw new NotFoundException(`Build with ID ${buildId} not found`);
-  //   }
+    const build = await this.buildModel.findById(buildId);
+    if (!build) {
+      throw new NotFoundException(`Build with ID ${buildId} not found`);
+    }
 
-  //   // Cek apakah user sudah pernah rating
-  //   const existingRatingIndex = build.ratings.findIndex(
-  //     (r) => r.userId.toString() === userId,
-  //   );
+    const userObjectId = new Types.ObjectId(userId);
+    build.ratings = build.ratings ?? [];
 
-  //   if (existingRatingIndex >= 0) {
-  //     // Update rating yang sudah ada
-  //     build.ratings[existingRatingIndex].rating = rating;
-  //   } else {
-  //     // Tambah rating baru
-  //     build.ratings.push({
-  //       userId,
-  //       rating,
-  //       createdAt: new Date(),
-  //     } as BuildRating);
-  //   }
+    const existingRating = build.ratings.find(
+      (item) => item.userId.toString() === userId,
+    );
 
-  //   // Update rata-rata rating
-  //   if ('updateRating' in build && typeof build.updateRating === 'function') {
-  //     (build.updateRating as Function)();
-  //   }
-  //   await build.save();
+    if (existingRating) {
+      existingRating.rating = rating;
+      existingRating.createdAt = new Date();
+    } else {
+      build.ratings.push({
+        userId: userObjectId,
+        rating,
+        createdAt: new Date(),
+      });
+    }
 
-  //   return this.findOne(build._id);
-  // }
+    const sum = build.ratings.reduce((total, item) => total + item.rating, 0);
+    build.totalRatings = build.ratings.length;
+    build.rating = Number((sum / build.totalRatings).toFixed(2));
+
+    await build.save();
+    return this.findOne(build._id.toString());
+  }
+
+  private buildFilterToQuery(filter: BuildFilterInput): FilterQuery<Build> {
+    const query: FilterQuery<Build> = {};
+
+    if (filter.heroId) query.hero = new Types.ObjectId(filter.heroId);
+    if (filter.userId) query.user = new Types.ObjectId(filter.userId);
+    if (filter.role) query.role = filter.role;
+    if (filter.isOfficial !== undefined) query.is_official = filter.isOfficial;
+    if (filter.keyword) {
+      query.$or = [
+        { name: { $regex: filter.keyword, $options: 'i' } },
+        { description: { $regex: filter.keyword, $options: 'i' } },
+      ];
+    }
+
+    return query;
+  }
+
+  private removeMissingItems(builds: Build[]): Build[] {
+    return builds.map((build) => {
+      build.items = build.items?.filter((item: any) => item.item != null) || [];
+      return build;
+    });
+  }
 }

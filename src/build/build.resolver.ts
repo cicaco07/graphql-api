@@ -5,7 +5,7 @@ import {
   Args,
   ID,
   Int,
-  // Float,
+  Float,
 } from '@nestjs/graphql';
 import { BuildService } from './build.service';
 import { CreateBuildInput } from './dto/create-build.input';
@@ -16,6 +16,11 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enums/role.enum';
 import { BuildEntity } from './entities/build.entity';
+import { PaginatedBuilds } from './entities/paginated-builds.entity';
+import {
+  BuildFilterInput,
+  PopularBuildFilterInput,
+} from './dto/build-filter.input';
 
 @Resolver(() => BuildEntity)
 export class BuildResolver {
@@ -35,9 +40,9 @@ export class BuildResolver {
     );
   }
 
-  @Query(() => [BuildEntity], { name: 'builds' })
-  async findAll() {
-    return await this.buildService.findAll();
+  @Query(() => PaginatedBuilds, { name: 'builds' })
+  async findAll(@Args('filter', { nullable: true }) filter?: BuildFilterInput) {
+    return await this.buildService.findAll(filter ?? {});
   }
 
   @Query(() => BuildEntity, { name: 'build' })
@@ -77,13 +82,12 @@ export class BuildResolver {
     );
   }
 
-  // @Query(() => [Build], { name: 'popularBuilds' })
-  // async findPopular(
-  //   @Args('limit', { type: () => Int, defaultValue: 10 }) limit?: number,
-  //   @Args('offset', { type: () => Int, defaultValue: 0 }) offset?: number,
-  // ): Promise<Build[]> {
-  //   return await this.buildService.findPopular(limit, offset);
-  // }
+  @Query(() => PaginatedBuilds, { name: 'popularBuilds' })
+  async findPopular(
+    @Args('filter', { nullable: true }) filter?: PopularBuildFilterInput,
+  ) {
+    return await this.buildService.findPopular(filter ?? {});
+  }
 
   @Query(() => [BuildEntity], { name: 'officialBuilds' })
   async findOfficial(
@@ -112,13 +116,17 @@ export class BuildResolver {
     return await this.buildService.remove(id);
   }
 
-  // @Mutation(() => Build, { name: 'rateBuild' })
-  // @UseGuards(JwtAuthGuard)
-  // async rateBuild(
-  //   @Args('buildId', { type: () => ID }) buildId: string,
-  //   @Args('rating', { type: () => Float }) rating: number,
-  //   @CurrentUser() user: any,
-  // ): Promise<Build> {
-  //   return await this.buildService.rateBuild(buildId, rating, user.id);
-  // }
+  @Mutation(() => BuildEntity, { name: 'rateBuild' })
+  @UseGuards(JwtAuthGuard)
+  async rateBuild(
+    @Args('buildId', { type: () => ID }) buildId: string,
+    @Args('rating', { type: () => Float }) rating: number,
+    @CurrentUser() user: any,
+  ) {
+    return await this.buildService.rateBuild(
+      buildId,
+      rating,
+      (user as { _id: string })._id,
+    );
+  }
 }

@@ -1,21 +1,21 @@
-import { ObjectType, Field, ID, Int } from '@nestjs/graphql';
+import { ObjectType, Field, Float, ID, Int } from '@nestjs/graphql';
 import { User } from 'src/auth/entities/user.entity';
 import { BattleSpell } from 'src/battle-spell/entities/battle-spell.entity';
 import { Emblem } from 'src/emblem/entities/emblem.entity';
 import { Hero } from 'src/hero/entities/hero.entity';
 import { Item } from 'src/item/entities/item.entity';
 
-// @ObjectType()
-// export class BuildRating {
-//   @Field(() => ID)
-//   userId: string;
+@ObjectType()
+export class BuildRating {
+  @Field(() => ID)
+  userId: string;
 
-//   @Field(() => Float)
-//   rating: number;
+  @Field(() => Float)
+  rating: number;
 
-//   @Field()
-//   createdAt: Date;
-// }
+  @Field()
+  createdAt: Date;
+}
 
 @ObjectType()
 export class BuildItemObject {
@@ -58,12 +58,12 @@ export class BuildEntity {
   @Field()
   is_official: boolean;
 
-  // @Field(() => [BuildRating])
-  // ratings: BuildRating[];
+  @Field(() => [BuildRating])
+  ratings: BuildRating[];
 
-  // @Field(() => Float)
-  // rating: number;
+  @Field(() => Float)
+  rating: number;
 
-  // @Field(() => Int)
-  // totalRatings: number;
+  @Field(() => Int)
+  totalRatings: number;
 }

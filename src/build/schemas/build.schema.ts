@@ -1,12 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
 import { User } from 'src/auth/entities/user.entity';
-// import { User } from 'src/auth/schemas/user.schema';
 import { BattleSpell } from 'src/battle-spell/schemas/battle-spell.schema';
 import { Emblem } from 'src/emblem/schemas/emblem.schema';
 import { Hero } from 'src/hero/schemas/hero.schema';
 import { Item } from 'src/item/schemas/item.schema';
-// import { BuildRating } from '../entities/build.entity';
+
+export interface BuildRating {
+  userId: Types.ObjectId;
+  rating: number;
+  createdAt: Date;
+}
 
 @Schema({ timestamps: true })
 export class Build {
@@ -66,41 +70,26 @@ export class Build {
   @Prop({ default: false })
   is_official: boolean;
 
-  // @Prop([
-  //   {
-  //     userId: { type: Types.ObjectId, ref: 'User' },
-  //     rating: { type: Number, min: 1, max: 5 },
-  //     createdAt: { type: Date, default: Date.now },
-  //   },
-  // ])
-  // ratings: BuildRating[];
+  @Prop([
+    {
+      userId: { type: Types.ObjectId, ref: 'User', required: true },
+      rating: { type: Number, min: 1, max: 5, required: true },
+      createdAt: { type: Date, default: Date.now },
+    },
+  ])
+  ratings: BuildRating[];
 
-  // @Prop({ default: 0, min: 0, max: 5 })
-  // rating: number;
+  @Prop({ default: 0, min: 0, max: 5 })
+  rating: number;
 
-  // @Prop({ default: 0 })
-  // totalRatings: number;
+  @Prop({ default: 0 })
+  totalRatings: number;
 }
 
 export const BuildSchema = SchemaFactory.createForClass(Build);
 
-// Indexes
-// BuildSchema.index({ hero: 1, is_official: 1 });
-// BuildSchema.index({ user: 1 });
-// BuildSchema.index({ rating: -1 });
-// BuildSchema.index({ role: 1 });
-
-// Method untuk update rating
-// BuildSchema.methods.updateRating = function (this: Build) {
-//   if (this.ratings && this.ratings.length > 0) {
-//     const sum = this.ratings.reduce(
-//       (acc: number, rating: BuildRating) => acc + rating.rating,
-//       0,
-//     );
-//     this.rating = sum / this.ratings.length;
-//     this.totalRatings = this.ratings.length;
-//   } else {
-//     this.rating = 0;
-//     this.totalRatings = 0;
-//   }
-// };
+BuildSchema.index({ hero: 1, is_official: 1 });
+BuildSchema.index({ user: 1 });
+BuildSchema.index({ rating: -1, totalRatings: -1 });
+BuildSchema.index({ role: 1 });
+BuildSchema.index({ name: 'text', description: 'text' });

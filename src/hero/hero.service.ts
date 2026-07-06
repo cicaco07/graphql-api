@@ -1,12 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { Hero } from './schemas/hero.schema';
 import { CreateHeroInput } from './dto/create-hero.input';
 import { UpdateHeroInput } from './dto/update-hero.input';
 import { Skill } from '../skill/schemas/skill.schema';
 import { SkillDetail } from '../skill-detail/schemas/skill-detail.schema';
 import { BaseStat } from '../base-stat/schemas/base-stat.schema';
+import { HeroFilterInput } from './dto/hero-filter.input';
 
 @Injectable()
 export class HeroService {
@@ -115,18 +116,34 @@ export class HeroService {
     return detailIds;
   }
 
-  async findAll(): Promise<Hero[]> {
-    return this.heroModel
-      .find()
-      .populate({
-        path: 'skills',
-        populate: {
-          path: 'skills_detail',
-        },
-      })
-      .populate('baseStat')
-      .sort({ hero_order: 1 })
-      .exec();
+  async findAll(filter: HeroFilterInput = {}) {
+    const query = this.heroFilterToQuery(filter);
+    const limit = filter.limit ?? 10;
+    const offset = filter.offset ?? 0;
+
+    const [heroes, total] = await Promise.all([
+      this.heroModel
+        .find(query)
+        .populate({
+          path: 'skills',
+          populate: {
+            path: 'skills_detail',
+          },
+        })
+        .populate('baseStat')
+        .sort({ hero_order: 1 })
+        .limit(limit)
+        .skip(offset)
+        .exec(),
+      this.heroModel.countDocuments(query).exec(),
+    ]);
+
+    return {
+      items: heroes,
+      total,
+      limit,
+      offset,
+    };
   }
 
   async findById(id: string): Promise<Hero> {
@@ -150,7 +167,8 @@ export class HeroService {
         path: 'skills',
         populate: { path: 'skills_detail' },
       })
-      .populate('baseStat');
+      .populate('baseStat')
+      .exec();
 
     if (hero.length === 0) throw new NotFoundException('No heroes found');
     return hero;
@@ -166,6 +184,24 @@ export class HeroService {
     );
     if (!updated) throw new NotFoundException('Hero not found');
     return updated;
+  }
+
+  private heroFilterToQuery(filter: HeroFilterInput): FilterQuery<Hero> {
+    const query: FilterQuery<Hero> = {};
+
+    if (filter.role) query.role = filter.role;
+    if (filter.type) query.type = filter.type;
+    if (filter.region) query.region = filter.region;
+    if (filter.keyword) {
+      query.$or = [
+        { name: { $regex: filter.keyword, $options: 'i' } },
+        { alias: { $regex: filter.keyword, $options: 'i' } },
+        { speciality: { $regex: filter.keyword, $options: 'i' } },
+        { short_description: { $regex: filter.keyword, $options: 'i' } },
+      ];
+    }
+
+    return query;
   }
 
   async remove(id: string): Promise<Hero> {

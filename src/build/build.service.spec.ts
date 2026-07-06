@@ -84,6 +84,7 @@ describe('BuildService', () => {
   mockBuildModel.find = jest.fn();
   mockBuildModel.findById = jest.fn();
   mockBuildModel.findByIdAndDelete = jest.fn();
+  mockBuildModel.countDocuments = jest.fn();
 
   const mockHeroModel = {
     findById: jest.fn(),
@@ -267,12 +268,22 @@ describe('BuildService', () => {
       mockBuildModel.find.mockReturnValue({
         populate: jest.fn().mockReturnThis(),
         sort: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
         exec: jest.fn().mockResolvedValue(builds),
+      });
+      mockBuildModel.countDocuments.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(builds.length),
       });
 
       const result = await service.findAll();
 
-      expect(result).toEqual(builds);
+      expect(result).toEqual({
+        items: builds,
+        total: builds.length,
+        limit: 10,
+        offset: 0,
+      });
       expect(mockBuildModel.find).toHaveBeenCalled();
     });
   });

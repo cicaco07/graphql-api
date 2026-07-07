@@ -1,4 +1,4 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import { BadGatewayException, ConflictException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
@@ -10,6 +10,9 @@ import { PatchNoteParserService } from './patch-note-parser.service';
 
 @Injectable()
 export class PatchNoteImporterService {
+  private readonly gmsSourceUrl =
+    'https://api.gms.moontontech.com/api/gms/source/2669606/2672947';
+
   constructor(
     @InjectModel(PatchNote.name)
     private patchNoteModel: Model<PatchNote>,
@@ -30,19 +33,10 @@ export class PatchNoteImporterService {
       }
     }
 
-    const response = await axios.get(url, {
-      responseType: 'text',
-      timeout: 15000,
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (compatible; MLBBPatchImporter/1.0; +https://www.mobilelegends.com)',
-      },
-    });
-
-    const html = response.data as string;
-    const content = this.extractReadableContent(html);
-    const title = this.extractTitle(html, content);
-    const publishedAt = this.extractPublishedAt(content) ?? new Date();
+    const article = await this.fetchOfficialArticle(sourceNewsId);
+    const content = this.extractReadableContent(article.body);
+    const title = article.title;
+    const publishedAt = article.publishedAt ?? new Date();
 
     const patchNote = await this.patchNoteModel.create({
       name: title,
@@ -81,6 +75,42 @@ export class PatchNoteImporterService {
     } catch {
       return undefined;
     }
+  }
+
+  private async fetchOfficialArticle(newsId?: string): Promise<OfficialArticle> {
+    if (!newsId) {
+      throw new BadGatewayException('Mobile Legends newsid is missing');
+    }
+
+    const response = await axios.post(
+      this.gmsSourceUrl,
+      {},
+      {
+        timeout: 15000,
+        headers: {
+          Origin: 'https://www.mobilelegends.com',
+          Referer: 'https://www.mobilelegends.com/',
+          'User-Agent':
+            'Mozilla/5.0 (compatible; MLBBPatchImporter/1.0; +https://www.mobilelegends.com)',
+        },
+      },
+    );
+
+    const records = response.data?.data?.records ?? [];
+    const record = records.find(
+      (item: { id?: number | string }) => String(item.id) === String(newsId),
+    );
+    if (!record?.data?.body) {
+      throw new BadGatewayException('Mobile Legends article body not found');
+    }
+
+    return {
+      body: record.data.body,
+      title: record.data.title ?? record.data.brief ?? record.caption,
+      publishedAt: record.data.start_time
+        ? new Date(record.data.start_time)
+        : undefined,
+    };
   }
 
   private extractReadableContent(html: string): string {
@@ -133,3 +163,9 @@ export class PatchNoteImporterService {
       ?.slice(0, 500);
   }
 }
+
+type OfficialArticle = {
+  body: string;
+  title: string;
+  publishedAt?: Date;
+};

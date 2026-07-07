@@ -20,6 +20,8 @@ import {
   GameModePatchNoteSchema,
 } from './schemas/game-mode-patch-note.schema';
 import { PatchChange, PatchChangeSchema } from './schemas/patch-change.schema';
+import { Hero, HeroSchema } from 'src/hero/schemas/hero.schema';
+import { Item, ItemSchema } from 'src/item/schemas/item.schema';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { PatchChange, PatchChangeSchema } from './schemas/patch-change.schema';
       { name: SystemPatchNote.name, schema: SystemPatchNoteSchema },
       { name: GameModePatchNote.name, schema: GameModePatchNoteSchema },
       { name: PatchChange.name, schema: PatchChangeSchema },
+      { name: Hero.name, schema: HeroSchema },
+      { name: Item.name, schema: ItemSchema },
     ]),
   ],
   providers: [PatchNoteResolver, PatchNoteService],

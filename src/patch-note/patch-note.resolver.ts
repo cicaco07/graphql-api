@@ -21,6 +21,10 @@ import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/enums/role.enum';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
+import { PatchChangeEntity } from './entities/patch-change.entity';
+import { CreatePatchChangeInput } from './dto/create-patch-change.input';
+import { UpdatePatchChangeInput } from './dto/update-patch-change.input';
+import { PatchChangeFilterInput } from './dto/patch-change-filter.input';
 
 @Resolver(() => PatchNoteEntity)
 export class PatchNoteResolver {
@@ -95,9 +99,56 @@ export class PatchNoteResolver {
     );
   }
 
+  @Mutation(() => PatchChangeEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
+  async createPatchChange(
+    @Args('patchNoteId') patchNoteId: string,
+    @Args('createPatchChangeInput')
+    createPatchChangeInput: CreatePatchChangeInput,
+  ) {
+    return await this.patchNoteService.createPatchChange(
+      patchNoteId,
+      createPatchChangeInput,
+    );
+  }
+
   @Query(() => [PatchNoteEntity], { name: 'patchNotes' })
   async findAll() {
     return await this.patchNoteService.findAll();
+  }
+
+  @Query(() => [PatchChangeEntity], { name: 'patchChanges' })
+  async findPatchChanges(
+    @Args('filter', { nullable: true }) filter?: PatchChangeFilterInput,
+  ) {
+    return await this.patchNoteService.findPatchChanges(filter ?? {});
+  }
+
+  @Query(() => [PatchChangeEntity], { name: 'heroPatchHistory' })
+  async findHeroPatchHistory(
+    @Args('heroId', { nullable: true }) heroId?: string,
+    @Args('heroName', { nullable: true }) heroName?: string,
+    @Args('includeDrafts', { nullable: true }) includeDrafts?: boolean,
+  ) {
+    return await this.patchNoteService.findHeroPatchHistory(
+      heroId,
+      heroName,
+      includeDrafts ?? false,
+    );
+  }
+
+  @Query(() => [PatchChangeEntity], { name: 'itemPatchHistory' })
+  async findItemPatchHistory(
+    @Args('itemId', { nullable: true }) itemId?: string,
+    @Args('itemName', { nullable: true }) itemName?: string,
+    @Args('includeDrafts', { nullable: true }) includeDrafts?: boolean,
+  ) {
+    return await this.patchNoteService.findItemPatchHistory(
+      itemId,
+      itemName,
+      includeDrafts ?? false,
+    );
   }
 
   @Query(() => PatchNoteEntity, { name: 'patchNote' })
@@ -118,6 +169,20 @@ export class PatchNoteResolver {
       id,
       updatePatchNoteInput,
       (user as { _id: string })._id,
+    );
+  }
+
+  @Mutation(() => PatchChangeEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
+  async updatePatchChange(
+    @Args('id', { type: () => ID }) id: string,
+    @Args('updatePatchChangeInput')
+    updatePatchChangeInput: UpdatePatchChangeInput,
+  ) {
+    return await this.patchNoteService.updatePatchChange(
+      id,
+      updatePatchChangeInput,
     );
   }
 
@@ -182,6 +247,13 @@ export class PatchNoteResolver {
   @Roles(Role.SUPER_ADMIN)
   async removePatchNote(@Args('id', { type: () => ID }) id: string) {
     return await this.patchNoteService.removePatchNote(id);
+  }
+
+  @Mutation(() => PatchChangeEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
+  async removePatchChange(@Args('id', { type: () => ID }) id: string) {
+    return await this.patchNoteService.removePatchChange(id);
   }
 
   @Mutation(() => HeroPatchNoteEntity)

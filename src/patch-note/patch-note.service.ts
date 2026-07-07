@@ -1,11 +1,14 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
 import { PatchNote } from './schemas/patch-note.schema';
-import { Model } from 'mongoose';
 import { HeroPatchNote } from './schemas/hero-patch-note.schema';
 import { BattlefieldPatchNote } from './schemas/battlefield-patch-note.schema';
 import { GameModePatchNote } from './schemas/game-mode-patch-note.schema';
 import { SystemPatchNote } from './schemas/system-patch-note.schema';
+import { PatchChange } from './schemas/patch-change.schema';
+import { Hero } from 'src/hero/schemas/hero.schema';
+import { Item } from 'src/item/schemas/item.schema';
 import { CreatePatchNoteInput } from './dto/create-patch-note.input';
 import { CreateHeroPatchNoteInput } from './dto/create-hero-patch-note.input';
 import { UpdatePatchNoteInput } from './dto/update-patch-note.input';
@@ -14,6 +17,11 @@ import { UpdateHeroPatchNoteInput } from './dto/update-hero-patch-note.input';
 import { UpdateBattlefieldPatchNoteInput } from './dto/update-battlefield-patch-note.input';
 import { UpdateSystemPatchNoteInput } from './dto/update-system-patch-note.input';
 import { UpdateGameModePatchNoteInput } from './dto/update-game-mode-patch-note.input';
+import { CreatePatchChangeInput } from './dto/create-patch-change.input';
+import { UpdatePatchChangeInput } from './dto/update-patch-change.input';
+import { PatchChangeFilterInput } from './dto/patch-change-filter.input';
+import { PatchNoteStatus } from './entities/patch-note.entity';
+import { PatchTargetType } from './entities/patch-change.entity';
 
 @Injectable()
 export class PatchNoteService {
@@ -28,6 +36,12 @@ export class PatchNoteService {
     private gameModeModel: Model<GameModePatchNote>,
     @InjectModel(SystemPatchNote.name)
     private systemModel: Model<SystemPatchNote>,
+    @InjectModel(PatchChange.name)
+    private patchChangeModel: Model<PatchChange>,
+    @InjectModel(Hero.name)
+    private heroEntityModel: Model<Hero>,
+    @InjectModel(Item.name)
+    private itemModel: Model<Item>,
   ) {}
 
   async createPatchNote(
@@ -37,6 +51,7 @@ export class PatchNoteService {
     const createdPatchNote = new this.patchNoteModel({
       ...createPatchNoteInput,
       season: Number(createPatchNoteInput.season),
+      status: createPatchNoteInput.status ?? PatchNoteStatus.DRAFT,
       created_by: userId,
       created_at: new Date(),
       updated_at: new Date(),
@@ -125,6 +140,20 @@ export class PatchNoteService {
     return gameModePatchNote;
   }
 
+  async createPatchChange(
+    patchNoteId: string,
+    createPatchChangeInput: CreatePatchChangeInput,
+  ): Promise<PatchChange> {
+    await this.ensurePatchNoteExists(patchNoteId);
+    await this.validateTargetReference(createPatchChangeInput);
+
+    return this.patchChangeModel.create({
+      ...createPatchChangeInput,
+      patch_note: patchNoteId,
+      order: createPatchChangeInput.order ?? 0,
+    });
+  }
+
   async findAll(): Promise<PatchNote[]> {
     return this.patchNoteModel
       .find({ deleted_at: null })
@@ -149,6 +178,61 @@ export class PatchNoteService {
     return patchNote;
   }
 
+  async findPatchChanges(
+    filter: PatchChangeFilterInput = {},
+  ): Promise<PatchChange[]> {
+    const query: Record<string, any> = { deleted_at: null };
+
+    if (filter.patchNoteId) query.patch_note = filter.patchNoteId;
+    if (filter.targetType) query.target_type = filter.targetType;
+    if (filter.targetId) query.target_ref = filter.targetId;
+    if (filter.targetName) query.target_name = new RegExp(`^${this.escapeRegex(filter.targetName)}$`, 'i');
+    if (filter.changeType) query.change_type = filter.changeType;
+
+    const patchNoteFilters: Record<string, any> = { deleted_at: null };
+    if (!filter.includeDrafts) patchNoteFilters.status = PatchNoteStatus.PUBLISHED;
+    if (filter.version) patchNoteFilters.version = filter.version;
+
+    if (Object.keys(patchNoteFilters).length > 1 || filter.version || !filter.includeDrafts) {
+      const patchIds = await this.patchNoteModel.distinct('_id', patchNoteFilters);
+      query.patch_note = filter.patchNoteId
+        ? filter.patchNoteId
+        : { $in: patchIds };
+    }
+
+    return this.patchChangeModel
+      .find(query)
+      .sort({ patch_note: -1, order: 1, createdAt: 1 })
+      .populate('patch_note')
+      .exec();
+  }
+
+  async findHeroPatchHistory(
+    heroId?: string,
+    heroName?: string,
+    includeDrafts = false,
+  ): Promise<PatchChange[]> {
+    return this.findPatchChanges({
+      targetType: PatchTargetType.HERO,
+      targetId: heroId,
+      targetName: heroName,
+      includeDrafts,
+    });
+  }
+
+  async findItemPatchHistory(
+    itemId?: string,
+    itemName?: string,
+    includeDrafts = false,
+  ): Promise<PatchChange[]> {
+    return this.findPatchChanges({
+      targetType: PatchTargetType.ITEM,
+      targetId: itemId,
+      targetName: itemName,
+      includeDrafts,
+    });
+  }
+
   async updatePatchNote(
     id: string,
     updatePatchNoteInput: UpdatePatchNoteInput,
@@ -167,6 +251,23 @@ export class PatchNoteService {
       throw new NotFoundException(`PatchNote with ID "${id}" not found`);
     }
     return patchNote;
+  }
+
+  async updatePatchChange(
+    id: string,
+    updatePatchChangeInput: UpdatePatchChangeInput,
+  ): Promise<PatchChange> {
+    await this.validateTargetReference(updatePatchChangeInput);
+
+    const patchChange = await this.patchChangeModel.findByIdAndUpdate(
+      id,
+      updatePatchChangeInput,
+      { new: true },
+    );
+    if (!patchChange) {
+      throw new NotFoundException(`PatchChange with ID "${id}" not found`);
+    }
+    return patchChange;
   }
 
   async updateHeroPatchNote(
@@ -245,6 +346,18 @@ export class PatchNoteService {
     return patchNote;
   }
 
+  async removePatchChange(id: string): Promise<PatchChange> {
+    const patchChange = await this.patchChangeModel.findByIdAndUpdate(
+      id,
+      { deleted_at: new Date() },
+      { new: true },
+    );
+    if (!patchChange) {
+      throw new NotFoundException(`PatchChange with ID "${id}" not found`);
+    }
+    return patchChange;
+  }
+
   async removeHeroPatchNote(id: string): Promise<HeroPatchNote> {
     const heroPatchNote = await this.heroModel.findByIdAndDelete(id);
     if (!heroPatchNote) {
@@ -280,5 +393,38 @@ export class PatchNoteService {
       );
     }
     return gameModePatchNote;
+  }
+
+  private async ensurePatchNoteExists(patchNoteId: string): Promise<void> {
+    const patchNote = await this.patchNoteModel.exists({
+      _id: patchNoteId,
+      deleted_at: null,
+    });
+    if (!patchNote) {
+      throw new NotFoundException('PatchNote not found');
+    }
+  }
+
+  private async validateTargetReference(
+    input: Pick<CreatePatchChangeInput, 'target_type' | 'target_ref'>,
+  ): Promise<void> {
+    if (!input.target_ref) return;
+    if (!Types.ObjectId.isValid(input.target_ref)) {
+      throw new BadRequestException('Invalid target_ref');
+    }
+
+    if (input.target_type === PatchTargetType.HERO) {
+      const hero = await this.heroEntityModel.exists({ _id: input.target_ref });
+      if (!hero) throw new NotFoundException('Hero target not found');
+    }
+
+    if (input.target_type === PatchTargetType.ITEM) {
+      const item = await this.itemModel.exists({ _id: input.target_ref });
+      if (!item) throw new NotFoundException('Item target not found');
+    }
+  }
+
+  private escapeRegex(value: string): string {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 }

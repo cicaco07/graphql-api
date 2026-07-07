@@ -19,6 +19,7 @@ import {
   GameModePatchNote,
   GameModePatchNoteSchema,
 } from './schemas/game-mode-patch-note.schema';
+import { PatchChange, PatchChangeSchema } from './schemas/patch-change.schema';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import {
       { name: BattlefieldPatchNote.name, schema: BattlefieldPatchNoteSchema },
       { name: SystemPatchNote.name, schema: SystemPatchNoteSchema },
       { name: GameModePatchNote.name, schema: GameModePatchNoteSchema },
+      { name: PatchChange.name, schema: PatchChangeSchema },
     ]),
   ],
   providers: [PatchNoteResolver, PatchNoteService],

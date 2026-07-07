@@ -334,6 +334,40 @@ export class PatchNoteService {
     return gameModePatchNote;
   }
 
+  async publishPatchNote(id: string, userId: string): Promise<PatchNote> {
+    const patchNote = await this.patchNoteModel.findByIdAndUpdate(
+      id,
+      {
+        status: PatchNoteStatus.PUBLISHED,
+        is_active: true,
+        updated_by: userId,
+        updated_at: new Date(),
+      },
+      { new: true },
+    );
+    if (!patchNote) {
+      throw new NotFoundException(`PatchNote with ID "${id}" not found`);
+    }
+    return patchNote;
+  }
+
+  async unpublishPatchNote(id: string, userId: string): Promise<PatchNote> {
+    const patchNote = await this.patchNoteModel.findByIdAndUpdate(
+      id,
+      {
+        status: PatchNoteStatus.DRAFT,
+        is_active: false,
+        updated_by: userId,
+        updated_at: new Date(),
+      },
+      { new: true },
+    );
+    if (!patchNote) {
+      throw new NotFoundException(`PatchNote with ID "${id}" not found`);
+    }
+    return patchNote;
+  }
+
   async removePatchNote(id: string): Promise<PatchNote> {
     const patchNote = await this.patchNoteModel.findByIdAndUpdate(
       id,

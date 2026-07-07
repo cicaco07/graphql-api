@@ -189,6 +189,32 @@ export class PatchNoteResolver {
     );
   }
 
+  @Mutation(() => PatchNoteEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
+  async publishPatchNote(
+    @Args('id', { type: () => ID }) id: string,
+    @CurrentUser() user: any,
+  ) {
+    return await this.patchNoteService.publishPatchNote(
+      id,
+      (user as { _id: string })._id,
+    );
+  }
+
+  @Mutation(() => PatchNoteEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
+  async unpublishPatchNote(
+    @Args('id', { type: () => ID }) id: string,
+    @CurrentUser() user: any,
+  ) {
+    return await this.patchNoteService.unpublishPatchNote(
+      id,
+      (user as { _id: string })._id,
+    );
+  }
+
   @Mutation(() => PatchChangeEntity)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)

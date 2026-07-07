@@ -25,10 +25,14 @@ import { PatchChangeEntity } from './entities/patch-change.entity';
 import { CreatePatchChangeInput } from './dto/create-patch-change.input';
 import { UpdatePatchChangeInput } from './dto/update-patch-change.input';
 import { PatchChangeFilterInput } from './dto/patch-change-filter.input';
+import { PatchNoteImporterService } from './services/patch-note-importer.service';
 
 @Resolver(() => PatchNoteEntity)
 export class PatchNoteResolver {
-  constructor(private readonly patchNoteService: PatchNoteService) {}
+  constructor(
+    private readonly patchNoteService: PatchNoteService,
+    private readonly patchNoteImporterService: PatchNoteImporterService,
+  ) {}
 
   @Mutation(() => PatchNoteEntity)
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -39,6 +43,19 @@ export class PatchNoteResolver {
   ) {
     return await this.patchNoteService.createPatchNote(
       createPatchNoteInput,
+      (user as { _id: string })._id,
+    );
+  }
+
+  @Mutation(() => PatchNoteEntity)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
+  async importPatchNoteFromUrl(
+    @Args('url') url: string,
+    @CurrentUser() user: any,
+  ) {
+    return await this.patchNoteImporterService.importFromUrl(
+      url,
       (user as { _id: string })._id,
     );
   }

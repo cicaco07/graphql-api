@@ -26,10 +26,13 @@ export class PatchNoteImporterService {
     if (sourceNewsId) {
       const existing = await this.patchNoteModel.findOne({
         source_newsid: sourceNewsId,
-        deleted_at: null,
       });
-      if (existing) {
+      if (existing && !existing.deleted_at) {
         throw new ConflictException('Patch note source already imported');
+      }
+      if (existing?.deleted_at) {
+        await this.patchChangeModel.deleteMany({ patch_note: (existing as any)._id });
+        await this.patchNoteModel.deleteOne({ _id: (existing as any)._id });
       }
     }
 

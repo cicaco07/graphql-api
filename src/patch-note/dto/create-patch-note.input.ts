@@ -7,7 +7,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { PatchNoteType } from '../entities/patch-note.entity';
+import { PatchNoteStatus, PatchNoteType } from '../entities/patch-note.entity';
 import { CreateHeroPatchNoteInput } from './create-hero-patch-note.input';
 import { CreateBattlefieldPatchNoteInput } from './create-battlefield-patch-note.input';
 import { CreateSystemPatchNoteInput } from './create-system-patch-note.input';
@@ -20,6 +20,11 @@ export class CreatePatchNoteInput {
   @IsString()
   name: string;
 
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  version?: string;
+
   @Field()
   @IsNotEmpty()
   @IsDate()
@@ -29,6 +34,11 @@ export class CreatePatchNoteInput {
   @IsNotEmpty()
   @IsDate()
   end_date: Date;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsDate()
+  published_at?: Date;
 
   @Field(() => PatchNoteType)
   @IsNotEmpty()
@@ -43,6 +53,36 @@ export class CreatePatchNoteInput {
   @IsNotEmpty()
   @IsBoolean()
   is_active: boolean;
+
+  @Field(() => PatchNoteStatus, { nullable: true })
+  @IsOptional()
+  @IsEnum(PatchNoteStatus)
+  status?: PatchNoteStatus;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  source_url?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  source_newsid?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  summary?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  raw_content?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsDate()
+  imported_at?: Date;
 
   @Field({ nullable: true })
   @IsOptional()

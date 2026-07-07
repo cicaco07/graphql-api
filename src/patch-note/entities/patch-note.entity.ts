@@ -11,8 +11,17 @@ export enum PatchNoteType {
   HOTFIX = 'hotfix',
 }
 
+export enum PatchNoteStatus {
+  DRAFT = 'draft',
+  PUBLISHED = 'published',
+}
+
 registerEnumType(PatchNoteType, {
   name: 'PatchNoteType',
+});
+
+registerEnumType(PatchNoteStatus, {
+  name: 'PatchNoteStatus',
 });
 
 @ObjectType()
@@ -23,11 +32,17 @@ export class PatchNoteEntity {
   @Field()
   name: string;
 
+  @Field({ nullable: true })
+  version?: string;
+
   @Field()
   start_date: Date;
 
   @Field()
   end_date: Date;
+
+  @Field({ nullable: true })
+  published_at?: Date;
 
   @Field(() => PatchNoteType)
   type: PatchNoteType;
@@ -37,6 +52,24 @@ export class PatchNoteEntity {
 
   @Field()
   is_active: boolean;
+
+  @Field(() => PatchNoteStatus)
+  status: PatchNoteStatus;
+
+  @Field({ nullable: true })
+  source_url?: string;
+
+  @Field({ nullable: true })
+  source_newsid?: string;
+
+  @Field({ nullable: true })
+  summary?: string;
+
+  @Field({ nullable: true })
+  raw_content?: string;
+
+  @Field({ nullable: true })
+  imported_at?: Date;
 
   @Field(() => [HeroPatchNoteEntity], { nullable: true })
   hero_changes?: HeroPatchNoteEntity[];
@@ -59,30 +92,3 @@ export class PatchNoteEntity {
   @Field({ nullable: true })
   deleted_at?: Date;
 }
-
-// @ObjectType()
-// export class TypeStats {
-//   @Field()
-//   _id: string;
-
-//   @Field(() => Int)
-//   count: number;
-// }
-
-// @ObjectType()
-// export class PaginatedPatchNotesResponse {
-//   @Field(() => [PatchNote])
-//   data: PatchNote[];
-
-//   @Field(() => Int)
-//   total: number;
-
-//   @Field(() => Int)
-//   page: number;
-
-//   @Field(() => Int)
-//   limit: number;
-
-//   @Field(() => Int)
-//   totalPages: number;
-// }

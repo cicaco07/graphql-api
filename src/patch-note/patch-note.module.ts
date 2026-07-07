@@ -23,6 +23,7 @@ import { PatchChange, PatchChangeSchema } from './schemas/patch-change.schema';
 import { Hero, HeroSchema } from 'src/hero/schemas/hero.schema';
 import { Item, ItemSchema } from 'src/item/schemas/item.schema';
 import { PatchNoteImporterService } from './services/patch-note-importer.service';
+import { PatchNoteParserService } from './services/patch-note-parser.service';
 
 @Module({
   imports: [
@@ -37,7 +38,12 @@ import { PatchNoteImporterService } from './services/patch-note-importer.service
       { name: Item.name, schema: ItemSchema },
     ]),
   ],
-  providers: [PatchNoteResolver, PatchNoteService, PatchNoteImporterService],
-  exports: [PatchNoteService, PatchNoteImporterService],
+  providers: [
+    PatchNoteResolver,
+    PatchNoteService,
+    PatchNoteImporterService,
+    PatchNoteParserService,
+  ],
+  exports: [PatchNoteService, PatchNoteImporterService, PatchNoteParserService],
 })
 export class PatchNoteModule {}

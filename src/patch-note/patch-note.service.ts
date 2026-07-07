@@ -22,6 +22,7 @@ import { UpdatePatchChangeInput } from './dto/update-patch-change.input';
 import { PatchChangeFilterInput } from './dto/patch-change-filter.input';
 import { PatchNoteStatus } from './entities/patch-note.entity';
 import { PatchTargetType } from './entities/patch-change.entity';
+import { PatchNoteParserService } from './services/patch-note-parser.service';
 
 @Injectable()
 export class PatchNoteService {
@@ -42,22 +43,36 @@ export class PatchNoteService {
     private heroEntityModel: Model<Hero>,
     @InjectModel(Item.name)
     private itemModel: Model<Item>,
+    private patchNoteParserService: PatchNoteParserService,
   ) {}
 
   async createPatchNote(
     createPatchNoteInput: CreatePatchNoteInput,
     userId: string,
   ): Promise<PatchNote> {
+    const { changes, ...patchNoteInput } = createPatchNoteInput;
     const createdPatchNote = new this.patchNoteModel({
-      ...createPatchNoteInput,
-      season: Number(createPatchNoteInput.season),
-      status: createPatchNoteInput.status ?? PatchNoteStatus.DRAFT,
+      ...patchNoteInput,
+      season: Number(patchNoteInput.season),
+      status: patchNoteInput.status ?? PatchNoteStatus.DRAFT,
       created_by: userId,
       created_at: new Date(),
       updated_at: new Date(),
     });
 
-    return createdPatchNote.save();
+    const savedPatchNote = await createdPatchNote.save();
+    if (changes?.length) {
+      await Promise.all(
+        changes.map((change, index) =>
+          this.createPatchChange(String((savedPatchNote as any)._id), {
+            ...change,
+            order: change.order ?? index,
+          }),
+        ),
+      );
+    }
+
+    return savedPatchNote;
   }
 
   async createHeroPatchNote(
@@ -231,6 +246,27 @@ export class PatchNoteService {
       targetName: itemName,
       includeDrafts,
     });
+  }
+
+  async reparsePatchNote(id: string): Promise<PatchChange[]> {
+    const patchNote = await this.patchNoteModel.findOne({
+      _id: id,
+      deleted_at: null,
+    });
+    if (!patchNote) {
+      throw new NotFoundException(`PatchNote with ID "${id}" not found`);
+    }
+    if (!patchNote.raw_content) {
+      throw new BadRequestException('PatchNote does not have raw_content to parse');
+    }
+
+    await this.patchChangeModel.deleteMany({ patch_note: id });
+    const changes = await this.patchNoteParserService.parse(patchNote.raw_content);
+    if (!changes.length) return [];
+
+    return this.patchChangeModel.create(
+      changes.map((change) => ({ ...change, patch_note: id })),
+    );
   }
 
   async updatePatchNote(

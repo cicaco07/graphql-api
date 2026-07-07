@@ -36,6 +36,7 @@ export class HeroChange {
   change_details?: HeroChangeDetail[];
 }
 
+// Legacy schema kept for backward compatibility. New patch data should use PatchChange.
 @Schema({ timestamps: true })
 export class HeroPatchNote {
   @Prop({ required: true })

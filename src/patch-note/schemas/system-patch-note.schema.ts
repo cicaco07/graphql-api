@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Schema as MongooseSchema } from 'mongoose';
 
+// Legacy schema kept for backward compatibility. New patch data should use PatchChange.
 @Schema({ timestamps: true })
 export class SystemPatchNote {
   @Prop({ required: true })

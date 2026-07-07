@@ -12,6 +12,7 @@ import { CreateHeroPatchNoteInput } from './create-hero-patch-note.input';
 import { CreateBattlefieldPatchNoteInput } from './create-battlefield-patch-note.input';
 import { CreateSystemPatchNoteInput } from './create-system-patch-note.input';
 import { CreateGameModePatchNoteInput } from './create-game-mode-patch-note.input';
+import { CreatePatchChangeInput } from './create-patch-change.input';
 
 @InputType()
 export class CreatePatchNoteInput {
@@ -109,4 +110,8 @@ export class CreatePatchNoteInput {
   @Field(() => [CreateGameModePatchNoteInput], { nullable: true })
   @IsOptional()
   game_mode_changes?: CreateGameModePatchNoteInput[];
+
+  @Field(() => [CreatePatchChangeInput], { nullable: true })
+  @IsOptional()
+  changes?: CreatePatchChangeInput[];
 }

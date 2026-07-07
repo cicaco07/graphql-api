@@ -4,13 +4,18 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { Model } from 'mongoose';
 import { PatchNote } from '../schemas/patch-note.schema';
+import { PatchChange } from '../schemas/patch-change.schema';
 import { PatchNoteStatus, PatchNoteType } from '../entities/patch-note.entity';
+import { PatchNoteParserService } from './patch-note-parser.service';
 
 @Injectable()
 export class PatchNoteImporterService {
   constructor(
     @InjectModel(PatchNote.name)
     private patchNoteModel: Model<PatchNote>,
+    @InjectModel(PatchChange.name)
+    private patchChangeModel: Model<PatchChange>,
+    private patchNoteParserService: PatchNoteParserService,
   ) {}
 
   async importFromUrl(url: string, userId: string): Promise<PatchNote> {
@@ -39,7 +44,7 @@ export class PatchNoteImporterService {
     const title = this.extractTitle(html, content);
     const publishedAt = this.extractPublishedAt(content) ?? new Date();
 
-    return this.patchNoteModel.create({
+    const patchNote = await this.patchNoteModel.create({
       name: title,
       version: this.extractVersion(title) ?? this.extractVersion(content),
       start_date: publishedAt,
@@ -56,6 +61,18 @@ export class PatchNoteImporterService {
       imported_at: new Date(),
       created_by: userId,
     });
+
+    const changes = await this.patchNoteParserService.parse(content);
+    if (changes.length) {
+      await this.patchChangeModel.create(
+        changes.map((change) => ({
+          ...change,
+          patch_note: (patchNote as any)._id,
+        })),
+      );
+    }
+
+    return patchNote;
   }
 
   private extractNewsId(url: string): string | undefined {

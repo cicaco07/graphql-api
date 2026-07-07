@@ -189,6 +189,13 @@ export class PatchNoteResolver {
     );
   }
 
+  @Mutation(() => [PatchChangeEntity])
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
+  async reparsePatchNote(@Args('id', { type: () => ID }) id: string) {
+    return await this.patchNoteService.reparsePatchNote(id);
+  }
+
   @Mutation(() => PatchNoteEntity)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN)

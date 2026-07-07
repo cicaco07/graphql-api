@@ -257,7 +257,15 @@ export class PatchNoteService {
     id: string,
     updatePatchChangeInput: UpdatePatchChangeInput,
   ): Promise<PatchChange> {
-    await this.validateTargetReference(updatePatchChangeInput);
+    const currentPatchChange = await this.patchChangeModel.findById(id);
+    if (!currentPatchChange) {
+      throw new NotFoundException(`PatchChange with ID "${id}" not found`);
+    }
+    await this.validateTargetReference({
+      target_type:
+        updatePatchChangeInput.target_type ?? currentPatchChange.target_type,
+      target_ref: updatePatchChangeInput.target_ref,
+    });
 
     const patchChange = await this.patchChangeModel.findByIdAndUpdate(
       id,

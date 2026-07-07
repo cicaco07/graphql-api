@@ -36,6 +36,9 @@ export class Item extends Document {
 
   @Prop({ required: false })
   parent_items?: string[];
+
+  @Prop({ type: [Object], required: false, default: [] })
+  calculation_attributes?: Record<string, unknown>[];
 }
 
 export const ItemSchema = SchemaFactory.createForClass(Item);

@@ -26,7 +26,7 @@ export class HeroFilterInput {
   @Field(() => Int, { nullable: true, defaultValue: 10 })
   @IsOptional()
   @Min(1)
-  @Max(100)
+  @Max(200)
   limit?: number = 10;
 
   @Field(() => Int, { nullable: true, defaultValue: 0 })

@@ -1,6 +1,7 @@
 import { InputType, Field } from '@nestjs/graphql';
 import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ItemTier } from '../enums/item-tier.enum';
+import { CalculationAttributeInput } from './calculation-attribute.input';
 
 @InputType()
 export class CreateItemInput {
@@ -52,4 +53,8 @@ export class CreateItemInput {
   @Field(() => [String], { nullable: true })
   @IsOptional()
   parent_items?: string[];
+
+  @Field(() => [CalculationAttributeInput], { nullable: true })
+  @IsOptional()
+  calculation_attributes?: CalculationAttributeInput[];
 }

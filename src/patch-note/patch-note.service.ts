@@ -198,7 +198,9 @@ export class PatchNoteService {
   ): Promise<PatchChange[]> {
     const query: Record<string, any> = { deleted_at: null };
 
-    if (filter.patchNoteId) query.patch_note = filter.patchNoteId;
+    if (filter.patchNoteId) {
+      query.patch_note = new Types.ObjectId(filter.patchNoteId);
+    }
     if (filter.targetType) query.target_type = filter.targetType;
     if (filter.targetId) query.target_ref = filter.targetId;
     if (filter.targetName) query.target_name = new RegExp(`^${this.escapeRegex(filter.targetName)}$`, 'i');

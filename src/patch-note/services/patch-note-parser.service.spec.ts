@@ -75,4 +75,45 @@ Cooldown: 9s >> 10s
       ],
     });
   });
+
+  it('recovers headers from legacy raw content without line breaks', async () => {
+    const changes = await service.parse(
+      '[Saber] (↑)Saber relied too much on burst damage.[Attributes] (↑)Base HP: 2440 >> 2500[Skill 1] (~)Cooldown: 9s >> 10s',
+    );
+
+    expect(changes).toHaveLength(3);
+    expect(changes.map((change) => change.section)).toEqual([
+      'General',
+      'Attributes',
+      'Skill 1',
+    ]);
+    expect(changes[1].details?.[0]).toMatchObject({
+      field: 'Base HP',
+      old_value: '2440',
+      new_value: '2500',
+    });
+  });
+
+  it('classifies a matched item as an item target', async () => {
+    const itemModel = createModelMock();
+    itemModel.findOne().select().lean.mockResolvedValue({ _id: 'item-id' });
+    const module = await Test.createTestingModule({
+      providers: [
+        PatchNoteParserService,
+        { provide: getModelToken(Hero.name), useValue: createModelMock() },
+        { provide: getModelToken(Item.name), useValue: itemModel },
+      ],
+    }).compile();
+    const itemParser = module.get<PatchNoteParserService>(PatchNoteParserService);
+
+    const changes = await itemParser.parse(
+      '[Blade of Despair] (↑)\n[Attributes] (↑)\nPhysical Attack: 160 >> 170',
+    );
+
+    expect(changes[0]).toMatchObject({
+      target_type: PatchTargetType.ITEM,
+      target_ref: 'item-id',
+      target_name: 'Blade of Despair',
+    });
+  });
 });

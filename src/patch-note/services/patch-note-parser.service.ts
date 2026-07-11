@@ -22,7 +22,7 @@ export class PatchNoteParserService {
   ) {}
 
   async parse(rawContent: string): Promise<CreatePatchChangeInput[]> {
-    const lines = rawContent
+    const lines = this.normalizeContent(rawContent)
       .split('\n')
       .map((line) => line.trim())
       .filter(Boolean);
@@ -37,9 +37,10 @@ export class PatchNoteParserService {
       if (!currentTarget || !buffer.length) return;
 
       const rawText = buffer.join('\n');
+      const resolvedTarget = await this.resolveTarget(currentTarget);
       changes.push({
-        target_type: currentTarget.type,
-        target_ref: await this.resolveTargetRef(currentTarget),
+        target_type: resolvedTarget.type,
+        target_ref: resolvedTarget.ref,
         target_name: currentTarget.name,
         change_type: currentTarget.changeType,
         section: currentSection,
@@ -75,6 +76,13 @@ export class PatchNoteParserService {
 
     await flush();
     return changes;
+  }
+
+  private normalizeContent(rawContent: string): string {
+    return rawContent
+      .replace(/\r\n?/g, '\n')
+      .replace(/\s*(\[[^\]]+\]\s*\([↑↓~]\))\s*/g, '\n$1\n')
+      .trim();
   }
 
   private parseTargetHeader(line: string): ParsedTarget | undefined {
@@ -145,24 +153,25 @@ export class PatchNoteParserService {
       .filter((detail): detail is PatchChangeDetailInput => Boolean(detail));
   }
 
-  private async resolveTargetRef(target: ParsedTarget): Promise<string | undefined> {
-    if (target.type === PatchTargetType.HERO) {
-      const hero = await this.heroModel
-        .findOne({ name: new RegExp(`^${this.escapeRegex(target.name)}$`, 'i') })
-        .select('_id')
-        .lean();
-      return hero?._id?.toString();
+  private async resolveTarget(target: ParsedTarget): Promise<ResolvedTarget> {
+    if (target.type !== PatchTargetType.HERO) {
+      return { type: target.type };
     }
 
-    if (target.type === PatchTargetType.ITEM) {
-      const item = await this.itemModel
-        .findOne({ name: new RegExp(`^${this.escapeRegex(target.name)}$`, 'i') })
-        .select('_id')
-        .lean();
-      return item?._id?.toString();
+    const nameFilter = {
+      name: new RegExp(`^${this.escapeRegex(target.name)}$`, 'i'),
+    };
+    const hero = await this.heroModel.findOne(nameFilter).select('_id').lean();
+    if (hero?._id) {
+      return { type: PatchTargetType.HERO, ref: hero._id.toString() };
     }
 
-    return undefined;
+    const item = await this.itemModel.findOne(nameFilter).select('_id').lean();
+    if (item?._id) {
+      return { type: PatchTargetType.ITEM, ref: item._id.toString() };
+    }
+
+    return { type: PatchTargetType.HERO };
   }
 
   private escapeRegex(value: string): string {
@@ -174,4 +183,9 @@ type ParsedTarget = {
   name: string;
   type: PatchTargetType;
   changeType: PatchChangeType;
+};
+
+type ResolvedTarget = {
+  type: PatchTargetType;
+  ref?: string;
 };

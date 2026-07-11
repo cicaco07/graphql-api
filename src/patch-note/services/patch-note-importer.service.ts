@@ -110,15 +110,15 @@ export class PatchNoteImporterService {
     return {
       body: record.data.body,
       title: record.data.title ?? record.data.brief ?? record.caption,
-      publishedAt: record.data.start_time
-        ? new Date(record.data.start_time)
-        : undefined,
+      publishedAt: this.parsePublishedAt(record.data.start_time),
     };
   }
 
   private extractReadableContent(html: string): string {
     const $ = cheerio.load(html);
     $('script, style, noscript').remove();
+    $('br').replaceWith('\n');
+    $('div, p, li, h1, h2, h3, h4, h5, h6, section, article').append('\n');
 
     return $('body')
       .text()
@@ -126,6 +126,17 @@ export class PatchNoteImporterService {
       .map((line) => line.trim())
       .filter(Boolean)
       .join('\n');
+  }
+
+  private parsePublishedAt(value: unknown): Date | undefined {
+    if (value === null || value === undefined || value === '') return undefined;
+
+    const numericValue = Number(value);
+    const parsed = Number.isFinite(numericValue)
+      ? new Date(numericValue)
+      : new Date(String(value));
+
+    return Number.isNaN(parsed.getTime()) ? undefined : parsed;
   }
 
   private extractTitle(html: string, content: string): string {

@@ -4,6 +4,11 @@ import { PatchNote } from '../schemas/patch-note.schema';
 import { PatchChange } from '../schemas/patch-change.schema';
 import { PatchNoteParserService } from './patch-note-parser.service';
 import { PatchNoteImporterService } from './patch-note-importer.service';
+import axios from 'axios';
+
+jest.mock('axios');
+
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('PatchNoteImporterService', () => {
   let service: PatchNoteImporterService;
@@ -33,5 +38,39 @@ describe('PatchNoteImporterService', () => {
     const publishedAt = (service as any).parsePublishedAt('1781683210000');
 
     expect(publishedAt).toEqual(new Date(1781683210000));
+  });
+
+  it('requests and returns the official Indonesian article content', async () => {
+    mockedAxios.post.mockResolvedValueOnce({
+      data: {
+        data: {
+          records: [
+            {
+              id: 3314600,
+              data: {
+                title: '2.1.88 CATATAN PATCH',
+                body: '<div>2. Penyesuaian Hero</div><div>[Saber] (↑)</div><div>Damage meningkat.</div>',
+                start_time: '1781683210000',
+              },
+            },
+          ],
+        },
+      },
+    });
+
+    const article = await service.fetchOfficialContent('3314600');
+
+    expect(mockedAxios.post).toHaveBeenCalledWith(
+      expect.any(String),
+      {},
+      expect.objectContaining({
+        headers: expect.objectContaining({ 'X-Lang': 'id' }),
+      }),
+    );
+    expect(article).toEqual({
+      title: '2.1.88 CATATAN PATCH',
+      content: '2. Penyesuaian Hero\n[Saber] (↑)\nDamage meningkat.',
+      publishedAt: new Date(1781683210000),
+    });
   });
 });

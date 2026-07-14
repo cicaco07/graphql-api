@@ -189,4 +189,36 @@ Cooldown: 20-14s >> 1.5s
       },
     ]);
   });
+
+  it('parses Indonesian section and domain headings', async () => {
+    const changes = await service.parse(`
+2. Penyesuaian Hero
+[Saber] (↑)
+Kami meningkatkan kemampuan Saber.
+[Atribut] (↑)
+HP Dasar: 2.440 >> 2.500
+[Pasif] (~)
+Pengurangan Physical Defense meningkat.
+3. Penyesuaian Medan Tempur
+Penyesuaian Jungle:
+Perolehan Gold: 100 >> 120
+4. Penyesuaian Sistem
+Antarmuka pemilihan Hero telah dioptimalkan.
+5. Penyesuaian Mode
+Mode Brawl kini memiliki area baru.
+`);
+
+    expect(changes.map((change) => [change.target_type, change.section])).toEqual([
+      [PatchTargetType.HERO, 'General'],
+      [PatchTargetType.HERO, 'Atribut'],
+      [PatchTargetType.HERO, 'Pasif'],
+      [PatchTargetType.BATTLEFIELD, 'General'],
+      [PatchTargetType.SYSTEM, 'General'],
+      [PatchTargetType.GAME_MODE, 'General'],
+    ]);
+    expect(changes[1].details?.[0]).toMatchObject({
+      old_value: '2.440',
+      new_value: '2.500',
+    });
+  });
 });

@@ -36,8 +36,8 @@ export class PatchNoteImporterService {
       }
     }
 
-    const article = await this.fetchOfficialArticle(sourceNewsId);
-    const content = this.extractReadableContent(article.body);
+    const article = await this.fetchOfficialContent(sourceNewsId);
+    const content = article.content;
     const title = article.title;
     const publishedAt = article.publishedAt ?? new Date();
 
@@ -80,7 +80,7 @@ export class PatchNoteImporterService {
     }
   }
 
-  private async fetchOfficialArticle(newsId?: string): Promise<OfficialArticle> {
+  async fetchOfficialContent(newsId?: string): Promise<OfficialContent> {
     if (!newsId) {
       throw new BadGatewayException('Mobile Legends newsid is missing');
     }
@@ -93,6 +93,7 @@ export class PatchNoteImporterService {
         headers: {
           Origin: 'https://www.mobilelegends.com',
           Referer: 'https://www.mobilelegends.com/',
+          'X-Lang': 'id',
           'User-Agent':
             'Mozilla/5.0 (compatible; MLBBPatchImporter/1.0; +https://www.mobilelegends.com)',
         },
@@ -108,8 +109,8 @@ export class PatchNoteImporterService {
     }
 
     return {
-      body: record.data.body,
       title: record.data.title ?? record.data.brief ?? record.caption,
+      content: this.extractReadableContent(record.data.body),
       publishedAt: this.parsePublishedAt(record.data.start_time),
     };
   }
@@ -178,8 +179,8 @@ export class PatchNoteImporterService {
   }
 }
 
-type OfficialArticle = {
-  body: string;
+export type OfficialContent = {
   title: string;
+  content: string;
   publishedAt?: Date;
 };

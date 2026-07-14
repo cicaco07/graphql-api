@@ -77,7 +77,13 @@ export class PatchNoteParserService {
       if (domainContext) {
         await flush();
         currentDomainType = domainContext;
-        currentTarget = undefined;
+        currentTarget = domainContext === PatchTargetType.BATTLEFIELD
+          ? {
+              name: 'Battlefield',
+              type: PatchTargetType.BATTLEFIELD,
+              changeType: PatchChangeType.ADJUSTED,
+            }
+          : undefined;
         currentSection = 'General';
         currentChangeType = PatchChangeType.ADJUSTED;
         continue;
@@ -142,17 +148,17 @@ export class PatchNoteParserService {
       type: PatchTargetType;
     }> = [
       {
-        pattern: /^battlefield adjustments?$/i,
+        pattern: /^(?:battlefield adjustments?|penyesuaian (?:battlefield|medan tempur))$/i,
         name: 'Battlefield',
         type: PatchTargetType.BATTLEFIELD,
       },
       {
-        pattern: /^system adjustments?$/i,
+        pattern: /^(?:system adjustments?|penyesuaian sistem)$/i,
         name: 'System',
         type: PatchTargetType.SYSTEM,
       },
       {
-        pattern: /^(?:game\s+)?mode adjustments?$/i,
+        pattern: /^(?:(?:game\s+)?mode adjustments?|penyesuaian mode)$/i,
         name: 'Game Mode',
         type: PatchTargetType.GAME_MODE,
       },
@@ -168,10 +174,14 @@ export class PatchNoteParserService {
   }
 
   private parseDomainContext(line: string): PatchTargetType | undefined {
-    if (/^equipment adjustments?\b/i.test(line)) {
+    const normalized = line.replace(/^\d+\.\s*/, '').trim();
+    if (/^(?:hero adjustments?|penyesuaian hero)$/i.test(normalized)) {
+      return PatchTargetType.HERO;
+    }
+    if (/^(?:equipment adjustments?|penyesuaian equipment|penyesuaian item)\b/i.test(normalized)) {
       return PatchTargetType.ITEM;
     }
-    if (/^jungle adjustments?\b/i.test(line)) {
+    if (/^(?:jungle adjustments?|penyesuaian jungle)\b/i.test(normalized)) {
       return PatchTargetType.BATTLEFIELD;
     }
 
@@ -192,7 +202,7 @@ export class PatchNoteParserService {
   }
 
   private isSectionName(name: string): boolean {
-    return /^(attributes|passive|skill\s*\d+|ultimate|equipment|item|system|battlefield|game mode)/i.test(
+    return /^(attributes|atribut|passive|pasif|skill\s*\d+|ultimate|equipment|item|system|sistem|battlefield|game mode|mode)/i.test(
       name,
     );
   }

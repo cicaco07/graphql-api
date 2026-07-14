@@ -23,6 +23,7 @@ import { PatchChangeFilterInput } from './dto/patch-change-filter.input';
 import { PatchNoteStatus } from './entities/patch-note.entity';
 import { PatchTargetType } from './entities/patch-change.entity';
 import { PatchNoteParserService } from './services/patch-note-parser.service';
+import { PatchNoteImporterService } from './services/patch-note-importer.service';
 
 @Injectable()
 export class PatchNoteService {
@@ -44,6 +45,7 @@ export class PatchNoteService {
     @InjectModel(Item.name)
     private itemModel: Model<Item>,
     private patchNoteParserService: PatchNoteParserService,
+    private patchNoteImporterService: PatchNoteImporterService,
   ) {}
 
   async createPatchNote(
@@ -268,12 +270,25 @@ export class PatchNoteService {
     if (!patchNote) {
       throw new NotFoundException(`PatchNote with ID "${id}" not found`);
     }
+
+    let refreshedOfficialContent = false;
+    if (patchNote.source_newsid) {
+      const officialContent = await this.patchNoteImporterService.fetchOfficialContent(
+        patchNote.source_newsid,
+      );
+      patchNote.raw_content = officialContent.content;
+      patchNote.summary = this.extractSummary(officialContent.content);
+      patchNote.imported_at = new Date();
+      refreshedOfficialContent = true;
+    }
+
     if (!patchNote.raw_content) {
       throw new BadRequestException('PatchNote does not have raw_content to parse');
     }
 
-    await this.patchChangeModel.deleteMany({ patch_note: id });
     const changes = await this.patchNoteParserService.parse(patchNote.raw_content);
+    if (refreshedOfficialContent) await patchNote.save();
+    await this.patchChangeModel.deleteMany({ patch_note: id });
     if (!changes.length) return [];
 
     await this.patchChangeModel.create(
@@ -521,6 +536,13 @@ export class PatchNoteService {
 
   private escapeRegex(value: string): string {
     return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  private extractSummary(content: string): string | undefined {
+    return content
+      .split('\n')
+      .find((line) => line.length > 80 && !line.includes('>>'))
+      ?.slice(0, 500);
   }
 
   private getPatchSortDate(patchNote?: PatchNote): number {

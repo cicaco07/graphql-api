@@ -10,6 +10,7 @@ import { SystemPatchNote } from './schemas/system-patch-note.schema';
 import { Hero } from 'src/hero/schemas/hero.schema';
 import { Item } from 'src/item/schemas/item.schema';
 import { PatchNoteParserService } from './services/patch-note-parser.service';
+import { PatchNoteImporterService } from './services/patch-note-importer.service';
 import { PatchTargetType } from './entities/patch-change.entity';
 
 const modelNames = [
@@ -32,6 +33,7 @@ describe('PatchNoteService', () => {
     create: jest.Mock;
   };
   let parser: { parse: jest.Mock };
+  let importer: { fetchOfficialContent: jest.Mock };
 
   beforeEach(async () => {
     patchNoteModel = { findOne: jest.fn() };
@@ -41,6 +43,7 @@ describe('PatchNoteService', () => {
       create: jest.fn(),
     };
     parser = { parse: jest.fn() };
+    importer = { fetchOfficialContent: jest.fn() };
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PatchNoteService,
@@ -56,6 +59,7 @@ describe('PatchNoteService', () => {
           useValue: patchChangeModel,
         },
         { provide: PatchNoteParserService, useValue: parser },
+        { provide: PatchNoteImporterService, useValue: importer },
       ],
     }).compile();
 
@@ -122,5 +126,49 @@ describe('PatchNoteService', () => {
 
     expect(result).toEqual([populatedChange]);
     expect(populate).toHaveBeenCalledWith('patch_note');
+  });
+
+  it('refreshes an imported patch with official Indonesian content before reparsing', async () => {
+    const patchNoteId = '507f1f77bcf86cd799439011';
+    const patchNote = {
+      _id: patchNoteId,
+      source_newsid: '3314600',
+      name: '2.1.88 PATCH NOTES',
+      raw_content: '2. Hero Adjustments',
+      save: jest.fn(),
+    };
+    const content = '2. Penyesuaian Hero\n[Saber] (↑)\nDamage meningkat.';
+    patchNoteModel.findOne.mockResolvedValue(patchNote);
+    importer.fetchOfficialContent.mockResolvedValue({
+      title: '2.1.88 CATATAN PATCH',
+      content,
+      publishedAt: new Date('2026-06-17T08:00:10.000Z'),
+    });
+    patchChangeModel.deleteMany.mockResolvedValue({ deletedCount: 1 });
+    parser.parse.mockResolvedValue([]);
+
+    await service.reparsePatchNote(patchNoteId);
+
+    expect(parser.parse).toHaveBeenCalledWith(content);
+    expect(patchNote).toMatchObject({
+      name: '2.1.88 PATCH NOTES',
+      raw_content: content,
+    });
+    expect(patchNote.save).toHaveBeenCalled();
+  });
+
+  it('keeps existing changes when refreshing official content fails', async () => {
+    const patchNoteId = '507f1f77bcf86cd799439011';
+    patchNoteModel.findOne.mockResolvedValue({
+      _id: patchNoteId,
+      source_newsid: '3314600',
+      raw_content: 'Existing raw content',
+    });
+    importer.fetchOfficialContent.mockRejectedValue(new Error('GMS unavailable'));
+
+    await expect(service.reparsePatchNote(patchNoteId)).rejects.toThrow('GMS unavailable');
+
+    expect(patchChangeModel.deleteMany).not.toHaveBeenCalled();
+    expect(parser.parse).not.toHaveBeenCalled();
   });
 });

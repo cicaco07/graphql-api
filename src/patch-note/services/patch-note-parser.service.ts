@@ -29,7 +29,9 @@ export class PatchNoteParserService {
     const changes: CreatePatchChangeInput[] = [];
 
     let currentTarget: ParsedTarget | undefined;
+    let currentDomainType: PatchTargetType | undefined;
     let currentSection = 'General';
+    let currentChangeType = PatchChangeType.ADJUSTED;
     let buffer: string[] = [];
     let order = 0;
 
@@ -37,16 +39,23 @@ export class PatchNoteParserService {
       if (!currentTarget || !buffer.length) return;
 
       const rawText = buffer.join('\n');
+      const description = this.buildDescription(buffer);
+      const details = this.extractDetails(buffer);
+      if (!description && !details.length) {
+        buffer = [];
+        return;
+      }
+
       const resolvedTarget = await this.resolveTarget(currentTarget);
       changes.push({
         target_type: resolvedTarget.type,
         target_ref: resolvedTarget.ref,
         target_name: currentTarget.name,
-        change_type: currentTarget.changeType,
+        change_type: currentChangeType,
         section: currentSection,
         title: currentSection,
-        description: this.buildDescription(buffer),
-        details: this.extractDetails(buffer),
+        description,
+        details,
         raw_text: rawText,
         order: order++,
       });
@@ -54,18 +63,43 @@ export class PatchNoteParserService {
     };
 
     for (const line of lines) {
+      const domainTarget = this.parseDomainHeading(line);
+      if (domainTarget) {
+        await flush();
+        currentTarget = domainTarget;
+        currentDomainType = domainTarget.type;
+        currentSection = 'General';
+        currentChangeType = domainTarget.changeType;
+        continue;
+      }
+
+      const domainContext = this.parseDomainContext(line);
+      if (domainContext) {
+        await flush();
+        currentDomainType = domainContext;
+        currentTarget = undefined;
+        currentSection = 'General';
+        currentChangeType = PatchChangeType.ADJUSTED;
+        continue;
+      }
+
       const target = this.parseTargetHeader(line);
       if (target) {
         await flush();
-        currentTarget = target;
+        currentTarget = {
+          ...target,
+          fallbackType: currentDomainType,
+        };
         currentSection = 'General';
+        currentChangeType = target.changeType;
         continue;
       }
 
       const section = this.parseSectionHeader(line);
       if (section && currentTarget) {
         await flush();
-        currentSection = section;
+        currentSection = section.name;
+        currentChangeType = section.changeType ?? currentTarget.changeType;
         continue;
       }
 
@@ -100,12 +134,61 @@ export class PatchNoteParserService {
     };
   }
 
-  private parseSectionHeader(line: string): string | undefined {
+  private parseDomainHeading(line: string): ParsedTarget | undefined {
+    const normalized = line.replace(/^\d+\.\s*/, '').trim();
+    const definitions: Array<{
+      pattern: RegExp;
+      name: string;
+      type: PatchTargetType;
+    }> = [
+      {
+        pattern: /^battlefield adjustments?$/i,
+        name: 'Battlefield',
+        type: PatchTargetType.BATTLEFIELD,
+      },
+      {
+        pattern: /^system adjustments?$/i,
+        name: 'System',
+        type: PatchTargetType.SYSTEM,
+      },
+      {
+        pattern: /^(?:game\s+)?mode adjustments?$/i,
+        name: 'Game Mode',
+        type: PatchTargetType.GAME_MODE,
+      },
+    ];
+    const definition = definitions.find(({ pattern }) => pattern.test(normalized));
+    if (!definition) return undefined;
+
+    return {
+      name: definition.name,
+      type: definition.type,
+      changeType: PatchChangeType.ADJUSTED,
+    };
+  }
+
+  private parseDomainContext(line: string): PatchTargetType | undefined {
+    if (/^equipment adjustments?\b/i.test(line)) {
+      return PatchTargetType.ITEM;
+    }
+    if (/^jungle adjustments?\b/i.test(line)) {
+      return PatchTargetType.BATTLEFIELD;
+    }
+
+    return undefined;
+  }
+
+  private parseSectionHeader(line: string): ParsedSection | undefined {
     const match = line.match(/^\[([^\]]+)\]\s*(?:\(([^)]+)\))?$/);
     if (!match) return undefined;
 
     const name = match[1].trim();
-    return this.isSectionName(name) ? name : undefined;
+    if (!this.isSectionName(name)) return undefined;
+
+    return {
+      name,
+      changeType: match[2] ? this.mapChangeType(match[2].trim()) : undefined,
+    };
   }
 
   private isSectionName(name: string): boolean {
@@ -131,10 +214,21 @@ export class PatchNoteParserService {
 
   private buildDescription(lines: string[]): string {
     return (
-      lines.find((line) => !line.includes('>>') && line.length > 20) ??
-      lines[0] ??
+      lines.find(
+        (line) =>
+          !line.includes('>>') &&
+          line.length > 20 &&
+          this.hasMeaningfulContent(line),
+      ) ??
+      lines.find((line) => this.hasMeaningfulContent(line)) ??
       ''
     );
+  }
+
+  private hasMeaningfulContent(value: string): boolean {
+    const words = value.toLowerCase().match(/[a-z0-9]+(?:['-][a-z0-9]+)*/g) ?? [];
+    const connectorWords = new Set(['and', 'or', 'but']);
+    return words.some((word) => !connectorWords.has(word));
   }
 
   private extractDetails(lines: string[]): PatchChangeDetailInput[] {
@@ -171,7 +265,7 @@ export class PatchNoteParserService {
       return { type: PatchTargetType.ITEM, ref: item._id.toString() };
     }
 
-    return { type: PatchTargetType.HERO };
+    return { type: target.fallbackType ?? PatchTargetType.HERO };
   }
 
   private escapeRegex(value: string): string {
@@ -183,6 +277,12 @@ type ParsedTarget = {
   name: string;
   type: PatchTargetType;
   changeType: PatchChangeType;
+  fallbackType?: PatchTargetType;
+};
+
+type ParsedSection = {
+  name: string;
+  changeType?: PatchChangeType;
 };
 
 type ResolvedTarget = {

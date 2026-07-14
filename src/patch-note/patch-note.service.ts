@@ -217,11 +217,21 @@ export class PatchNoteService {
         : { $in: patchIds };
     }
 
-    return this.patchChangeModel
+    const changes = await this.patchChangeModel
       .find(query)
-      .sort({ patch_note: -1, order: 1, createdAt: 1 })
+      .sort({ order: 1, createdAt: 1 })
       .populate('patch_note')
       .exec();
+
+    return changes.sort((first, second) => {
+      const firstPatch = first.patch_note as unknown as PatchNote | undefined;
+      const secondPatch = second.patch_note as unknown as PatchNote | undefined;
+      const patchDateDifference =
+        this.getPatchSortDate(secondPatch) - this.getPatchSortDate(firstPatch);
+      if (patchDateDifference !== 0) return patchDateDifference;
+
+      return first.order - second.order;
+    });
   }
 
   async findHeroPatchHistory(
@@ -266,9 +276,14 @@ export class PatchNoteService {
     const changes = await this.patchNoteParserService.parse(patchNote.raw_content);
     if (!changes.length) return [];
 
-    return this.patchChangeModel.create(
+    await this.patchChangeModel.create(
       changes.map((change) => ({ ...change, patch_note: id })),
     );
+
+    return this.findPatchChanges({
+      patchNoteId: id,
+      includeDrafts: true,
+    });
   }
 
   async updatePatchNote(
@@ -506,5 +521,10 @@ export class PatchNoteService {
 
   private escapeRegex(value: string): string {
     return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  private getPatchSortDate(patchNote?: PatchNote): number {
+    const date = patchNote?.published_at ?? patchNote?.start_date;
+    return date ? new Date(date).getTime() : 0;
   }
 }

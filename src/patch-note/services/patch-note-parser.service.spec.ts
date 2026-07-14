@@ -64,6 +64,7 @@ Cooldown: 9s >> 10s
       },
     ]);
     expect(changes[2]).toMatchObject({
+      change_type: PatchChangeType.ADJUSTED,
       section: 'Skill 1',
       details: [
         {
@@ -115,5 +116,77 @@ Cooldown: 9s >> 10s
       target_ref: 'item-id',
       target_name: 'Blade of Despair',
     });
+  });
+
+  it('separates battlefield, system, and game mode sections from hero changes', async () => {
+    const changes = await service.parse(`
+[Saber] (↑)
+Base HP: 2440 >> 2500
+3. Battlefield Adjustment
+Control targeting has been optimized for directional skills.
+4. System Adjustments
+Ranked season rewards have been updated for the new season.
+5. Mode Adjustments
+Brawl now uses the updated Necrokeep battlefield.
+`);
+
+    expect(changes).toHaveLength(4);
+    expect(changes.map((change) => change.target_type)).toEqual([
+      PatchTargetType.HERO,
+      PatchTargetType.BATTLEFIELD,
+      PatchTargetType.SYSTEM,
+      PatchTargetType.GAME_MODE,
+    ]);
+    expect(changes.slice(1).map((change) => change.target_name)).toEqual([
+      'Battlefield',
+      'System',
+      'Game Mode',
+    ]);
+  });
+
+  it('keeps unmatched equipment targets in item history', async () => {
+    const changes = await service.parse(`
+Equipment Adjustments: roaming equipment has been updated.
+[Roaming Blessings] (↑)
+Solo Income: 50% >> 30%
+`);
+
+    expect(changes).toHaveLength(1);
+    expect(changes[0]).toMatchObject({
+      target_type: PatchTargetType.ITEM,
+      target_name: 'Roaming Blessings',
+      change_type: PatchChangeType.BUFF,
+    });
+  });
+
+  it('drops punctuation-only general fragments and keeps meaningful detail sections', async () => {
+    const changes = await service.parse(`
+[Argus] (↑)
+,
+[Attributes] (↑)
+Base Attack: 111 >> 120
+[Yin] (↑)
+, and
+[Skill 1 (Lieh Form)] (↑)
+Cooldown: 20-14s >> 1.5s
+`);
+
+    expect(changes).toHaveLength(2);
+    expect(changes.map((change) => ({
+      target: change.target_name,
+      section: change.section,
+      description: change.description,
+    }))).toEqual([
+      {
+        target: 'Argus',
+        section: 'Attributes',
+        description: 'Base Attack: 111 >> 120',
+      },
+      {
+        target: 'Yin',
+        section: 'Skill 1 (Lieh Form)',
+        description: 'Cooldown: 20-14s >> 1.5s',
+      },
+    ]);
   });
 });
